@@ -4,6 +4,7 @@
 import { useEffect, useRef, useState } from "react";
 import "./ForgotPassword.css";
 
+
 /* ── Types ── */
 type Status = "idle" | "loading" | "success" | "error";
 
@@ -120,6 +121,7 @@ export default function ForgotPassword() {
   const [phone, setPhone] = useState("");
   const [status, setStatus] = useState<Status>("idle");
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+ 
 
   /* Cleanup any pending timer on unmount */
   useEffect(() => {
@@ -142,6 +144,7 @@ export default function ForgotPassword() {
     setStatus("loading");
     timerRef.current = setTimeout(() => {
       setStatus("success");
+     
       timerRef.current = setTimeout(() => setStatus("idle"), 2800);
     }, 1800);
   };
@@ -248,7 +251,7 @@ export default function ForgotPassword() {
           {/* Footer */}
           <div className="anim-d5 mt-10 text-center flex flex-col gap-4">
             <a
-              href="#"
+              href="/login"
               className="group flex justify-center items-center gap-2 text-[#006b5d] font-bold transition-opacity hover:opacity-75"
             >
               <span className="material-symbols-outlined text-xl transition-transform duration-300 group-hover:translate-x-1">
