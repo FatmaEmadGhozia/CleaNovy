@@ -524,10 +524,10 @@
 import { useState, useEffect } from "react"
 import "./ResetPassword.css"
 
-import BackButton from "../../components/Auth/Backbutton"
-import PasswordField from "../../components/Auth/Passwordfield"
-import PasswordRules from "../../components/Auth/Passwordrules"
-import BrandPanel from "../../components/Auth/Brandpanel"
+import BackButton from "../../components/auth/Backbutton"
+import PasswordField from "../../components/auth/Passwordfield"
+import PasswordRules from "../../components/auth/Passwordrules"
+import BrandPanel from "../../components/auth/Brandpanel"
 
 // ─── Password rule definitions ────────────────────────────────────────────────
 const PASSWORD_RULES = [
