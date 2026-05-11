@@ -1,4 +1,3 @@
-
 // import { useState, useEffect } from "react";
 // import "./ResetPassword.css";
 
@@ -169,7 +168,7 @@
 //         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
 //         rel="stylesheet"
 //       />
-// {/* 
+// {/*
 //       <style>{`
 //         .material-symbols-outlined {
 //           font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
@@ -204,7 +203,6 @@
 //         .d6 { animation-delay: 0.45s; }
 //       `}</style> */}
 
-    
 //       <div
 //         dir="rtl"
 //         className="flex min-h-screen overflow-x-hidden"
@@ -523,71 +521,76 @@
 //   );
 // }
 
+import { useState, useEffect } from "react"
+import "./ResetPassword.css"
 
-
-
-
-
-import { useState, useEffect } from "react";
-import "./ResetPassword.css";
-
-import BackButton    from "../components/Auth/Backbutton";
-import PasswordField from "../components/Auth/Passwordfield";
-import PasswordRules from "../components/Auth/Passwordrules";
-import BrandPanel    from "../components/Auth/Brandpanel";
+import BackButton from "../../components/auth/Backbutton"
+import PasswordField from "../../components/auth/Passwordfield"
+import PasswordRules from "../../components/auth/Passwordrules"
+import BrandPanel from "../../components/auth/Brandpanel"
 
 // ─── Password rule definitions ────────────────────────────────────────────────
 const PASSWORD_RULES = [
-  { id: "length", label: "على الأقل 8 أحرف",                  test: (v: string) => v.length >= 8    },
-  { id: "number", label: "يجب أن تحتوي على رقم واحد على الأقل", test: (v: string) => /\d/.test(v) },
-];
+  {
+    id: "length",
+    label: "على الأقل 8 أحرف",
+    test: (v: string) => v.length >= 8,
+  },
+  {
+    id: "number",
+    label: "يجب أن تحتوي على رقم واحد على الأقل",
+    test: (v: string) => /\d/.test(v),
+  },
+]
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 export default function ResetPassword() {
-  const [newPassword,     setNewPassword]     = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [errors,          setErrors]          = useState<{ new?: string; confirm?: string }>({});
-  const [submitted,       setSubmitted]       = useState(false);
-  const [success,         setSuccess]         = useState(false);
-  const [mounted,         setMounted]         = useState(false);
+  const [newPassword, setNewPassword] = useState("")
+  const [confirmPassword, setConfirmPassword] = useState("")
+  const [errors, setErrors] = useState<{ new?: string; confirm?: string }>({})
+  const [submitted, setSubmitted] = useState(false)
+  const [success, setSuccess] = useState(false)
+  const [mounted, setMounted] = useState(false)
 
   // Fade-in on mount
   useEffect(() => {
-    const t = setTimeout(() => setMounted(true), 40);
-    return () => clearTimeout(t);
-  }, []);
+    const t = setTimeout(() => setMounted(true), 40)
+    return () => clearTimeout(t)
+  }, [])
 
   // Evaluate each rule against current password value
   const ruleResults = PASSWORD_RULES.map((r) => ({
     ...r,
     passed: r.test(newPassword),
-  }));
+  }))
 
   // ── Validation ──────────────────────────────────────────────────────────────
   function validate(): boolean {
-    const e: typeof errors = {};
+    const e: typeof errors = {}
 
-    if (!newPassword)                         e.new = "كلمة المرور مطلوبة";
-    else if (newPassword.length < 8)          e.new = "يجب أن تكون 8 أحرف على الأقل";
-    else if (!/\d/.test(newPassword))         e.new = "يجب أن تحتوي على رقم واحد على الأقل";
+    if (!newPassword) e.new = "كلمة المرور مطلوبة"
+    else if (newPassword.length < 8) e.new = "يجب أن تكون 8 أحرف على الأقل"
+    else if (!/\d/.test(newPassword))
+      e.new = "يجب أن تحتوي على رقم واحد على الأقل"
 
-    if (!confirmPassword)                     e.confirm = "تأكيد كلمة المرور مطلوب";
-    else if (newPassword !== confirmPassword)  e.confirm = "كلمتا المرور غير متطابقتين";
+    if (!confirmPassword) e.confirm = "تأكيد كلمة المرور مطلوب"
+    else if (newPassword !== confirmPassword)
+      e.confirm = "كلمتا المرور غير متطابقتين"
 
-    setErrors(e);
-    return Object.keys(e).length === 0;
+    setErrors(e)
+    return Object.keys(e).length === 0
   }
 
   // Re-validate live after first submit attempt
   useEffect(() => {
-    if (submitted) validate();
+    if (submitted) validate()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [newPassword, confirmPassword]);
+  }, [newPassword, confirmPassword])
 
   function handleSubmit(ev: React.FormEvent) {
-    ev.preventDefault();
-    setSubmitted(true);
-    if (validate()) setTimeout(() => setSuccess(true), 350);
+    ev.preventDefault()
+    setSubmitted(true)
+    if (validate()) setTimeout(() => setSuccess(true), 350)
   }
 
   // ── Render ──────────────────────────────────────────────────────────────────
@@ -597,17 +600,26 @@ export default function ResetPassword() {
       className="flex min-h-screen overflow-x-hidden"
       style={{ backgroundColor: "#fbf8fc", fontFamily: "Tajawal" }}
     >
-
       {/* ── RIGHT: Form section ───────────────────────────────────────────── */}
-      <section className="w-full lg:w-1/2 flex items-center justify-center bg-white px-6 py-10">
+      <section className="flex w-full items-center justify-center bg-white px-6 py-10 lg:w-1/2">
         <div
-          className="w-full flex flex-col"
-          style={{ maxWidth: 480, opacity: mounted ? 1 : 0, transition: "opacity 0.4s ease" }}
+          className="flex w-full flex-col"
+          style={{
+            maxWidth: 480,
+            opacity: mounted ? 1 : 0,
+            transition: "opacity 0.4s ease",
+          }}
         >
-
           {/* Mobile-only logo */}
-          <div className="lg:hidden flex justify-center mb-8 anim-fsu d1">
-            <span style={{ fontFamily: "Cairo", fontSize: 32, fontWeight: 700, color: "#006b5d" }}>
+          <div className="anim-fsu d1 mb-8 flex justify-center lg:hidden">
+            <span
+              style={{
+                fontFamily: "Cairo",
+                fontSize: 32,
+                fontWeight: 700,
+                color: "#006b5d",
+              }}
+            >
               نظيف
             </span>
           </div>
@@ -618,63 +630,110 @@ export default function ResetPassword() {
           </div>
 
           {/* ② Page heading */}
-          <div className="mb-7 anim-fsu d2" style={{ textAlign: "right" }}>
+          <div className="anim-fsu d2 mb-7" style={{ textAlign: "right" }}>
             <h1
               className="mb-2"
-              style={{ fontFamily: "Cairo", fontSize: 32, fontWeight: 700, color: "#000719", lineHeight: 1.3 }}
+              style={{
+                fontFamily: "Cairo",
+                fontSize: 32,
+                fontWeight: 700,
+                color: "#000719",
+                lineHeight: 1.3,
+              }}
             >
               إعادة تعيين كلمة المرور
             </h1>
-            <p style={{ fontFamily: "Tajawal", fontSize: 16, color: "#44474d", lineHeight: 1.6 }}>
+            <p
+              style={{
+                fontFamily: "Tajawal",
+                fontSize: 16,
+                color: "#44474d",
+                lineHeight: 1.6,
+              }}
+            >
               أدخل كلمة المرور الجديدة الخاصة بك أدناه.
             </p>
           </div>
 
           {/* ── Success state ─────────────────────────────────────────────── */}
           {success ? (
-            <div className="flex flex-col items-center gap-5 py-10 anim-sp">
+            <div className="anim-sp flex flex-col items-center gap-5 py-10">
               <div
-                className="w-20 h-20 rounded-full flex items-center justify-center"
+                className="flex h-20 w-20 items-center justify-center rounded-full"
                 style={{ backgroundColor: "rgba(0,107,93,0.1)" }}
               >
                 <span
                   className="material-symbols-outlined"
                   style={{
-                    fontSize: 48, color: "#006b5d",
-                    fontVariationSettings: "'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 48",
+                    fontSize: 48,
+                    color: "#006b5d",
+                    fontVariationSettings:
+                      "'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 48",
                   }}
                 >
                   check_circle
                 </span>
               </div>
 
-              <h2 style={{ fontFamily: "Cairo", fontSize: 24, fontWeight: 700, color: "#000719", textAlign: "center" }}>
+              <h2
+                style={{
+                  fontFamily: "Cairo",
+                  fontSize: 24,
+                  fontWeight: 700,
+                  color: "#000719",
+                  textAlign: "center",
+                }}
+              >
                 تم تحديث كلمة المرور!
               </h2>
-              <p style={{ fontFamily: "Tajawal", fontSize: 16, color: "#44474d", textAlign: "center" }}>
+              <p
+                style={{
+                  fontFamily: "Tajawal",
+                  fontSize: 16,
+                  color: "#44474d",
+                  textAlign: "center",
+                }}
+              >
                 يمكنك الآن تسجيل الدخول بكلمة المرور الجديدة.
               </p>
 
               <button
                 style={{
-                  fontFamily: "Cairo", fontSize: 18, fontWeight: 700,
-                  backgroundColor: "#006b5d", color: "#fff",
-                  borderRadius: 9999, padding: "12px 40px", marginTop: 16,
-                  border: "none", cursor: "pointer", transition: "background 0.2s, transform 0.1s",
+                  fontFamily: "Cairo",
+                  fontSize: 18,
+                  fontWeight: 700,
+                  backgroundColor: "#006b5d",
+                  color: "#fff",
+                  borderRadius: 9999,
+                  padding: "12px 40px",
+                  marginTop: 16,
+                  border: "none",
+                  cursor: "pointer",
+                  transition: "background 0.2s, transform 0.1s",
                 }}
-                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#005046")}
-                onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#006b5d")}
-                onMouseDown={(e)  => (e.currentTarget.style.transform = "scale(0.98)")}
-                onMouseUp={(e)    => (e.currentTarget.style.transform = "scale(1)")}
+                onMouseEnter={(e) =>
+                  (e.currentTarget.style.backgroundColor = "#005046")
+                }
+                onMouseLeave={(e) =>
+                  (e.currentTarget.style.backgroundColor = "#006b5d")
+                }
+                onMouseDown={(e) =>
+                  (e.currentTarget.style.transform = "scale(0.98)")
+                }
+                onMouseUp={(e) =>
+                  (e.currentTarget.style.transform = "scale(1)")
+                }
               >
                 تسجيل الدخول
               </button>
             </div>
-
           ) : (
             /* ── Form ──────────────────────────────────────────────────────── */
-            <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-6">
-
+            <form
+              onSubmit={handleSubmit}
+              noValidate
+              className="flex flex-col gap-6"
+            >
               {/* ③ New password field */}
               <div className="anim-fsu d3">
                 <PasswordField
@@ -706,17 +765,30 @@ export default function ResetPassword() {
                   type="submit"
                   style={{
                     width: "100%",
-                    backgroundColor: "#006b5d", color: "#fff",
-                    fontFamily: "Cairo", fontSize: 20, fontWeight: 700,
-                    padding: "16px 0", borderRadius: 9999,
-                    border: "none", cursor: "pointer",
+                    backgroundColor: "#006b5d",
+                    color: "#fff",
+                    fontFamily: "Cairo",
+                    fontSize: 20,
+                    fontWeight: 700,
+                    padding: "16px 0",
+                    borderRadius: 9999,
+                    border: "none",
+                    cursor: "pointer",
                     boxShadow: "0 8px 24px rgba(0,107,93,0.2)",
                     transition: "background 0.2s, transform 0.1s",
                   }}
-                  onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#005046")}
-                  onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#006b5d")}
-                  onMouseDown={(e)  => (e.currentTarget.style.transform = "scale(0.98)")}
-                  onMouseUp={(e)    => (e.currentTarget.style.transform = "scale(1)")}
+                  onMouseEnter={(e) =>
+                    (e.currentTarget.style.backgroundColor = "#005046")
+                  }
+                  onMouseLeave={(e) =>
+                    (e.currentTarget.style.backgroundColor = "#006b5d")
+                  }
+                  onMouseDown={(e) =>
+                    (e.currentTarget.style.transform = "scale(0.98)")
+                  }
+                  onMouseUp={(e) =>
+                    (e.currentTarget.style.transform = "scale(1)")
+                  }
                 >
                   تحديث كلمة المرور
                 </button>
@@ -728,15 +800,36 @@ export default function ResetPassword() {
           {!success && (
             <div
               className="anim-fi d6"
-              style={{ marginTop: 40, paddingTop: 24, borderTop: "1px solid #c5c6ce", textAlign: "center" }}
+              style={{
+                marginTop: 40,
+                paddingTop: 24,
+                borderTop: "1px solid #c5c6ce",
+                textAlign: "center",
+              }}
             >
-              <p style={{ fontFamily: "Tajawal", fontSize: 14, color: "#44474d" }}>
+              <p
+                style={{
+                  fontFamily: "Tajawal",
+                  fontSize: 14,
+                  color: "#44474d",
+                }}
+              >
                 هل تواجه مشكلة؟{" "}
                 <a
                   href="#"
-                  style={{ color: "#006b5d", fontWeight: 700, textDecoration: "none" }}
-                  onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.textDecoration = "underline")}
-                  onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.textDecoration = "none")}
+                  style={{
+                    color: "#006b5d",
+                    fontWeight: 700,
+                    textDecoration: "none",
+                  }}
+                  onMouseEnter={(e) =>
+                    ((e.currentTarget as HTMLElement).style.textDecoration =
+                      "underline")
+                  }
+                  onMouseLeave={(e) =>
+                    ((e.currentTarget as HTMLElement).style.textDecoration =
+                      "none")
+                  }
                 >
                   تواصل مع الدعم الفني
                 </a>
@@ -749,5 +842,5 @@ export default function ResetPassword() {
       {/* ── LEFT: Branded panel ⑦ ─────────────────────────────────────────── */}
       <BrandPanel />
     </div>
-  );
+  )
 }
