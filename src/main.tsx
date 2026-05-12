@@ -8,7 +8,7 @@ import LoginPage from "./Pages/LoginPage/LoginPage";
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <ThemeProvider>
-      <LoginPage />
+      <App />
     </ThemeProvider>
   </StrictMode>
 );
