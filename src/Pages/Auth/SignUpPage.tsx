@@ -1,6 +1,6 @@
 import React from "react";
-import SignUpForm from "../components/signup/SignUpForm"
-import SideBanner from "../components/signup/SideBanner"
+import SignUpForm from "../../components/Auth/signup/SignUpForm"
+import SideBanner from "../../components/Auth/signup/SideBanner"
 export default function SignUpPage(): React.ReactElement {
   return (
     <div
