@@ -2,11 +2,11 @@
 
 import { useState } from "react";
 
-import HeroPanel from "../../components/login/HeroPanel/HeroPanel";
-import LoginForm from "../../components/login/LoginForm/LoginForm";
+import HeroPanel from "../../components/Auth/login/HeroPanel/HeroPanel";
+import LoginForm from "../../components/Auth/login/LoginForm/LoginForm";
 import RoleSelector, {
   type Role,
-} from "../../components/login/RoleSelector/RoleSelector";
+} from "../../components/Auth/login/RoleSelector/RoleSelector";
 
 import "./LoginPage.css";
 
