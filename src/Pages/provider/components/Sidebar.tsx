@@ -9,7 +9,7 @@ const navItems = [
   { id: "dashboard", label: "لوحة القيادة", icon: "dashboard" },
   { id: "orders", label: "الطلبات", icon: "local_laundry_service" },
 //   { id: "partners", label: "الشركاء", icon: "handshake" },
-  { id: "discounts", label: "المبيعات", icon: "payments" },
+  { id: "discounts", label: "الخصومات", icon: "payments" },
   { id: "settings", label: "الإعدادات", icon: "settings" },
 //   { id: "support", label: "الدعم", icon: "support_agent" },
 ] as const;
