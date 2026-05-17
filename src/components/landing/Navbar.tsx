@@ -271,12 +271,14 @@ export default function Navbar() {
             </button>
           ))}
 
-          <Button
+         <a href="/signup"> 
+         <Button
             className="w-full mt-2 rounded-2xl text-white font-semibold"
             style={{ backgroundColor: "rgb(0, 201, 177)" }}
           >
             تسجيل الدخول
           </Button>
+          </a>
         </div>
       </div>
     </nav>

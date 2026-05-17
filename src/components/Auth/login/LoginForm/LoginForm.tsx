@@ -289,7 +289,7 @@ const LoginForm = ({ role }: LoginFormProps) => {
       {/* ── Register link ── */}
       <p className="login-form__register-line">
         ليس لديك حساب؟{" "}
-        <a href="/register" className="login-form__register-link">
+        <a href="/signup" className="login-form__register-link">
           إنشاء حساب جديد
         </a>
       </p>
