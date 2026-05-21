@@ -7,6 +7,14 @@ import LandingPage from "@/components/landing/LandingPage";
 import LoginPage from "../Pages/Auth/LoginPage";
 import SignUpPage from "@/Pages/Auth/SignUpPage";
 import ProviderLayout from "@/Pages/provider/ProviderLayout";
+import DashboardApp from "@/modules/app/App";
+import { Layout } from "@/modules/app/components/Layout";
+import { Dashboard } from "@/modules/app/pages/Dashboard";
+import { UsersManagement } from "@/modules/app/pages/UsersManagement";
+import { ProvidersManagement } from "@/modules/app/pages/ProvidersManagement";
+import { OrdersManagement } from "@/modules/app/pages/OrdersManagement";
+import { ServicesCategories } from "@/modules/app/pages/ServicesCategories";
+import { ReviewsReports } from "@/modules/app/pages/ReviewsReports";
 
 
 export default function AppRoutes() {
@@ -27,14 +35,17 @@ export default function AppRoutes() {
         <Route path="/provider" element={<ProviderLayout />} />
         <Route path="*" element={<Navigate to="/provider" replace />} />
         {/* Protected Routes */}
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute>
-              {/* <Dashboard /> */}
-            </ProtectedRoute>
-          }
-        />
+        {/*  */}
+        <Route path="/" element={<Layout />} >
+        <Route path="dashboard"  element={<Dashboard/>}  />
+        <Route path="users" element={<UsersManagement />} />
+        <Route path="providers" element={<ProvidersManagement />} />
+        <Route path="orders" element={<OrdersManagement />} />
+        <Route path="services" element={<ServicesCategories />} />
+        <Route path="reviews" element={<ReviewsReports />} />
+        
+        
+        </Route>
 
       </Routes>
     </BrowserRouter>
