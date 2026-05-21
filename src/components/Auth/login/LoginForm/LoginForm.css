@@ -1,0 +1,300 @@
+/* src/components/login/LoginForm/LoginForm.css */
+
+/* ── Form container ── */
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  width: 100%;
+}
+
+/* ── Server error banner ── */
+.login-form__error-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background-color: #fef2f2;
+  border: 1px solid #fca5a5;
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  color: var(--color-error);
+  animation: lf-fade-up 0.3s ease;
+}
+
+/* ── Field wrapper ── */
+.login-form__field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* ── Label ── */
+.login-form__label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-soft);
+  text-align: right;
+}
+
+/* ── Input wrapper ── */
+.login-form__input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background-color: #ffffff;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.login-form__input-wrap:focus-within {
+  border-color: var(--color-teal);
+  box-shadow: 0 0 0 3px rgba(16, 197, 162, 0.12);
+}
+
+.login-form__input-wrap--error {
+  border-color: var(--color-error) !important;
+}
+
+/* ── Input icons ── */
+.login-form__icon {
+  display: flex;
+  align-items: center;
+  color: var(--color-text-muted);
+  pointer-events: none;
+  flex-shrink: 0;
+}
+
+.login-form__icon--right {
+  position: absolute;
+  right: 14px;
+}
+
+/* ── Input ── */
+.login-form__input {
+  flex: 1;
+  padding: 13px 46px 13px 16px;
+  border: none;
+  outline: none;
+  font-size: 14px;
+  font-family: inherit;
+  color: var(--color-text);
+  background: transparent;
+  text-align: right;
+  width: 100%;
+}
+
+.login-form__input::placeholder {
+  color: var(--color-text-muted);
+  direction: ltr;
+}
+
+/* ── Eye toggle ── */
+.login-form__eye-btn {
+  position: absolute;
+  left: 12px;
+  display: flex;
+  align-items: center;
+  padding: 4px;
+  background: none;
+  border: none;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.login-form__eye-btn:hover {
+  color: var(--color-teal);
+}
+
+/* ── Field error ── */
+.login-form__field-error {
+  font-size: 12px;
+  color: var(--color-error);
+  text-align: right;
+}
+
+/* ── Remember + forgot row ── */
+.login-form__meta-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* ── Custom checkbox ── */
+.login-form__checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--color-text-soft);
+  cursor: pointer;
+  user-select: none;
+}
+
+.login-form__checkbox-input {
+  display: none;
+}
+
+.login-form__checkmark {
+  width: 18px;
+  height: 18px;
+  border: 1.5px solid var(--color-border);
+  border-radius: 4px;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.login-form__checkbox-input:checked + .login-form__checkmark {
+  background-color: var(--color-teal);
+  border-color: var(--color-teal);
+}
+
+.login-form__checkbox-input:checked + .login-form__checkmark::after {
+  content: "";
+  display: block;
+  width: 5px;
+  height: 9px;
+  border: 2px solid #ffffff;
+  border-top: none;
+  border-left: none;
+  transform: rotate(45deg) translate(-1px, -1px);
+}
+
+/* ── Forgot link ── */
+.login-form__forgot-link {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-teal);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.login-form__forgot-link:hover {
+  color: var(--color-teal-dark);
+  text-decoration: underline;
+}
+
+/* ── Submit button ── */
+.login-form__submit {
+  background-color: teal;
+  width: 100%;
+  min-height: 52px;
+  padding: 14px;
+  /* background-color: var(--color-teal); */
+  color: #ffffff;
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: 16px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.login-form__submit:hover:not(:disabled) {
+  background-color: var(--color-teal-dark);
+  transform: translateY(-1px);
+}
+
+.login-form__submit:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.login-form__submit:disabled {
+  opacity: 0.72;
+  cursor: not-allowed;
+}
+
+/* ── Loading spinner ── */
+.login-form__spinner {
+  display: inline-block;
+  width: 22px;
+  height: 22px;
+  border: 2.5px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: lf-spin 0.7s linear infinite;
+}
+
+/* ── Divider ── */
+.login-form__divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--color-text-muted);
+  font-size: 13px;
+}
+
+.login-form__divider::before,
+.login-form__divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background-color: var(--color-border);
+}
+
+/* ── Social buttons ── */
+.login-form__social {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.login-form__social-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background-color: #ffffff;
+  font-size: 14px;
+  font-weight: 500;
+  font-family: inherit;
+  color: var(--color-text-soft);
+  cursor: pointer;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.login-form__social-btn:hover {
+  border-color: var(--color-text-soft);
+  background-color: var(--color-bg);
+}
+
+/* ── Register link ── */
+.login-form__register-line {
+  text-align: center;
+  font-size: 14px;
+  color: var(--color-text-muted);
+}
+
+.login-form__register-link {
+  color: var(--color-teal);
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.login-form__register-link:hover {
+  color: var(--color-teal-dark);
+  text-decoration: underline;
+}
+
+/* ── Animations ── */
+@keyframes lf-spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes lf-fade-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
