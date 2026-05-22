@@ -117,6 +117,7 @@ export function OrdersManagement() {
         <select
           value={selectedProvider}
           onChange={(e) => setSelectedProvider(e.target.value)}
+          aria-label="تصفية حسب اسم المغسلة"
           className="px-4 py-2 border border-[#F4F6F9] rounded-lg focus:outline-none focus:border-[#00C9B1] bg-white text-[#777779]"
         >
           <option value="">تصفية حسب اسم المغسلة</option>

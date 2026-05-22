@@ -35,8 +35,9 @@ function ConfirmDeleteModal({ onConfirm, onCancel }: { onConfirm: () => void; on
       >
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-medium text-[#0D1F3C]">تأكيد الحذف</h3>
-          <button onClick={onCancel} className="p-1 hover:bg-[#F4F6F9] rounded-lg transition-colors">
+          <button onClick={onCancel} aria-label="إغلاق النافذة" className="p-1 hover:bg-[#F4F6F9] rounded-lg transition-colors">
             <X className="w-5 h-5 text-[#777779]" />
+            
           </button>
         </div>
         <p className="text-[#777779] mb-6">هل أنت متأكد أنك تريد حذف هذا العنصر؟</p>
