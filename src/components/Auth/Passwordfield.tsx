@@ -1,6 +1,6 @@
 import { useState } from "react";
 // import EyeToggle from "../components/Auth/EyeToggle.tsx";
-import EyeToggle from "./Eyetoggle.tsx";
+import EyeToggle from "./Eyetoggle";
 
 interface PasswordFieldProps {
   id: string;

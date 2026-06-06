@@ -1,11 +1,13 @@
 
 import { useState, useEffect } from "react"
+import { useSearchParams, useNavigate } from "react-router-dom"
 import "./ResetPassword.css"
 
-import BackButton from "../../components/auth/Backbutton"
-import PasswordField from "../../components/auth/Passwordfield"
-import PasswordRules from "../../components/auth/Passwordrules"
-import BrandPanel from "../../components/auth/Brandpanel"
+import BackButton from "../../components/Auth/Backbutton"
+import PasswordField from "../../components/Auth/Passwordfield"
+import PasswordRules from "../../components/Auth/Passwordrules"
+import BrandPanel from "../../components/Auth/Brandpanel"
+ 
 
 // ─── Password rule definitions ────────────────────────────────────────────────
 const PASSWORD_RULES = [
@@ -29,6 +31,14 @@ export default function ResetPassword() {
   const [submitted, setSubmitted] = useState(false)
   const [success, setSuccess] = useState(false)
   const [mounted, setMounted] = useState(false)
+
+  // الاضافه
+
+const [searchParams] = useSearchParams()
+const navigate = useNavigate()
+const token = searchParams.get("token")
+
+
 
   // Fade-in on mount
   useEffect(() => {
@@ -65,12 +75,40 @@ export default function ResetPassword() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [newPassword, confirmPassword])
 
-  function handleSubmit(ev: React.FormEvent) {
+  // function handleSubmit(ev: React.FormEvent) {
+  //   ev.preventDefault()
+  //   setSubmitted(true)
+  //   if (validate()) setTimeout(() => setSuccess(true), 350)
+  // }
+   async function handleSubmit(ev: React.FormEvent) {
     ev.preventDefault()
     setSubmitted(true)
-    if (validate()) setTimeout(() => setSuccess(true), 350)
-  }
+    if (!validate()) return
 
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/v1/auth/reset-password/${token}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            password: newPassword,
+            confirmPassword,
+          }),
+        }
+      )
+
+      const data = await response.json()
+
+      if (response.ok) {
+        setSuccess(true)
+      } else {
+        setErrors({ new: data.message || "حدث خطأ، حاول مرة أخرى" })
+      }
+    } catch {
+      setErrors({ new: "حدث خطأ في الاتصال بالسيرفر" })
+    }
+  }
   // ── Render ──────────────────────────────────────────────────────────────────
   return (
     <div
@@ -98,7 +136,7 @@ export default function ResetPassword() {
                 color: "#006b5d",
               }}
             >
-              نظيف
+              CleaNovy
             </span>
           </div>
 
@@ -201,6 +239,7 @@ export default function ResetPassword() {
                 onMouseUp={(e) =>
                   (e.currentTarget.style.transform = "scale(1)")
                 }
+                    onClick={() => navigate("/login")}
               >
                 تسجيل الدخول
               </button>

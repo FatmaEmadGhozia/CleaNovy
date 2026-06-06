@@ -2,7 +2,7 @@ import { Share2, Camera, Globe, Smartphone, Play } from "lucide-react";
 import { useState } from "react";
 
 const links = {
-  "الشركة": ["عن نظيف", "انضم كشريك", "الوظائف", "المدونة"],
+  "الشركة": ["عن Cleanovy", "انضم كشريك", "الوظائف", "المدونة"],
   "المساعدة": ["خريطة الموقع", "الشروط والأحكام", "سياسة الخصوصية", "تواصل معنا"],
 };
 
@@ -26,7 +26,7 @@ export default function Footer() {
             className="text-3xl font-extrabold"
             style={{ fontFamily: "Tajawal, sans-serif", color: "#fff" }}
           >
-            نظيف
+            Cleanovy
           </h3>
           <p className="leading-relaxed text-sm" style={{ color: "#ffffff70" }}>
             منصتكم الموثوقة للوصول لأفضل خدمات العناية بالملابس. نضمن الجودة، السرعة، والراحة.

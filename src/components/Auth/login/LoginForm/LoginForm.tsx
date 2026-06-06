@@ -3,10 +3,16 @@
 import { useState } from "react";
 import { type Role } from "../RoleSelector/RoleSelector";
 import "./LoginForm.css";
+import { useAuth } from "@/context/AuthContext";
+import { useNavigate } from "react-router-dom";
+// import { useAuth } from "@/context/AuthContext";
+// const { login } = useAuth();
+
 
 // ── Types ──────────────────────────────────────────────────────────────────
 interface LoginFormProps {
   role: Role;
+
 }
 
 interface FormValues {
@@ -76,12 +82,22 @@ const EyeClosedIcon = () => (
 );
 
 // ── Component  
-const LoginForm = ({ role }: LoginFormProps) => {
+// const LoginForm = ({ role }: LoginFormProps) => {
+//   const [values, setValues] = useState<FormValues>({
+//     identifier: "",
+//     password: "",
+//     remember: false,
+//   });
+
+const LoginForm = ({ role: _role }: LoginFormProps) => {
+  const { login } = useAuth();  // ← ضيفي السطر ده هنا
+  const navigate = useNavigate();
   const [values, setValues] = useState<FormValues>({
     identifier: "",
     password: "",
     remember: false,
   });
+
 
   const [errors, setErrors] = useState<FormErrors>({});
   const [serverError, setServerError] = useState<string>("");
@@ -118,16 +134,48 @@ const LoginForm = ({ role }: LoginFormProps) => {
     setErrors({});
     setIsLoading(true);
 
-    // TODO: replace with real API call
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/v1/auth/login`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            identifier: values.identifier,
+            password: values.password,
+          }),
+        }
+      );
 
-    const isValid = values.identifier.includes("@") || values.identifier.length >= 8;
+      const data = await response.json();
 
-    if (!isValid) {
-      setServerError("البريد الإلكتروني أو كلمة المرور غير صحيحة");
-    } else {
-      // TODO: navigate based on role using react-router
-      console.log("Login success →", { role, identifier: values.identifier });
+      if (response.ok) {
+        localStorage.setItem("token", data.data.accessToken);
+        localStorage.setItem("refreshToken", data.data.refreshToken);
+        localStorage.setItem("user", JSON.stringify(data.data.user));
+        login(data.data.user); // ← هنا 
+
+
+        const userRole = data.data.user.role;
+
+
+        // if (userRole === "laundry_owner") {
+        //   window.location.href = "/provider";
+        // }
+        // else {
+        //   window.location.href = "/";
+        // }
+
+        if (userRole === "laundry_owner") {
+          navigate("/provider");
+        } else {
+          navigate("/");
+        }
+      } else {
+        setServerError(data.message || "البريد الإلكتروني أو كلمة المرور غير صحيحة");
+      }
+    } catch {
+      setServerError("حدث خطأ في الاتصال بالسيرفر");
     }
 
     setIsLoading(false);

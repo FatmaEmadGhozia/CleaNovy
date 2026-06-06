@@ -1,9 +1,7 @@
-
 "use client";
 
 import { useEffect, useRef, useState } from "react";
 import "./ForgotPassword.css";
-
 
 /* ── Types ── */
 type Status = "idle" | "loading" | "success" | "error";
@@ -77,11 +75,11 @@ function RightSide() {
       <div className="right-content relative z-10 text-center text-white px-10">
         <SpinningRing />
         <div className="glow-pulse text-[64px] font-black text-[#5ffae0] leading-none">
-          نظيف
+          CleaNovy
         </div>
         <h2 className="text-3xl font-bold mt-4">نعتني بملابسك كأنها لنا</h2>
         <p className="mt-4 text-gray-300 max-w-md mx-auto leading-relaxed">
-          انضم إلى آلاف المستخدمين الذين يثقون في نظيف للحصول على أفضل خدمات الغسيل
+          انضم إلى آلاف المستخدمين الذين يثقون في CleaNovy للحصول على أفضل خدمات الغسيل
         </p>
       </div>
     </section>
@@ -103,7 +101,7 @@ const BUTTON_CONFIG: Record<Status, { label: string; icon: string; bg: string; s
     shadow: "0 6px 24px rgba(0,107,93,.3)",
   },
   success: {
-    label: "تم الإرسال بنجاح!",
+    label: "تم إرسال الرابط للإيميل!",
     icon: "check_circle",
     bg: "linear-gradient(135deg,#059669,#34d399)",
     shadow: "0 6px 24px rgba(5,150,105,.35)",
@@ -118,10 +116,11 @@ const BUTTON_CONFIG: Record<Status, { label: string; icon: string; bg: string; s
 
 /* ── Main component ── */
 export default function ForgotPassword() {
-  const [phone, setPhone] = useState("");
+  //   تم تغيير الاسم من phone إلى identifier ليطابق طلب الباك اند
+  const [identifier, setIdentifier] = useState("");
   const [status, setStatus] = useState<Status>("idle");
+  const [errorMessage, setErrorMessage] = useState("");
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
- 
 
   /* Cleanup any pending timer on unmount */
   useEffect(() => {
@@ -130,24 +129,71 @@ export default function ForgotPassword() {
     };
   }, []);
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (status === "loading" || status === "success") return;
-
     if (timerRef.current) clearTimeout(timerRef.current);
 
-    if (!phone.trim()) {
+    //   التحقق من المدخلات
+    if (!identifier.trim()) {
+      setErrorMessage("برجاء إدخال البريد الإلكتروني أو رقم الهاتف");
       setStatus("error");
-      timerRef.current = setTimeout(() => setStatus("idle"), 1800);
+      timerRef.current = setTimeout(() => setStatus("idle"), 2500);
       return;
     }
 
     setStatus("loading");
-    timerRef.current = setTimeout(() => {
-      setStatus("success");
-     
-      timerRef.current = setTimeout(() => setStatus("idle"), 2800);
-    }, 1800);
-  };
+
+
+    //   try {
+    //     //  هنا هتربطي مع الـ API بتاعكم (مثال للربط الحقيقي):
+    //     /*
+    //     const response = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/users/forgotPassword`, {
+    //       method: "POST",
+    //       headers: { "Content-Type": "application/json" },
+    //       body: JSON.stringify({ identifier: identifier }), // بيبعت الـ identifier للباك اند
+    //     });
+    //     const data = await response.json();
+    //     */
+
+    //     // محاكاة لنجاح الطلب مؤقتاً لحين ربط الـ Fetch
+    //     timerRef.current = setTimeout(() => {
+    //       setStatus("success");
+    //       timerRef.current = setTimeout(() => setStatus("idle"), 3500);
+    //     }, 1500);
+
+    //   } catch (error) {
+    //     setErrorMessage("حدث خطأ ما، يرجى المحاولة مرة أخرى");
+    //     setStatus("error");
+    //     timerRef.current = setTimeout(() => setStatus("idle"), 2500);
+    //   }
+    // };
+
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/v1/auth/forgot-password`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ identifier }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setStatus("success");
+        timerRef.current = setTimeout(() => setStatus("idle"), 3500);
+      } else {
+        setErrorMessage(data.message || "حدث خطأ ما، يرجى المحاولة مرة أخرى");
+        setStatus("error");
+        timerRef.current = setTimeout(() => setStatus("idle"), 2500);
+      }
+    } catch {
+      setErrorMessage("حدث خطأ في الاتصال بالسيرفر");
+      setStatus("error");
+      timerRef.current = setTimeout(() => setStatus("idle"), 2500);
+    }
+  }
 
   const btn = BUTTON_CONFIG[status];
   const isDisabled = status === "loading" || status === "success";
@@ -197,20 +243,22 @@ export default function ForgotPassword() {
             نسيت كلمة المرور؟
           </h1>
 
+          {/*  تعديل النص التوضيحي ليكون متوافقاً مع فكرة إرسال الرابط للإيميل */}
           <p className="anim-d3 text-gray-500 mb-10 text-base leading-relaxed">
-            لا تقلق، ادخل رقم هاتفك وسنرسل لك رابطاً لاستعادة حسابك.
+            لا تقلق، أدخل البريد الإلكتروني المرتبط بحسابك، وسنرسل لك رابطاً لاستعادة بياناتك على بريدك الإلكتروني المسجل.
           </p>
 
-          {/* Phone input */}
+          {/* Identifier input */}
           <div className="anim-d3 mb-6">
-            <label className="block mb-2 font-bold text-[#1b1b1e]">رقم الهاتف</label>
+            {/*   تعديل الـ Label والـ Placeholder */}
+            <label className="block mb-2 font-bold text-[#1b1b1e]">البريد الإلكتروني</label>
             <div className="input-wrapper">
               <input
-                type="tel"
+                type="email" // تم تغييره إلى email عشان يقبل فقط الإيميلات
                 dir="ltr"
-                placeholder="015xxxxxxx"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
+                placeholder="name@example.com أو 015xxxxxxx"
+                value={identifier}
+                onChange={(e) => setIdentifier(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
                 disabled={isDisabled}
                 className={[
@@ -226,7 +274,7 @@ export default function ForgotPassword() {
             </div>
             {status === "error" && (
               <p className="text-red-500 text-sm mt-1.5 text-right">
-                برجاء إدخال رقم الهاتف
+                {errorMessage}
               </p>
             )}
           </div>

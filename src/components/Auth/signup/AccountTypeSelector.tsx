@@ -1,7 +1,8 @@
 import React from "react";
 import { CustomerIcon, LaundryIcon, CheckCircleIcon } from "./Icons.jsx";
 
-type AccountType = "customer" | "owner";
+// 💡 1. تعديل الأنواع لتطابق قيم الباك اند الجديدة
+type AccountType = "client" | "laundry_owner";
 
 type AccountOption = {
   id: AccountType;
@@ -9,9 +10,10 @@ type AccountOption = {
   icon: React.ReactNode;
 };
 
+// 💡 2. تحديث الـ id داخل المصفوفة لتطابق الأنواع الجديدة
 const ACCOUNT_TYPES: AccountOption[] = [
-  { id: "customer", label: "عميل", icon: <CustomerIcon /> },
-  { id: "owner", label: "صاحب مغسلة", icon: <LaundryIcon /> },
+  { id: "client", label: "عميل", icon: <CustomerIcon /> },
+  { id: "laundry_owner", label: "صاحب مغسلة", icon: <LaundryIcon /> },
 ];
 
 type Props = {
