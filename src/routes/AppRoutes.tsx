@@ -21,10 +21,11 @@ export default function AppRoutes() {
         <Route path="/contact" element={<ContactPage />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/signup" element={<SignUpPage />} />
-        <Route path="/provider" element={<ProviderLayout />} />
-
+         <Route path="/login" element={<LoginPage />} />
+        <Route path="/signup" element={<SignUpPage />} /> 
+        <Route path="/provider" element={<ProviderLayout />} /> 
+         <Route path="*" element={<Navigate to="/provider" replace />} />
+         {/* <Route path="/provider" element={<Provider />} /> */}
         {/* Protected Routes */}
         <Route
           path="/settings"
