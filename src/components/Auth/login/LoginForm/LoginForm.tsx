@@ -1,18 +1,11 @@
-// src/components/login/LoginForm/LoginForm.tsx
-
 import { useState } from "react";
 import { type Role } from "../RoleSelector/RoleSelector";
 import "./LoginForm.css";
 import { useAuth } from "@/context/AuthContext";
 import { useNavigate } from "react-router-dom";
-// import { useAuth } from "@/context/AuthContext";
-// const { login } = useAuth();
 
-
-// ── Types ──────────────────────────────────────────────────────────────────
 interface LoginFormProps {
   role: Role;
-
 }
 
 interface FormValues {
@@ -26,24 +19,14 @@ interface FormErrors {
   password?: string;
 }
 
-// ── Helpers 
 const validate = (values: FormValues): FormErrors => {
   const errors: FormErrors = {};
-
-  if (!values.identifier.trim()) {
-    errors.identifier = "هذا الحقل مطلوب";
-  }
-
-  if (!values.password.trim()) {
-    errors.password = "هذا الحقل مطلوب";
-  } else if (values.password.length < 6) {
-    errors.password = "كلمة المرور 6 أحرف على الأقل";
-  }
-
+  if (!values.identifier.trim()) errors.identifier = "هذا الحقل مطلوب";
+  if (!values.password.trim()) errors.password = "هذا الحقل مطلوب";
+  else if (values.password.length < 6) errors.password = "كلمة المرور 6 أحرف على الأقل";
   return errors;
 };
 
-// ── Icons  
 const EmailIcon = () => (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
     <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
@@ -81,43 +64,30 @@ const EyeClosedIcon = () => (
   </svg>
 );
 
-// ── Component  
-// const LoginForm = ({ role }: LoginFormProps) => {
-//   const [values, setValues] = useState<FormValues>({
-//     identifier: "",
-//     password: "",
-//     remember: false,
-//   });
-
 const LoginForm = ({ role: _role }: LoginFormProps) => {
-  const { login } = useAuth();  // ← ضيفي السطر ده هنا
+  const { login } = useAuth();
   const navigate = useNavigate();
+
   const [values, setValues] = useState<FormValues>({
     identifier: "",
     password: "",
     remember: false,
   });
 
-
   const [errors, setErrors] = useState<FormErrors>({});
   const [serverError, setServerError] = useState<string>("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  // ── Handlers  
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
-
     setValues((prev) => ({
       ...prev,
       [name]: type === "checkbox" ? checked : value,
     }));
-
-    // Clear field error on typing
     if (errors[name as keyof FormErrors]) {
       setErrors((prev) => ({ ...prev, [name]: "" }));
     }
-
     setServerError("");
   };
 
@@ -153,19 +123,9 @@ const LoginForm = ({ role: _role }: LoginFormProps) => {
         localStorage.setItem("token", data.data.accessToken);
         localStorage.setItem("refreshToken", data.data.refreshToken);
         localStorage.setItem("user", JSON.stringify(data.data.user));
-        login(data.data.user); // ← هنا 
-
+        login(data.data.user);
 
         const userRole = data.data.user.role;
-
-
-        // if (userRole === "laundry_owner") {
-        //   window.location.href = "/provider";
-        // }
-        // else {
-        //   window.location.href = "/";
-        // }
-
         if (userRole === "laundry_owner") {
           navigate("/provider");
         } else {
@@ -181,16 +141,8 @@ const LoginForm = ({ role: _role }: LoginFormProps) => {
     setIsLoading(false);
   };
 
-  // ── Render   
   return (
-    <form
-      className="login-form"
-      onSubmit={handleSubmit}
-      noValidate
-      aria-label="نموذج تسجيل الدخول"
-    >
-
-      {/* Server error */}
+    <form className="login-form" onSubmit={handleSubmit} noValidate aria-label="نموذج تسجيل الدخول">
       {serverError && (
         <div className="login-form__error-banner" role="alert">
           <AlertIcon />
@@ -198,123 +150,59 @@ const LoginForm = ({ role: _role }: LoginFormProps) => {
         </div>
       )}
 
-      {/* ── Identifier ── */}
       <div className="login-form__field">
         <label className="login-form__label" htmlFor="identifier">
           البريد الإلكتروني أو رقم الهاتف
         </label>
-
         <div className={`login-form__input-wrap ${errors.identifier ? "login-form__input-wrap--error" : ""}`}>
-          <span className="login-form__icon login-form__icon--right">
-            <EmailIcon />
-          </span>
+          <span className="login-form__icon login-form__icon--right"><EmailIcon /></span>
           <input
-            id="identifier"
-            name="identifier"
-            type="text"
-            value={values.identifier}
-            onChange={handleChange}
+            id="identifier" name="identifier" type="text"
+            value={values.identifier} onChange={handleChange}
             placeholder="example@cleanovy.com"
-            className="login-form__input"
-            autoComplete="username"
-            dir="ltr"
+            className="login-form__input" autoComplete="username" dir="ltr"
             aria-invalid={!!errors.identifier}
-            aria-describedby={errors.identifier ? "err-identifier" : undefined}
           />
         </div>
-
-        {errors.identifier && (
-          <p id="err-identifier" className="login-form__field-error" role="alert">
-            {errors.identifier}
-          </p>
-        )}
+        {errors.identifier && <p className="login-form__field-error" role="alert">{errors.identifier}</p>}
       </div>
 
-      {/* ── Password ── */}
       <div className="login-form__field">
-        <label className="login-form__label" htmlFor="password">
-          كلمة المرور
-        </label>
-
+        <label className="login-form__label" htmlFor="password">كلمة المرور</label>
         <div className={`login-form__input-wrap ${errors.password ? "login-form__input-wrap--error" : ""}`}>
-          <span className="login-form__icon login-form__icon--right">
-            <LockIcon />
-          </span>
+          <span className="login-form__icon login-form__icon--right"><LockIcon /></span>
           <input
-            id="password"
-            name="password"
+            id="password" name="password"
             type={showPassword ? "text" : "password"}
-            value={values.password}
-            onChange={handleChange}
-            placeholder="••••••••"
-            className="login-form__input"
-            autoComplete="current-password"
-            dir="ltr"
+            value={values.password} onChange={handleChange}
+            placeholder="••••••••" className="login-form__input"
+            autoComplete="current-password" dir="ltr"
             aria-invalid={!!errors.password}
-            aria-describedby={errors.password ? "err-password" : undefined}
           />
-          <button
-            type="button"
-            className="login-form__eye-btn"
-            onClick={() => setShowPassword((v) => !v)}
-            aria-label={showPassword ? "إخفاء كلمة المرور" : "إظهار كلمة المرور"}
-            tabIndex={-1}
-          >
+          <button type="button" className="login-form__eye-btn"
+            onClick={() => setShowPassword((v) => !v)} tabIndex={-1}>
             {showPassword ? <EyeClosedIcon /> : <EyeOpenIcon />}
           </button>
         </div>
-
-        {errors.password && (
-          <p id="err-password" className="login-form__field-error" role="alert">
-            {errors.password}
-          </p>
-        )}
+        {errors.password && <p className="login-form__field-error" role="alert">{errors.password}</p>}
       </div>
 
-      {/* ── Remember + Forgot ── */}
       <div className="login-form__meta-row">
         <label className="login-form__checkbox-label">
-          <input
-            type="checkbox"
-            name="remember"
-            checked={values.remember}
-            onChange={handleChange}
-            className="login-form__checkbox-input"
-          />
+          <input type="checkbox" name="remember" checked={values.remember}
+            onChange={handleChange} className="login-form__checkbox-input" />
           <span className="login-form__checkmark" aria-hidden="true" />
           تذكرني
         </label>
-
-        <a href="/forgot-password" className="login-form__forgot-link">
-          نسيت كلمة المرور؟
-        </a>
+        <a href="/forgot-password" className="login-form__forgot-link">نسيت كلمة المرور؟</a>
       </div>
 
-
-
-
-      {/* ── Submit ── */}
-      <button
-        type="submit"
-        className="login-form__submit"
-        disabled={isLoading}
-        aria-busy={isLoading}
-      >
-        {isLoading
-          ? <span className="login-form__spinner" aria-label="جاري تسجيل الدخول" />
-          : "تسجيل الدخول"
-        }
+      <button type="submit" className="login-form__submit" disabled={isLoading} aria-busy={isLoading}>
+        {isLoading ? <span className="login-form__spinner" /> : "تسجيل الدخول"}
       </button>
 
+      <div className="login-form__divider" aria-hidden="true"><span>أو عبر</span></div>
 
-
-
-      {/* ── Divider ── */}
-      <div className="login-form__divider" aria-hidden="true">
-        <span>أو عبر</span>
-      </div>
-
-      {/* ── Social ── */}
       <div className="login-form__social">
         <button type="button" className="login-form__social-btn">
           <svg width="20" height="20" viewBox="0 0 24 24">
@@ -322,7 +210,6 @@ const LoginForm = ({ role: _role }: LoginFormProps) => {
           </svg>
           فيسبوك
         </button>
-
         <button type="button" className="login-form__social-btn">
           <svg width="20" height="20" viewBox="0 0 24 24">
             <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
@@ -334,14 +221,10 @@ const LoginForm = ({ role: _role }: LoginFormProps) => {
         </button>
       </div>
 
-      {/* ── Register link ── */}
       <p className="login-form__register-line">
         ليس لديك حساب؟{" "}
-        <a href="/signup" className="login-form__register-link">
-          إنشاء حساب جديد
-        </a>
+        <a href="/signup" className="login-form__register-link">إنشاء حساب جديد</a>
       </p>
-
     </form>
   );
 };

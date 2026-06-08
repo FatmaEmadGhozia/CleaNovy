@@ -21,18 +21,47 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
     if (file) onImageChange(file);
   };
 
+  // الباك اند بيحفظ الـ URL كاملة: "http://localhost:5000/uploads/avatar-xxx.jpg"
+  // فبنستخدمها مباشرة بدون إضافة حاجة
+  const getAvatarSrc = (): string | null => {
+    if (!profileImage) return null;
+    // لو URL كاملة (بتبدأ بـ http) استخدمها مباشرة
+    if (profileImage.startsWith("http://") || profileImage.startsWith("https://")) {
+      return profileImage;
+    }
+    // لو relative path ضيف الـ base URL
+    const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+    return `${API_URL}/${profileImage.replace(/^\//, "")}`;
+  };
+
+  const avatarSrc = getAvatarSrc();
+
   return (
     <div className="profile-header">
       <div className="avatar-wrapper">
-        <img
-          src={
-            profileImage
-              ? `${import.meta.env.VITE_API_URL}/${profileImage}`
-              : "/assets/default-avatar.png"
-          }
-          alt={name}
-          className="avatar-img"
-        />
+        {avatarSrc ? (
+          <img
+            src={avatarSrc}
+            alt={name}
+            className="avatar-img"
+            onError={(e) => {
+              // لو الصورة فشلت في التحميل، اعرض الـ placeholder
+              const target = e.currentTarget;
+              target.style.display = "none";
+              const placeholder = target.nextElementSibling as HTMLElement;
+              if (placeholder) placeholder.style.display = "flex";
+            }}
+          />
+        ) : null}
+
+        {/* Placeholder - بيظهر لو مفيش صورة أو لو الصورة فشلت */}
+        <div
+          className="avatar-placeholder"
+          style={{ display: avatarSrc ? "none" : "flex" }}
+        >
+          {name?.charAt(0)?.toUpperCase() || "U"}
+        </div>
+
         <button
           className="avatar-edit-btn"
           onClick={() => fileInputRef.current?.click()}
@@ -51,7 +80,6 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
 
       <h2 className="profile-name">{name}</h2>
 
-      {/* Completed Orders - Full width card */}
       <div className="orders-card">
         <div className="orders-icon">
           <svg width="28" height="28" viewBox="0 0 24 24" fill="none">

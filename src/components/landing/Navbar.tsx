@@ -1,4 +1,4 @@
- import { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Navigation, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -56,11 +56,10 @@ export default function Navbar() {
 
   return (
     <nav
+      dir="ltr"
       className={cn(
         "fixed top-0 w-full z-50 transition-all duration-500",
-        scrolled
-          ? "bg-white/95 backdrop-blur-xl shadow-lg shadow-[#0D1F3C]/10 border-b border-gray-100"
-          : "bg-white"
+        scrolled ? "bg-white/95 backdrop-blur-xl shadow-lg shadow-[#0D1F3C]/10 border-b border-gray-100" : "bg-white"
       )}
     >
       <div className="max-w-7xl mx-auto px-6 lg:px-12 h-20 flex items-center justify-between">
@@ -76,16 +75,13 @@ export default function Navbar() {
         {/* Desktop nav */}
         <div className="hidden md:flex items-center gap-1">
           {SCROLL_LINKS.map((item) => (
-            <button
-              key={item.href}
-              onClick={() => scrollTo(item.href)}
+            <button key={item.href} onClick={() => scrollTo(item.href)}
               className={cn(
                 "relative px-4 py-2 text-sm font-medium rounded-xl transition-all duration-300",
                 isLandingPage && active === item.href
                   ? "text-[#0D1F3C] bg-[rgb(0,201,177)]/10"
                   : "text-[#0D1F3C]/70 hover:text-[rgb(0,201,177)] hover:bg-[rgb(0,201,177)]/10"
-              )}
-            >
+              )}>
               {item.label}
             </button>
           ))}
@@ -93,16 +89,13 @@ export default function Navbar() {
           <div className="w-px h-5 bg-gray-200 mx-1" />
 
           {PAGE_LINKS.map((item) => (
-            <button
-              key={item.path}
-              onClick={() => goToPage(item.path)}
+            <button key={item.path} onClick={() => goToPage(item.path)}
               className={cn(
                 "relative px-4 py-2 text-sm font-medium rounded-xl transition-all duration-300",
                 isPageActive(item.path)
                   ? "text-[#0D1F3C] bg-[rgb(0,201,177)]/10"
                   : "text-[#0D1F3C]/70 hover:text-[rgb(0,201,177)] hover:bg-[rgb(0,201,177)]/10"
-              )}
-            >
+              )}>
               {item.label}
             </button>
           ))}
@@ -146,10 +139,8 @@ export default function Navbar() {
         </div>
 
         {/* Mobile toggle */}
-        <button
-          className="md:hidden p-2 rounded-xl hover:bg-[rgb(0,201,177)]/10 transition-colors"
-          onClick={() => setMenuOpen(!menuOpen)}
-        >
+        <button className="md:hidden p-2 rounded-xl hover:bg-[rgb(0,201,177)]/10 transition-colors"
+          onClick={() => setMenuOpen(!menuOpen)}>
           <div className={cn("transition-all duration-300", menuOpen ? "rotate-90" : "rotate-0")}>
             {menuOpen ? <X size={22} style={{ color: "#0D1F3C" }} /> : <Menu size={22} style={{ color: "#0D1F3C" }} />}
           </div>
@@ -163,16 +154,13 @@ export default function Navbar() {
       )}>
         <div className="px-6 py-4 flex flex-col gap-1">
           {SCROLL_LINKS.map((item) => (
-            <button
-              key={item.href}
-              onClick={() => scrollTo(item.href)}
+            <button key={item.href} onClick={() => scrollTo(item.href)}
               className={cn(
                 "text-right py-3 px-4 text-sm font-medium rounded-xl transition-all duration-200",
                 isLandingPage && active === item.href
                   ? "text-[#0D1F3C] bg-[rgb(0,201,177)]/10"
                   : "text-[#0D1F3C]/70 hover:bg-[rgb(0,201,177)]/10 hover:text-[rgb(0,201,177)]"
-              )}
-            >
+              )}>
               {item.label}
             </button>
           ))}
@@ -180,25 +168,20 @@ export default function Navbar() {
           <div className="border-t border-gray-100 my-1" />
 
           {PAGE_LINKS.map((item) => (
-            <button
-              key={item.path}
-              onClick={() => goToPage(item.path)}
+            <button key={item.path} onClick={() => goToPage(item.path)}
               className={cn(
                 "text-right py-3 px-4 text-sm font-medium rounded-xl transition-all duration-200",
                 isPageActive(item.path)
                   ? "text-[#0D1F3C] bg-[rgb(0,201,177)]/10"
                   : "text-[#0D1F3C]/70 hover:bg-[rgb(0,201,177)]/10 hover:text-[rgb(0,201,177)]"
-              )}
-            >
+              )}>
               {item.label}
             </button>
           ))}
 
           {user ? (
-            <button
-              onClick={() => navigate("/settings")}
-              className="flex items-center gap-2 px-3 py-3 rounded-2xl hover:bg-[rgb(0,201,177)]/10 transition-all duration-200 mt-2"
-            >
+            <button onClick={() => navigate("/settings")}
+              className="flex items-center gap-2 px-3 py-3 rounded-2xl hover:bg-[rgb(0,201,177)]/10 transition-all duration-200 mt-2">
               <div style={{
                 width: 32, height: 32, borderRadius: "50%",
                 background: "rgb(0,201,177)",

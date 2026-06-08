@@ -7,8 +7,6 @@ import LandingPage from "@/components/landing/LandingPage";
 import LoginPage from "../Pages/Auth/LoginPage";
 import SignUpPage from "@/Pages/Auth/SignUpPage";
 import ProviderLayout from "@/Pages/provider/ProviderLayout";
-
-
 import AboutPage from "@/Pages/AboutPage/AboutPage";
 import ContactPage from "@/Pages/ContactPage/ContactPage";
 import Settingspage from "@/Pages/Settingspage/Settingspage";
@@ -17,26 +15,17 @@ export default function AppRoutes() {
   return (
     <BrowserRouter>
       <Routes>
-        {/*  Public Routes */}
+        {/* Public Routes */}
         <Route path="/" element={<LandingPage />} />
+        <Route path="/about" element={<AboutPage />} />
+        <Route path="/contact" element={<ContactPage />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignUpPage />} />
         <Route path="/provider" element={<ProviderLayout />} />
-        {/* Protected Routes */}
-        {/* <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute>
-            ر
-            </ProtectedRoute>
-          }
-        /> */}
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/about" element={<AboutPage />} />
-        <Route path="/contact" element={<ContactPage />} />
 
+        {/* Protected Routes */}
         <Route
           path="/settings"
           element={
@@ -45,8 +34,8 @@ export default function AppRoutes() {
             </ProtectedRoute>
           }
         />
-        <Route path="*" element={<Navigate to="/provider" replace />} />
 
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
   );

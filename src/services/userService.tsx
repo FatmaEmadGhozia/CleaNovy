@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
 // Helper: get token from localStorage
 const getAuthHeaders = () => ({
@@ -11,47 +11,48 @@ const getAuthHeaders = () => ({
 
 export interface UserProfile {
   _id: string;
-  name: string;
+  fullName: string;
   email: string;
   phone?: string;
   address?: string;
-  profileImage?: string;
-  completedOrders: number;
+  avatar?: string;
+  completedOrders?: number;
   role: string;
 }
 
 export interface UpdateProfilePayload {
-  name: string;
+  fullName: string;
   phone: string;
   address: string;
 }
 
-// GET /api/users/profile
+// GET /api/v1/profile/me
 export const fetchProfile = async (): Promise<UserProfile> => {
-  const { data } = await axios.get(`${API_URL}/users/profile`, getAuthHeaders());
-  return data.data;
+  const { data } = await axios.get(`${API_URL}/api/v1/profile/me`, getAuthHeaders());
+  return data.data.user;
 };
 
-// PUT /api/users/profile
+// PATCH /api/v1/profile/update
 export const updateProfile = async (
   payload: UpdateProfilePayload
 ): Promise<UserProfile> => {
-  const { data } = await axios.put(
-    `${API_URL}/users/profile`,
+  const { data } = await axios.patch(
+    `${API_URL}/api/v1/profile/update`,
     payload,
     getAuthHeaders()
   );
-  return data.data;
+  return data.data.user;
 };
-// PUT /api/users/profile/image
+
+// PATCH /api/v1/profile/avatar
 export const updateProfileImage = async (
   file: File
-): Promise<{ profileImage: string }> => {
+): Promise<{ avatar: string }> => {
   const formData = new FormData();
-  formData.append("profileImage", file);
+  formData.append("avatar", file);
 
-  const { data } = await axios.put(
-    `${API_URL}/users/profile/image`,
+  const { data } = await axios.patch(
+    `${API_URL}/api/v1/profile/avatar`,
     formData,
     {
       headers: {

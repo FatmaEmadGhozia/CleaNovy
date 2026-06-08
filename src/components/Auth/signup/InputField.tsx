@@ -1,12 +1,11 @@
- 
 import React, { useState, type ChangeEvent } from "react";
-// لازم الـ Interface ده يكون موجود عشان TypeScript يفهم الـ Props
+
 interface InputFieldProps {
   label: string;
   placeholder: string;
   value: string;
   onChange: (e: ChangeEvent<HTMLInputElement>) => void;
-  type?: string;     // علامة الـ ? معناها إنه اختياري
+  type?: string;
   error?: string;
   delay?: string;
 }
@@ -20,7 +19,7 @@ const InputField: React.FC<InputFieldProps> = ({
   error,
   delay,
 }) => {
-    const [hovered, setHovered] = useState(false); // ← هنا
+  const [hovered, setHovered] = useState(false);
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>

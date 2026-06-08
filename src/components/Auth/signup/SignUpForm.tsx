@@ -1,12 +1,12 @@
-import React, { useState, type ChangeEvent } from "react";
+import React, { useState } from "react";
+import type { ChangeEvent } from "react";
 import InputField from "./InputField";
 import AccountTypeSelector from "./AccountTypeSelector";
 import Checkbox from "./Checkbox";
 import Button from "./Button";
 import SuccessScreen from "./SuccessScreen";
 
-// 1. تعريف الأنواع بشكل دقيق لتطابق قيم الباك اند تماماً
-type AccountType = "client" | "laundry_owner";
+type AccountType = "customer" | "owner";
 
 interface FormState {
   accountType: AccountType;
@@ -17,11 +17,10 @@ interface FormState {
   agreed: boolean;
 }
 
-// تعريف نوع الأخطاء بحيث يرتبط بمفاتيح الفورم
 type Errors = Partial<Record<keyof FormState, string>>;
 
 const INITIAL_FORM: FormState = {
-  accountType: "client", // القيمة الافتراضية "عميل" متوافقة مع السيرفر
+  accountType: "customer",
   fullName: "",
   phone: "",
   email: "",
@@ -29,30 +28,43 @@ const INITIAL_FORM: FormState = {
   agreed: false,
 };
 
-// 2. منطق التحقق من صحة البيانات (Validation) للموبايل المصري والإيميل
+// Password rules - must match backend: min 8 chars + at least one digit
+interface PasswordRule {
+  id: string;
+  label: string;
+  test: (pw: string) => boolean;
+}
+
+const PASSWORD_RULES: PasswordRule[] = [
+  { id: "length", label: "على الأقل 8 أحرف", test: (pw) => pw.length >= 8 },
+  { id: "digit", label: "يحتوي على رقم واحد على الأقل", test: (pw) => /\d/.test(pw) },
+  { id: "letter", label: "يحتوي على حرف واحد على الأقل", test: (pw) => /[a-zA-Z]/.test(pw) },
+];
+
 function validate(form: FormState): Errors {
   const e: Errors = {};
 
-  if (!form.fullName.trim()) e.fullName = "الاسم الكامل مطلوب";
+  if (!form.fullName.trim() || form.fullName.trim().length < 3)
+    e.fullName = "الاسم يجب أن يكون 3 أحرف على الأقل";
 
-  // التحقق من رقم الهاتف المصري (11 رقم يبدأ بـ 01)
-  const egyptPhoneRegex = /^01[0125][0-9]{8}$/;
-  if (!form.phone.trim()) {
+  if (!form.phone.trim())
     e.phone = "رقم الهاتف مطلوب";
-  } else if (!egyptPhoneRegex.test(form.phone.trim())) {
-    e.phone = "رقم الهاتف غير صحيح، يجب أن يتكون من 11 رقم ويبدأ بـ 01";
-  }
+  else if (!/^01[0125]\d{8}$/.test(form.phone.trim()))
+    e.phone = "رقم الهاتف يجب أن يبدأ بـ 010 أو 011 أو 012 أو 015 ويتكون من 11 رقم";
 
-  // التحقق من صيغة البريد الإلكتروني
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!form.email.trim()) {
+  if (!form.email.trim())
     e.email = "البريد الإلكتروني مطلوب";
-  } else if (!emailRegex.test(form.email.trim())) {
-    e.email = "صيغة البريد الإلكتروني غير صحيحة";
-  }
+  else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email))
+    e.email = "البريد الإلكتروني غير صالح";
 
-  if (form.password.length < 8) e.password = "كلمة المرور يجب أن تكون 8 أحرف على الأقل";
-  if (!form.agreed) e.agreed = "يجب الموافقة على الشروط والأحكام";
+  if (!form.password)
+    e.password = "كلمة المرور مطلوبة";
+  else if (form.password.length < 8)
+    e.password = "كلمة المرور يجب أن تكون 8 أحرف على الأقل";
+  else if (!/\d/.test(form.password))
+    e.password = "كلمة المرور يجب أن تحتوي على رقم واحد على الأقل";
+
+  if (!form.agreed) e.agreed = "يجب الموافقة على الشروط";
 
   return e;
 }
@@ -62,11 +74,18 @@ export default function SignUpForm(): React.ReactElement {
   const [errors, setErrors] = useState<Errors>({});
   const [loading, setLoading] = useState<boolean>(false);
   const [success, setSuccess] = useState<boolean>(false);
+  const [serverError, setServerError] = useState<string>("");
 
-  // 3. دالة معالجة التغيير وحذف الأخطاء فوراً عند الكتابة
+  // Check which password rules pass
+  const passwordRules = PASSWORD_RULES.map((rule) => ({
+    ...rule,
+    passed: rule.test(form.password),
+  }));
+  const showPasswordRules = form.password.length > 0;
+
   const handleChange = (field: keyof FormState, value: any) => {
     setForm((prev) => ({ ...prev, [field]: value }));
-
+    setServerError("");
     if (errors[field]) {
       setErrors((prev) => {
         const newErrs = { ...prev };
@@ -76,7 +95,6 @@ export default function SignUpForm(): React.ReactElement {
     }
   };
 
-  // 4. دالة الإرسال والربط الحقيقي مع الباك اند واصطياد الأخطاء المتكررة
   const handleSubmit = async () => {
     const validationErrors = validate(form);
 
@@ -86,11 +104,16 @@ export default function SignUpForm(): React.ReactElement {
     }
 
     setLoading(true);
-    try {
+    setServerError("");
 
-      // الربط مع مسار الـ Register في الباك اند
-      //const response = await fetch("http://localhost:5000/api/v1/auth/register", {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/auth/register`, {
+    try {
+      const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+      const roleMap: Record<AccountType, string> = {
+        customer: "client",
+        owner: "laundry_owner",
+      };
+
+      const response = await fetch(`${API_URL}/api/v1/auth/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -98,34 +121,19 @@ export default function SignUpForm(): React.ReactElement {
           phone: form.phone,
           email: form.email,
           password: form.password,
-          role: form.accountType, // يرسل "client" أو "laundry_owner" مباشرة
+          role: roleMap[form.accountType],
         }),
       });
 
       const data = await response.json();
 
-      // if (response.ok) {
-      //   setSuccess(true); // تفعيل شاشة النجاح
-      // }
       if (response.ok) {
-        localStorage.setItem("token", data.data.accessToken);
-        localStorage.setItem("refreshToken", data.data.refreshToken);
-        localStorage.setItem("user", JSON.stringify(data.data.user));
         setSuccess(true);
+      } else {
+        setServerError(data.message || "حدث خطأ أثناء إنشاء الحساب");
       }
-      else {
-        // فحص نوع الخطأ المسترجع وعرضه فوق الحقل المخصص له
-        if (data.message && data.message.includes("البريد")) {
-          setErrors({ email: data.message });
-        } else if (data.message && data.message.includes("الهاتف")) {
-          setErrors({ phone: data.message });
-        } else {
-          alert(data.message || "فشل تسجيل الحساب");
-        }
-      }
-    } catch (error) {
-      console.error("Register Error:", error);
-      alert("حدث خطأ في الاتصال بالسيرفر، تأكدي من تشغيل السيرفر المحلي");
+    } catch {
+      setServerError("حدث خطأ في الاتصال بالسيرفر. تأكد من تشغيل الباك اند");
     } finally {
       setLoading(false);
     }
@@ -135,6 +143,7 @@ export default function SignUpForm(): React.ReactElement {
     setSuccess(false);
     setForm(INITIAL_FORM);
     setErrors({});
+    setServerError("");
   };
 
   if (success) {
@@ -144,18 +153,37 @@ export default function SignUpForm(): React.ReactElement {
   return (
     <div dir="rtl" style={{ display: "flex", flexDirection: "column", gap: 18 }}>
 
-      {/* اختيار نوع الحساب */}
+      {/* Server error */}
+      {serverError && (
+        <div style={{
+          background: "#ffdad6",
+          border: "1px solid #ba1a1a",
+          borderRadius: 10,
+          padding: "10px 14px",
+          color: "#ba1a1a",
+          fontSize: 13,
+          fontFamily: "Cairo, sans-serif",
+          display: "flex",
+          alignItems: "center",
+          gap: 8,
+        }}>
+          <span>⚠</span>
+          <span>{serverError}</span>
+        </div>
+      )}
+
+      {/* Account type selector */}
       <AccountTypeSelector
         value={form.accountType}
         onChange={(type: AccountType) => handleChange("accountType", type)}
         delay=".12s"
       />
 
-      {/* مجموعة حقول الإدخال */}
+      {/* Input fields */}
       <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
         <InputField
           label="الاسم الكامل"
-          placeholder="أدخل اسمك"
+          placeholder="أدخل اسمك (3 أحرف على الأقل)"
           value={form.fullName}
           onChange={(e: ChangeEvent<HTMLInputElement>) => handleChange("fullName", e.target.value)}
           error={errors.fullName}
@@ -164,7 +192,7 @@ export default function SignUpForm(): React.ReactElement {
 
         <InputField
           label="رقم الهاتف"
-          placeholder="011xxxxxxxx" // Placeholder بالمصري جاهز ومناسب
+          placeholder="01xxxxxxxxx"
           value={form.phone}
           onChange={(e: ChangeEvent<HTMLInputElement>) => handleChange("phone", e.target.value)}
           error={errors.phone}
@@ -181,18 +209,68 @@ export default function SignUpForm(): React.ReactElement {
           delay=".40s"
         />
 
+        {/* Password field with live rules */}
         <InputField
           label="كلمة المرور"
-          placeholder="********"
+          placeholder="أدخل كلمة مرور قوية"
           type="password"
           value={form.password}
           onChange={(e: ChangeEvent<HTMLInputElement>) => handleChange("password", e.target.value)}
           error={errors.password}
           delay=".50s"
         />
+
+        {/* Password rules - shown while typing */}
+        {showPasswordRules && (
+          <div style={{
+            background: "#f8fafc",
+            border: "1px solid #e2e8f0",
+            borderRadius: 10,
+            padding: "10px 14px",
+            display: "flex",
+            flexDirection: "column",
+            gap: 6,
+          }}>
+            <p style={{ fontSize: 12, color: "#64748b", fontFamily: "Cairo", fontWeight: 600, marginBottom: 2 }}>
+              متطلبات كلمة المرور:
+            </p>
+            {passwordRules.map((rule) => (
+              <div key={rule.id} style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+                flexDirection: "row-reverse",
+                justifyContent: "flex-start",
+              }}>
+                <span style={{
+                  width: 18,
+                  height: 18,
+                  borderRadius: "50%",
+                  background: rule.passed ? "#dcfce7" : "#f1f5f9",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: 11,
+                  flexShrink: 0,
+                  transition: "background 0.3s",
+                }}>
+                  {rule.passed ? "✓" : "○"}
+                </span>
+                <span style={{
+                  fontSize: 12,
+                  fontFamily: "Cairo, sans-serif",
+                  color: rule.passed ? "#16a34a" : "#64748b",
+                  transition: "color 0.3s",
+                }}>
+                  {rule.label}
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
-      {/* الموافقة على الشروط */}
+      {/* Terms checkbox */}
       <Checkbox
         checked={form.agreed}
         onChange={(e: ChangeEvent<HTMLInputElement>) => handleChange("agreed", e.target.checked)}
@@ -212,7 +290,7 @@ export default function SignUpForm(): React.ReactElement {
         }
       />
 
-      {/* زر الإرسال */}
+      {/* Submit button */}
       <Button onClick={handleSubmit} loading={loading}>
         إنشاء حساب
       </Button>

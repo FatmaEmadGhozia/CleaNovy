@@ -1,200 +1,250 @@
 import React from "react";
-import { WashingMachineIcon } from "./Icons.js";
 
-type Feature = {
-  icon: string;
-  label: string;
+// ─── Bubble particles
+const Bubbles = () => {
+  const bubbles = [
+    { size: 6, left: "15%", delay: "0s", duration: "4s" },
+    { size: 10, left: "30%", delay: "1s", duration: "5s" },
+    { size: 5, left: "55%", delay: "0.5s", duration: "3.5s" },
+    { size: 8, left: "70%", delay: "1.5s", duration: "4.5s" },
+    { size: 4, left: "85%", delay: "0.8s", duration: "3s" },
+    { size: 7, left: "45%", delay: "2s", duration: "5.5s" },
+  ];
+
+  return (
+    <>
+      {bubbles.map((b, i) => (
+        <div
+          key={i}
+          style={{
+            position: "absolute",
+            bottom: "-20px",
+            left: b.left,
+            width: b.size,
+            height: b.size,
+            borderRadius: "50%",
+            border: "1.5px solid rgba(45,212,191,0.5)",
+            background: "rgba(45,212,191,0.1)",
+            animation: `bubbleFloat ${b.duration} ${b.delay} ease-in infinite`,
+          }}
+        />
+      ))}
+    </>
+  );
 };
 
-const FEATURES: Feature[] = [
-  { icon: "⚡", label: "سرعة في التنفيذ" },
-  { icon: "✓", label: "جودة مضمونة" },
-];
-
 export default function SideBanner(): React.ReactElement {
+  const stats = [
+    { value: "500+", label: "مغسلة" },
+    { value: "50K+", label: "عميل" },
+    { value: "4.9", label: "تقييم" },
+  ];
+
   return (
-    <div
-      style={{
+    <>
+      <style>{`
+        @keyframes bubbleFloat {
+          0%   { transform: translateY(0) scale(1); opacity: 0.7; }
+          50%  { transform: translateY(-120px) scale(1.1); opacity: 0.4; }
+          100% { transform: translateY(-260px) scale(0.8); opacity: 0; }
+        }
+        @keyframes slideUp {
+          from { opacity: 0; transform: translateY(30px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes orb-pulse {
+          0%, 100% { opacity: 0.6; transform: scale(1); }
+          50%       { opacity: 1;   transform: scale(1.08); }
+        }
+        .banner-slide-up {
+          animation: slideUp 0.6s ease both;
+        }
+      `}</style>
+
+      <div style={{
         position: "relative",
+        width: "100%",
         height: "100%",
-        minHeight: 500,
+        minHeight: "100vh",
         display: "flex",
         flexDirection: "column",
-        justifyContent: "center",
+        justifyContent: "flex-end",
         overflow: "hidden",
-      }}
-    >
-      {/* Background */}
-      <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          background:
-            "linear-gradient(145deg, #0a1f38 0%, #0d4a4a 55%, #0a2a3a 100%)",
-        }}
-      />
-      <div
-        style={{
-          position: "absolute",
-          top: -60,
-          right: -60,
-          width: 260,
-          height: 260,
-          borderRadius: "50%",
-          background:
-            "radial-gradient(circle, rgba(45,212,191,.18) 0%, transparent 70%)",
-        }}
-      />
-      <div
-        style={{
-          position: "absolute",
-          bottom: -70,
-          left: -70,
-          width: 300,
-          height: 300,
-          borderRadius: "50%",
-          background:
-            "radial-gradient(circle, rgba(20,184,166,.15) 0%, transparent 70%)",
-        }}
-      />
-      <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          backgroundImage:
-            "linear-gradient(rgba(255,255,255,.04) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.04) 1px, transparent 1px)",
-          backgroundSize: "40px 40px",
-        }}
-      />
+      }}>
 
-      {/* Content */}
-      <div
-        style={{
-          position: "relative",
-          zIndex: 1,
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          padding: "40px 32px",
-          textAlign: "center",
-        }}
-      >
-        {/* Logo card */}
-        <div
-          className="glass fiu"
+        {/* ── Background image — same as LoginPage ── */}
+        <img
+          src="https://images.unsplash.com/photo-1545173168-9f1947eebb7f?w=900&q=85"
+          alt=""
+          aria-hidden="true"
           style={{
-            animationDelay: ".2s",
-            width: 88,
-            height: 88,
-            borderRadius: 24,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            marginBottom: 28,
+            position: "absolute",
+            inset: 0,
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
           }}
-        >
-          <WashingMachineIcon />
+        />
+
+        {/* ── Gradient overlay ── */}
+        <div style={{
+          position: "absolute",
+          inset: 0,
+          background: "linear-gradient(to bottom, rgba(6,28,46,0.3) 0%, rgba(6,28,46,0.6) 40%, rgba(6,28,46,0.92) 100%)",
+          zIndex: 1,
+        }} />
+
+        {/* ── Glow orb ── */}
+        <div style={{
+          position: "absolute",
+          top: 36,
+          right: 36,
+          width: 120,
+          height: 120,
+          borderRadius: "50%",
+          background: "radial-gradient(circle, rgba(45,212,191,0.55) 0%, rgba(45,212,191,0.15) 60%, transparent 100%)",
+          zIndex: 2,
+          animation: "orb-pulse 4s ease-in-out infinite",
+        }} />
+
+        {/* ── Bubbles ── */}
+        <div style={{ position: "absolute", inset: 0, zIndex: 2, overflow: "hidden" }}>
+          <Bubbles />
         </div>
 
-        <h1
-          className="fiu"
-          style={{
-            animationDelay: ".32s",
-            fontSize: 48,
-            fontWeight: 800,
+        {/* ── Content ── */}
+        <div style={{
+          position: "relative",
+          zIndex: 3,
+          padding: "48px 40px",
+          color: "#ffffff",
+        }}>
+          {/* Brand */}
+          <h2 style={{
+            fontSize: 52,
+            fontWeight: 900,
             color: "#fff",
-            margin: "0 0 12px",
-            letterSpacing: "-.02em",
-          }}
-        >
-          cleannovy
-        </h1>
+            margin: "0 0 14px",
+            letterSpacing: "-0.03em",
+            fontFamily: "'Cairo', sans-serif",
+            textShadow: "0 0 40px rgba(45,212,191,0.3)",
+            animation: "slideUp 0.5s 0.1s ease both",
+          }}>
+            Clea<span style={{ color: "#2dd4bf" }}>novy</span>
+          </h2>
 
-        <p
-          className="fiu"
-          style={{
-            animationDelay: ".44s",
+          {/* Title */}
+          <p style={{
+            fontSize: 24,
+            fontWeight: 700,
+            lineHeight: 1.5,
+            marginBottom: 14,
+            color: "#ffffff",
+            fontFamily: "'Cairo', sans-serif",
+            animation: "slideUp 0.5s 0.2s ease both",
+          }}>
+            نعتني بملابسك كما تعتني بها أنت
+          </p>
+
+          {/* Description */}
+          <p style={{
             fontSize: 14,
-            color: "#94a3b8",
-            lineHeight: 1.8,
-            maxWidth: 240,
-            margin: "0 0 32px",
-          }}
-        >
-          نعتني بملابسك كما تعتني بها أنت. انضم إلى أكبر شبكة لخدمات الغسيل
-          والكي في المنطقة.
-        </p>
+            color: "rgba(255,255,255,0.78)",
+            lineHeight: 1.9,
+            maxWidth: 340,
+            marginBottom: 28,
+            fontFamily: "'Cairo', sans-serif",
+            animation: "slideUp 0.5s 0.3s ease both",
+          }}>
+            انضم إلى آلاف المستخدمين وأصحاب المغاسل في أكبر شبكة
+            لخدمات الغسيل الرقمية في المنطقة.
+          </p>
 
-        {/* Feature pills */}
-        <div
-          className="fiu"
-          style={{
-            animationDelay: ".58s",
+          {/* Stats */}
+          <div style={{
             display: "flex",
             gap: 12,
-            width: "100%",
-            maxWidth: 260,
-          }}
-        >
-          {FEATURES.map((f, i) => (
-            <div
-              key={i}
-              className="glass"
-              style={{
-                flex: 1,
+            marginBottom: 28,
+            animation: "slideUp 0.5s 0.4s ease both",
+          }}>
+            {stats.map((s, i) => (
+              <div key={i} style={{
+                padding: "12px 18px",
                 borderRadius: 16,
-                padding: "14px 8px",
+                background: "rgba(255,255,255,0.1)",
+                border: "1px solid rgba(45,212,191,0.3)",
+                backdropFilter: "blur(8px)",
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "center",
-                gap: 8,
-              }}
-            >
-              <span style={{ fontSize: 22 }}>{f.icon}</span>
-              <span style={{ color: "#fff", fontSize: 12, fontWeight: 600 }}>
-                {f.label}
-              </span>
-            </div>
-          ))}
-        </div>
+                gap: 2,
+              }}>
+                <span style={{
+                  fontSize: 18, fontWeight: 800,
+                  color: "#2dd4bf",
+                  fontFamily: "'Cairo', sans-serif",
+                }}>
+                  {s.value}
+                </span>
+                <span style={{
+                  fontSize: 11,
+                  color: "rgba(255,255,255,0.7)",
+                  fontFamily: "'Cairo', sans-serif",
+                }}>
+                  {s.label}
+                </span>
+              </div>
+            ))}
+          </div>
 
-        {/* Dots */}
-        <div
-          className="fiu"
-          style={{
-            animationDelay: ".7s",
+          {/* Features */}
+          <div style={{
             display: "flex",
-            gap: 8,
+            gap: 10,
+            maxWidth: 300,
+            animation: "slideUp 0.5s 0.5s ease both",
+          }}>
+            {[
+              { icon: "⚡", label: "سرعة في التنفيذ" },
+              { icon: "✓", label: "جودة مضمونة" },
+            ].map((f, i) => (
+              <div key={i} style={{
+                flex: 1,
+                padding: "12px 8px",
+                borderRadius: 14,
+                background: "rgba(255,255,255,0.08)",
+                border: "1px solid rgba(255,255,255,0.12)",
+                backdropFilter: "blur(8px)",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: 6,
+              }}>
+                <span style={{ fontSize: 20 }}>{f.icon}</span>
+                <span style={{
+                  color: "#fff",
+                  fontSize: 12,
+                  fontWeight: 600,
+                  fontFamily: "'Cairo', sans-serif",
+                }}>
+                  {f.label}
+                </span>
+              </div>
+            ))}
+          </div>
+
+          {/* Copyright */}
+          <p style={{
             marginTop: 28,
-          }}
-        >
-          <span
-            style={{
-              width: 8,
-              height: 8,
-              borderRadius: "50%",
-              background: "#2dd4bf",
-            }}
-          />
-          <span
-            style={{
-              width: 8,
-              height: 8,
-              borderRadius: "50%",
-              background: "rgba(255,255,255,.25)",
-            }}
-          />
-          <span
-            style={{
-              width: 8,
-              height: 8,
-              borderRadius: "50%",
-              background: "rgba(255,255,255,.25)",
-            }}
-          />
+            fontSize: 12,
+            color: "rgba(255,255,255,0.4)",
+            fontFamily: "'Cairo', sans-serif",
+            animation: "slideUp 0.5s 0.6s ease both",
+          }}>
+            © 2024 · نظام Cleanovy الذكي · جميع الحقوق محفوظة
+          </p>
         </div>
       </div>
-    </div>
+    </>
   );
 }

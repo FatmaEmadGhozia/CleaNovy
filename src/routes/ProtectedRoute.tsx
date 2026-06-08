@@ -1,28 +1,21 @@
-// import { Navigate } from "react-router-dom";
-
-// export default function ProtectedRoute({ children }: any) {
-//   const token = localStorage.getItem("token");
-
-//   if (!token) {
-//     return <Navigate to="/login" replace />;
-//   }
-
-//   return children;
-// }
-
-
- import { Navigate } from "react-router-dom";
-//   أضفنا كلمة type هنا لحل المشكلة
-import type { ReactNode } from "react"; 
+import { Navigate } from "react-router-dom";
+import type { ReactNode } from "react";
+import { useAuth } from "@/context/AuthContext";
 
 interface ProtectedRouteProps {
   children: ReactNode;
 }
 
 export default function ProtectedRoute({ children }: ProtectedRouteProps) {
-  const token = localStorage.getItem("token");
+  const { user, isLoading } = useAuth();
 
-  if (!token) {
+  // لو لسه بيتحمل، مش هنعمل redirect
+  if (isLoading) {
+    return null;
+  }
+
+  // لو مفيش user بعد ما خلص التحميل، روح للـ login
+  if (!user) {
     return <Navigate to="/login" replace />;
   }
 

@@ -2,7 +2,7 @@
 
 import "./RoleSelector.css";
 
-// ── Types  
+// ── Types ──────────────────────────────────────────────────────────────────
 export type Role = "admin" | "laundry" | "client";
 
 interface RoleOption {
@@ -16,7 +16,7 @@ interface RoleSelectorProps {
   onRoleChange: (role: Role) => void;
 }
 
-// ── Data  
+// ── Data ───────────────────────────────────────────────────────────────────
 const ROLE_OPTIONS: RoleOption[] = [
   {
     id: "admin",
@@ -53,7 +53,7 @@ const ROLE_OPTIONS: RoleOption[] = [
   },
 ];
 
-// ── Component  
+// ── Component ──────────────────────────────────────────────────────────────
 const RoleSelector = ({ selectedRole, onRoleChange }: RoleSelectorProps) => {
   return (
     <div className="role-selector">

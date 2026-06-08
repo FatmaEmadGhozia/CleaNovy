@@ -32,7 +32,7 @@ const AccountInfoForm: React.FC<AccountInfoFormProps> = ({
             type="text"
             className="form-input"
             value={name}
-            onChange={(e) => onChange("name", e.target.value)}
+            onChange={(e) => onChange("fullName", e.target.value)}
             placeholder="أدخل اسمك الكامل"
             dir="rtl"
           />
@@ -65,7 +65,7 @@ const AccountInfoForm: React.FC<AccountInfoFormProps> = ({
             className="form-input"
             value={phone}
             onChange={(e) => onChange("phone", e.target.value)}
-            placeholder="+966 50 000 0000"
+            placeholder="01xxxxxxxxx"
             dir="ltr"
           />
         </div>

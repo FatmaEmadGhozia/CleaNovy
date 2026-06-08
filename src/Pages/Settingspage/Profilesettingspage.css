@@ -18,7 +18,7 @@
   --success: #10b981;
 }
 
-/* ─── Page wrapper ─────────────────────────────────────── */
+/*   Page wrapper  */
 .settings-page {
   min-height: 100vh;
   background: var(--bg);
@@ -369,4 +369,20 @@
   font-weight: 600;
   font-family: "Tajawal", sans-serif;
   cursor: pointer;
+}
+/* ─── Avatar Placeholder (when no image) ─────────────── */
+.avatar-placeholder {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  background: var(--teal);
+  border: 3px solid var(--teal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 36px;
+  font-weight: 700;
+  font-family: "Cairo", sans-serif;
+  text-transform: uppercase;
 }
