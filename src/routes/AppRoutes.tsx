@@ -7,6 +7,9 @@ import LandingPage from "@/components/landing/LandingPage";
 import LoginPage from "../Pages/Auth/LoginPage";
 import SignUpPage from "@/Pages/Auth/SignUpPage";
 import ProviderLayout from "@/Pages/provider/ProviderLayout";
+import CartPage from "@/Pages/orders/CartPage";
+import SchedulePage from "@/Pages/orders/SchedulePage";
+import CheckoutPage from "@/Pages/orders/CheckoutPage";
 
 
 export default function AppRoutes() {
@@ -18,8 +21,17 @@ export default function AppRoutes() {
   
 
         {/*  Public Routes */}
+
+
+
+{/* orders routes */}
+
+
+  <Route path="/cart"          element={<CartPage />} />
+        <Route path="/schedule"  element={<SchedulePage />} />
+        <Route path="/checkout"  element={<CheckoutPage />} />
         <Route path="/" element={<LandingPage />} />
-        
+      
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
          <Route path="/login" element={<LoginPage />} />

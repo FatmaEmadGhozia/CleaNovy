@@ -135,7 +135,7 @@
 
 
 import { useState, useEffect } from "react";
-import { Navigation, Menu, X } from "lucide-react";
+import { Navigation, Menu, X, ShoppingBag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -220,6 +220,17 @@ export default function Navbar() {
             <Navigation className="h-5 w-5" />
           </button>
 
+          <a
+            href="/cart"
+            className="p-2.5 rounded-xl text-[#0D1F3C]/70 hover:text-[rgb(0,201,177)] hover:bg-[rgb(0,201,177)]/10 transition-all duration-200 relative"
+            title="سلة الخدمات"
+          >
+            <ShoppingBag className="h-5 w-5" />
+            <span className="absolute -top-0.5 -right-0.5 w-4.5 h-4.5 bg-red-500 text-white text-[10px] rounded-full flex items-center justify-center font-bold shadow-sm">
+              4
+            </span>
+          </a>
+
           <Button
             className="rounded-2xl px-6 text-white font-semibold shadow-md shadow-[rgb(0,201,177)]/30 hover:shadow-lg hover:shadow-[rgb(0,201,177)]/40 hover:-translate-y-0.5 transition-all duration-200"
             style={{ backgroundColor: "rgb(0, 201, 177)" }}
@@ -271,8 +282,17 @@ export default function Navbar() {
             </button>
           ))}
 
-         <a href="/signup"> 
-         <Button
+          <a href="/cart"> 
+          <Button
+             className="w-full mt-2 rounded-2xl text-[#0D1F3C] font-semibold border border-[rgb(0,201,177)]/20 hover:bg-[rgb(0,201,177)]/10"
+             style={{ backgroundColor: "transparent" }}
+           >
+             سلة الخدمات (4)
+           </Button>
+           </a>
+
+          <a href="/signup"> 
+          <Button
             className="w-full mt-2 rounded-2xl text-white font-semibold"
             style={{ backgroundColor: "rgb(0, 201, 177)" }}
           >
