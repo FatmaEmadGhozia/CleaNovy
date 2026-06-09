@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Navigation, Menu, X } from "lucide-react";
+import { Navigation, Menu, X, ShoppingBag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useLocation, useNavigate } from "react-router-dom";

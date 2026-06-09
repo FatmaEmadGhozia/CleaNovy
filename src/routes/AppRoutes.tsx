@@ -7,6 +7,10 @@ import LandingPage from "@/components/landing/LandingPage";
 import LoginPage from "../Pages/Auth/LoginPage";
 import SignUpPage from "@/Pages/Auth/SignUpPage";
 import ProviderLayout from "@/Pages/provider/ProviderLayout";
+import CartPage from "@/Pages/orders/CartPage";
+import SchedulePage from "@/Pages/orders/SchedulePage";
+import CheckoutPage from "@/Pages/orders/CheckoutPage";
+
 import AboutPage from "@/Pages/AboutPage/AboutPage";
 import ContactPage from "@/Pages/ContactPage/ContactPage";
 import Settingspage from "@/Pages/Settingspage/Settingspage";
@@ -15,6 +19,22 @@ export default function AppRoutes() {
   return (
     <BrowserRouter>
       <Routes>
+      
+        
+  
+
+        {/*  Public Routes */}
+
+
+
+{/* orders routes */}
+
+
+  <Route path="/cart"          element={<CartPage />} />
+        <Route path="/schedule"  element={<SchedulePage />} />
+        <Route path="/checkout"  element={<CheckoutPage />} />
+      
+      
         {/* Public Routes */}
         <Route path="/" element={<LandingPage />} />
         <Route path="/about" element={<AboutPage />} />
