@@ -1,18 +1,16 @@
-import type { Page } from "../ProviderLayout";
+import type { Page } from "../types";
 
 interface Props {
   page: Page;
   setPage: (p: Page) => void;
 }
 
-const navItems = [
+const navItems: { id: Page; label: string; icon: string }[] = [
   { id: "dashboard", label: "لوحة القيادة", icon: "dashboard" },
   { id: "orders", label: "الطلبات", icon: "local_laundry_service" },
-//   { id: "partners", label: "الشركاء", icon: "handshake" },
   { id: "discounts", label: "الخصومات", icon: "payments" },
   { id: "settings", label: "الإعدادات", icon: "settings" },
-//   { id: "support", label: "الدعم", icon: "support_agent" },
-] as const;
+];
 
 export default function Sidebar({ page, setPage }: Props) {
   return (
@@ -32,11 +30,10 @@ export default function Sidebar({ page, setPage }: Props) {
       <nav className="flex-1 px-2 space-y-1">
         {navItems.map((item) => {
           const isActive = page === item.id;
-          const clickable = ["dashboard", "orders", "discounts"].includes(item.id);
           return (
             <button
               key={item.id}
-              onClick={() => clickable && setPage(item.id as Page)}
+              onClick={() => setPage(item.id)}
               className={`w-full flex items-center gap-3 px-4 py-3 transition-colors text-right ${
                 isActive
                   ? "bg-[#006B5D]/10 text-[#00C9B1] rounded-l-full mr-4"
@@ -71,9 +68,12 @@ export default function Sidebar({ page, setPage }: Props) {
 
       {/* Bottom */}
       <div className="p-6">
-        <button className="w-full py-3 px-4 bg-[#00C9B1] text-[#0D1F3C] font-bold rounded-xl flex items-center justify-center gap-2 hover:bg-[#38DDC4] transition-all active:scale-95">
-          <span className="material-symbols-outlined">add</span>
-          <span className="text-sm">إضافة شريك جديد</span>
+        <button
+          onClick={() => setPage("profile")}
+          className="w-full py-3 px-4 bg-[#00C9B1] text-[#0D1F3C] font-bold rounded-xl flex items-center justify-center gap-2 hover:bg-[#38DDC4] transition-all active:scale-95"
+        >
+          <span className="material-symbols-outlined">person</span>
+          <span className="text-sm">الملف الشخصي</span>
         </button>
         <div className="mt-6 pt-6 border-t border-white/10">
           <button className="flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-red-400 transition-colors w-full">

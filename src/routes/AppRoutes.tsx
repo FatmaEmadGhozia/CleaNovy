@@ -1,4 +1,4 @@
- import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
 import ProtectedRoute from "./ProtectedRoute";
 import ForgotPassword from "../Pages/Auth/ForgotPassword";
@@ -11,6 +11,9 @@ import CartPage from "@/Pages/orders/CartPage";
 import SchedulePage from "@/Pages/orders/SchedulePage";
 import CheckoutPage from "@/Pages/orders/CheckoutPage";
 
+import AboutPage from "@/Pages/AboutPage/AboutPage";
+import ContactPage from "@/Pages/ContactPage/ContactPage";
+import Settingspage from "@/Pages/Settingspage/Settingspage";
 
 export default function AppRoutes() {
   return (
@@ -30,24 +33,30 @@ export default function AppRoutes() {
   <Route path="/cart"          element={<CartPage />} />
         <Route path="/schedule"  element={<SchedulePage />} />
         <Route path="/checkout"  element={<CheckoutPage />} />
-        <Route path="/" element={<LandingPage />} />
       
+      
+        {/* Public Routes */}
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/about" element={<AboutPage />} />
+        <Route path="/contact" element={<ContactPage />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
          <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignUpPage />} /> 
-        <Route path="/provider" element={<ProviderLayout />} />
-        <Route path="*" element={<Navigate to="/provider" replace />} />
+        <Route path="/provider" element={<ProviderLayout />} /> 
+         <Route path="*" element={<Navigate to="/provider" replace />} />
+         {/* <Route path="/provider" element={<Provider />} /> */}
         {/* Protected Routes */}
         <Route
-          path="/dashboard"
+          path="/settings"
           element={
             <ProtectedRoute>
-              {/* <Dashboard /> */}
+              <Settingspage />
             </ProtectedRoute>
           }
         />
 
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
   );
