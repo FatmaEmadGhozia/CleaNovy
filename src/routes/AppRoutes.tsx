@@ -1,0 +1,43 @@
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+
+import ProtectedRoute from "./ProtectedRoute";
+import ForgotPassword from "../Pages/Auth/ForgotPassword";
+import ResetPassword from "../Pages/Auth/ResetPassword";
+import LandingPage from "@/components/landing/LandingPage";
+import LoginPage from "../Pages/Auth/LoginPage";
+import SignUpPage from "@/Pages/Auth/SignUpPage";
+import ProviderLayout from "@/Pages/provider/ProviderLayout";
+import AboutPage from "@/Pages/AboutPage/AboutPage";
+import ContactPage from "@/Pages/ContactPage/ContactPage";
+import Settingspage from "@/Pages/Settingspage/Settingspage";
+import { CleannovyPage } from "@/Pages/CleannovyPage";
+export default function AppRoutes() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        {/* Public Routes */}
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/about" element={<AboutPage />} />
+        <Route path="/contact" element={<ContactPage />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/signup" element={<SignUpPage />} />
+        <Route path="/cleannovy" element={<CleannovyPage/>} />
+        <Route path="/provider" element={<ProviderLayout />} />
+
+        {/* Protected Routes */}
+        <Route
+          path="/settings"
+          element={
+            <ProtectedRoute>
+              <Settingspage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </BrowserRouter>
+  );
+}
