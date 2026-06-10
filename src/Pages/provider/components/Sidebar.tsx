@@ -1,3 +1,6 @@
+
+
+
 import type { Page } from "../types";
 
 interface Props {
@@ -8,8 +11,8 @@ interface Props {
 const navItems: { id: Page; label: string; icon: string }[] = [
   { id: "dashboard", label: "لوحة القيادة", icon: "dashboard" },
   { id: "orders", label: "الطلبات", icon: "local_laundry_service" },
+  { id: "services", label: "الخدمات", icon: "list_alt" },
   { id: "discounts", label: "الخصومات", icon: "payments" },
-  { id: "settings", label: "الإعدادات", icon: "settings" },
 ];
 
 export default function Sidebar({ page, setPage }: Props) {
@@ -18,11 +21,19 @@ export default function Sidebar({ page, setPage }: Props) {
       {/* Logo */}
       <div className="p-6 flex flex-col items-center gap-2">
         <div className="w-16 h-16 rounded-2xl bg-[#006B5D]/20 flex items-center justify-center mb-2">
-          <span className="material-symbols-outlined text-[#00C9B1] text-4xl" style={{ fontVariationSettings: "'FILL' 1" }}>
+          <span
+            className="material-symbols-outlined text-[#00C9B1] text-4xl"
+            style={{ fontVariationSettings: "'FILL' 1" }}
+          >
             local_laundry_service
           </span>
         </div>
-        <h1 className="text-2xl font-bold text-white tracking-tight" style={{ fontFamily: "Cairo, sans-serif" }}>نظيف</h1>
+        <h1
+          className="text-2xl font-bold text-white tracking-tight"
+          style={{ fontFamily: "Cairo, sans-serif" }}
+        >
+          نظيف
+        </h1>
         <span className="text-slate-400 text-xs">لوحة التحكم</span>
       </div>
 
@@ -50,27 +61,17 @@ export default function Sidebar({ page, setPage }: Props) {
             </button>
           );
         })}
-        {/* Services as sub-item */}
-        <button
-          onClick={() => setPage("services")}
-          className={`w-full flex items-center gap-3 px-4 py-3 transition-colors text-right ${
-            page === "services"
-              ? "bg-[#006B5D]/10 text-[#00C9B1] rounded-l-full mr-4"
-              : "text-slate-400 hover:text-white hover:bg-white/5"
-          }`}
-        >
-          <span className="material-symbols-outlined" style={page === "services" ? { fontVariationSettings: "'FILL' 1" } : {}}>
-            list_alt
-          </span>
-          <span className="font-medium text-sm">الخدمات</span>
-        </button>
       </nav>
 
       {/* Bottom */}
       <div className="p-6">
         <button
           onClick={() => setPage("profile")}
-          className="w-full py-3 px-4 bg-[#00C9B1] text-[#0D1F3C] font-bold rounded-xl flex items-center justify-center gap-2 hover:bg-[#38DDC4] transition-all active:scale-95"
+          className={`w-full py-3 px-4 font-bold rounded-xl flex items-center justify-center gap-2 transition-all active:scale-95 ${
+            page === "profile"
+              ? "bg-[#00C9B1] text-[#0D1F3C]"
+              : "bg-white/10 text-white hover:bg-[#00C9B1] hover:text-[#0D1F3C]"
+          }`}
         >
           <span className="material-symbols-outlined">person</span>
           <span className="text-sm">الملف الشخصي</span>

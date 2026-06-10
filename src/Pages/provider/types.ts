@@ -1,4 +1,6 @@
-export type Page = "dashboard" | "orders" | "services" | "discounts" | "settings" | "profile";
+
+
+export type Page = "dashboard" | "orders" | "services" | "discounts" | "profile";
 
 export type OrderStatus = "new" | "processing" | "ready" | "delivering" | "done" | "cancelled";
 
@@ -17,7 +19,7 @@ export interface OrderCategory {
 }
 
 export interface Service {
-  id: number;
+  id: string;
   categoryId: string;
   icon: string;
   name: string;
@@ -49,7 +51,7 @@ export interface Order {
 }
 
 export interface DiscountTier {
-  id: number;
+  id: string;
   name: string;
   minQty: number;
   maxQty: number | null;
@@ -60,6 +62,7 @@ export interface DiscountTier {
 
 export interface SpecialEntity {
   id: string;
+  entityKey: string;
   icon: string;
   label: string;
   sub: string;

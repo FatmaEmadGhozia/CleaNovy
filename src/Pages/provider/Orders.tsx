@@ -1,7 +1,10 @@
-import { useState, type ReactNode } from "react";
+
+
+
+import { useState, useEffect, type ReactNode } from "react";
 import { useProvider } from "./context/ProviderContext";
 import type { Order, OrderStatus } from "./types";
-import { ORDER_STATUS_LABELS, ORDER_CATEGORY_ICONS } from "./types";
+import { ORDER_STATUS_LABELS } from "./types";
 
 type Tab = "all" | OrderStatus;
 
@@ -22,17 +25,34 @@ const NEXT_STATUS: Partial<Record<OrderStatus, OrderStatus[]>> = {
 
 export default function Orders() {
   const {
-    orders, orderCategories, orderStats,
-    acceptOrder, rejectOrder, updateOrderStatus, addOrderCategory, deleteOrderCategory, showToast,
+    orders, orderStats,
+    acceptOrder, rejectOrder, updateOrderStatus, showToast, fetchOrderDetails,
+    defaultOrderTab, setDefaultOrderTab,
   } = useProvider();
 
-  const [activeTab, setActiveTab] = useState<Tab>("all");
+  const [activeTab, setActiveTab] = useState<Tab>(defaultOrderTab as Tab || "all");
   const [activeCategory, setActiveCategory] = useState<string | "all">("all");
-  const [selectedId, setSelectedId] = useState(orders[0]?.id ?? "");
-  const [showAddCategory, setShowAddCategory] = useState(false);
+  const [selectedId, setSelectedId] = useState("");
   const [showFilter, setShowFilter] = useState(false);
-  const [newCatLabel, setNewCatLabel] = useState("");
-  const [newCatIcon, setNewCatIcon] = useState<string>(ORDER_CATEGORY_ICONS[0]);
+
+  // auto-select first order and fetch its details when orders load
+  useEffect(() => {
+    if (orders.length > 0 && !selectedId) {
+      const firstId = orders[0].id;
+      setSelectedId(firstId);
+      fetchOrderDetails(firstId);
+    }
+  }, [orders.length]);
+
+  // reset defaultOrderTab after using it
+  useEffect(() => {
+    return () => setDefaultOrderTab("all");
+  }, []);
+
+  const handleSelectOrder = (id: string) => {
+    setSelectedId(id);
+    fetchOrderDetails(id);
+  };
 
   const tabs: { id: Tab; label: string; count?: number; countColor?: string }[] = [
     { id: "all", label: "الكل" },
@@ -44,27 +64,22 @@ export default function Orders() {
     { id: "cancelled", label: "ملغي" },
   ];
 
+  // derive unique service names from all loaded order items
+  const allServiceNames = [
+    ...new Set(
+      orders.flatMap((o) => o.itemsList.map((i) => i.name))
+    ),
+  ].filter(Boolean);
+
   const filtered = orders.filter((o) => {
     const tabMatch = activeTab === "all" || o.status === activeTab;
-    const catMatch = activeCategory === "all" || o.categoryId === activeCategory;
+    const catMatch =
+      activeCategory === "all" ||
+      o.itemsList.some((i) => i.name === activeCategory);
     return tabMatch && catMatch;
   });
 
   const selectedOrder = orders.find((o) => o.id === selectedId) ?? filtered[0];
-
-  const handleAddCategory = () => {
-    if (!newCatLabel.trim()) return;
-    const colors = ["bg-purple-500", "bg-pink-500", "bg-indigo-500", "bg-teal-500"];
-    addOrderCategory(newCatLabel.trim(), newCatIcon, colors[orderCategories.length % colors.length]);
-    setNewCatLabel("");
-    setShowAddCategory(false);
-  };
-
-  const handleDeleteCategory = (id: string) => {
-    if (deleteOrderCategory(id) && activeCategory === id) {
-      setActiveCategory("all");
-    }
-  };
 
   const downloadReport = () => {
     const report = orders.map((o) => `${o.id} | ${o.customerName} | ${ORDER_STATUS_LABELS[o.status]} | ${o.price} ر.س`).join("\n");
@@ -110,14 +125,8 @@ export default function Orders() {
           <div className="bg-white rounded-2xl shadow-sm border border-[#0D1F3C]/5 p-4">
             <div className="flex justify-between items-center mb-3">
               <h3 className="font-bold text-sm text-[#0D1F3C]">التصنيفات</h3>
-              <button
-                onClick={() => setShowAddCategory(true)}
-                className="p-1.5 rounded-lg text-[#006B5D] hover:bg-[#EFF4FA] transition-all"
-                title="إضافة تصنيف"
-              >
-                <span className="material-symbols-outlined text-lg">add_circle</span>
-              </button>
             </div>
+            {/* الكل */}
             <button
               onClick={() => setActiveCategory("all")}
               className={`w-full flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm transition-all mb-1 ${
@@ -128,28 +137,25 @@ export default function Orders() {
               الكل
               <span className="mr-auto text-xs">{orders.length}</span>
             </button>
-            {orderCategories.map((cat) => (
-              <div key={cat.id} className="group flex items-center gap-1">
-                <button
-                  onClick={() => setActiveCategory(cat.id)}
-                  className={`flex-1 flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm transition-all ${
-                    activeCategory === cat.id ? "bg-[#EFF4FA] text-[#006B5D] font-bold" : "text-slate-500 hover:bg-[#EFF4FA]/50"
-                  }`}
-                >
-                  <span className={`w-2 h-2 rounded-full ${cat.color}`} />
-                  <span className="material-symbols-outlined text-lg">{cat.icon}</span>
-                  {cat.label}
-                  <span className="mr-auto text-xs">{orders.filter((o) => o.categoryId === cat.id).length}</span>
-                </button>
-                <button
-                  onClick={() => handleDeleteCategory(cat.id)}
-                  className="p-1 rounded-lg text-slate-300 hover:text-red-500 hover:bg-red-50 opacity-0 group-hover:opacity-100 transition-all"
-                  title="حذف التصنيف"
-                >
-                  <span className="material-symbols-outlined text-base">delete</span>
-                </button>
-              </div>
+            {/* dynamic service names */}
+            {allServiceNames.map((name) => (
+              <button
+                key={name}
+                onClick={() => setActiveCategory(name)}
+                className={`w-full flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm transition-all ${
+                  activeCategory === name ? "bg-[#EFF4FA] text-[#006B5D] font-bold" : "text-slate-500 hover:bg-[#EFF4FA]/50"
+                }`}
+              >
+                <span className="material-symbols-outlined text-lg">dry_cleaning</span>
+                {name}
+                <span className="mr-auto text-xs">
+                  {orders.filter((o) => o.itemsList.some((i) => i.name === name)).length}
+                </span>
+              </button>
             ))}
+            {allServiceNames.length === 0 && (
+              <p className="text-xs text-slate-400 text-center py-2">اضغط على طلب لتحميل التصنيفات</p>
+            )}
           </div>
         </aside>
 
@@ -197,7 +203,7 @@ export default function Orders() {
                     key={order.id}
                     order={order}
                     selected={selectedOrder?.id === order.id}
-                    onSelect={() => setSelectedId(order.id)}
+                    onSelect={() => handleSelectOrder(order.id)}
                     onAccept={() => acceptOrder(order.id)}
                     onReject={() => rejectOrder(order.id)}
                     onStatusChange={(s) => updateOrderStatus(order.id, s)}
@@ -222,41 +228,6 @@ export default function Orders() {
         </div>
       </div>
 
-      {/* Add Category Modal */}
-      {showAddCategory && (
-        <Modal title="إضافة تصنيف جديد" onClose={() => setShowAddCategory(false)}>
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-bold text-[#0D1F3C] mb-2">اسم التصنيف</label>
-              <input
-                value={newCatLabel}
-                onChange={(e) => setNewCatLabel(e.target.value)}
-                placeholder="مثال: أزياء رسمية"
-                className="w-full bg-[#EFF4FA] rounded-xl py-3 px-4 outline-none focus:ring-2 focus:ring-[#006B5D]/20 text-sm"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-bold text-[#0D1F3C] mb-2">الأيقونة</label>
-              <div className="flex flex-wrap gap-2">
-                {ORDER_CATEGORY_ICONS.map((icon) => (
-                  <button
-                    key={icon}
-                    onClick={() => setNewCatIcon(icon)}
-                    className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${
-                      newCatIcon === icon ? "bg-[#006B5D] text-white" : "bg-[#EFF4FA] text-[#0D1F3C]"
-                    }`}
-                  >
-                    <span className="material-symbols-outlined">{icon}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-            <button onClick={handleAddCategory} className="w-full py-3 bg-[#006B5D] text-white rounded-full font-bold text-sm hover:bg-[#005046]">
-              إضافة التصنيف
-            </button>
-          </div>
-        </Modal>
-      )}
     </div>
   );
 }

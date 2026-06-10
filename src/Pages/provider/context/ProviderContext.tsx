@@ -1,4 +1,7 @@
-import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from "react";
+
+import { createContext, useContext, useState, useCallback, useEffect, useRef, type ReactNode } from "react";
+
+const BASE_URL = "http://localhost:3000/api/v1";
 import type {
   Service,
   ServiceCategory,
@@ -37,17 +40,17 @@ const initialOrderCategories: OrderCategory[] = [
 
 const initialServices: Service[] = [
   {
-    id: 1, categoryId: "clothes", icon: "dry_cleaning", name: "غسيل وكوي (ثوب/قميص)",
+    id: "1", categoryId: "clothes", icon: "dry_cleaning", name: "غسيل وكوي (ثوب/قميص)",
     description: "غسيل وكوي احترافي للثوب والقميص", durationHours: 24,
     duration: "الوقت المتوقع: 24 ساعة", price: "15.00", fastService: true, multiplier: "x1.5", active: true,
   },
   {
-    id: 2, categoryId: "clothes", icon: "iron", name: "كوي فقط",
+    id: "2", categoryId: "clothes", icon: "iron", name: "كوي فقط",
     description: "كوي فقط بدون غسيل", durationHours: 12,
     duration: "الوقت المتوقع: 12 ساعة", price: "8.00", fastService: true, multiplier: "x1.2", active: true,
   },
   {
-    id: 3, categoryId: "clothes", icon: "checkroom", name: "غسيل جاف (فستان سهرة)",
+    id: "3", categoryId: "clothes", icon: "checkroom", name: "غسيل جاف (فستان سهرة)",
     description: "تنظيف جاف للأزياء الراقية", durationHours: 48,
     duration: "غير متاح مؤقتاً", price: "45.00", fastService: false, multiplier: "--", active: false,
   },
@@ -110,17 +113,17 @@ const initialOrders: Order[] = [
 ];
 
 const initialTiers: DiscountTier[] = [
-  { id: 1, name: "Standard", minQty: 0, maxQty: 10, discount: 0, color: "bg-slate-300", active: true },
-  { id: 2, name: "Bronze", minQty: 11, maxQty: 30, discount: 10, color: "bg-orange-400", active: true },
-  { id: 3, name: "Silver", minQty: 31, maxQty: 60, discount: 15, color: "bg-slate-400", active: true },
-  { id: 4, name: "Gold", minQty: 61, maxQty: 100, discount: 20, color: "bg-yellow-500", active: true },
-  { id: 5, name: "Platinum", minQty: 101, maxQty: null, discount: 25, color: "bg-cyan-400", active: false },
+  { id: "1", name: "Standard", minQty: 0, maxQty: 10, discount: 0, color: "bg-slate-300", active: true },
+  { id: "2", name: "Bronze", minQty: 11, maxQty: 30, discount: 10, color: "bg-orange-400", active: true },
+  { id: "3", name: "Silver", minQty: 31, maxQty: 60, discount: 15, color: "bg-slate-400", active: true },
+  { id: "4", name: "Gold", minQty: 61, maxQty: 100, discount: 20, color: "bg-yellow-500", active: true },
+  { id: "5", name: "Platinum", minQty: 101, maxQty: null, discount: 25, color: "bg-cyan-400", active: false },
 ];
 
 const initialSpecialEntities: SpecialEntity[] = [
-  { id: "mosque", icon: "mosque", label: "المساجد", sub: "خصم ثابت للخدمات", value: 50, bg: "bg-emerald-100", color: "text-emerald-700", enabled: true },
-  { id: "school", icon: "school", label: "المدارس", sub: "خصم الزي المدرسي", value: 30, bg: "bg-blue-100", color: "text-blue-700", enabled: true },
-  { id: "hospital", icon: "medical_services", label: "المستشفيات", sub: "خصم التعقيم الخاص", value: 40, bg: "bg-red-100", color: "text-red-700", enabled: false },
+  { id: "mosque", entityKey: "mosque", icon: "mosque", label: "المساجد", sub: "خصم ثابت للخدمات", value: 50, bg: "bg-emerald-100", color: "text-emerald-700", enabled: true },
+  { id: "school", entityKey: "school", icon: "school", label: "المدارس", sub: "خصم الزي المدرسي", value: 30, bg: "bg-blue-100", color: "text-blue-700", enabled: true },
+  { id: "hospital", entityKey: "hospital", icon: "medical_services", label: "المستشفيات", sub: "خصم التعقيم الخاص", value: 40, bg: "bg-red-100", color: "text-red-700", enabled: false },
 ];
 
 const initialNotifications: Notification[] = [
@@ -154,39 +157,56 @@ interface ProviderContextValue {
   setPickupEnabled: (v: boolean) => void;
   setLaundryCapacity: (v: number) => void;
   showToast: (message: string, type?: ToastMessage["type"]) => void;
-  addService: (form: NewServiceForm) => void;
-  deleteService: (id: number) => void;
-  updateService: (id: number, updates: Partial<Service>) => void;
+  servicesLoading: boolean;
+  fetchServices: (categoryId?: string) => Promise<void>;
+  addService: (form: NewServiceForm) => Promise<void>;
+  deleteService: (id: string) => Promise<void>;
+  updateService: (id: string, updates: Partial<Service>) => Promise<void>;
   searchQuery: string;
   setSearchQuery: (q: string) => void;
-  addServiceCategory: (label: string, icon: string) => string;
-  deleteServiceCategory: (id: string) => boolean;
+  addServiceCategory: (label: string, icon: string) => Promise<string>;
+  deleteServiceCategory: (id: string) => Promise<boolean>;
   addOrderCategory: (label: string, icon: string, color: string) => void;
   deleteOrderCategory: (id: string) => boolean;
-  updateOrderStatus: (id: string, status: OrderStatus) => void;
-  acceptOrder: (id: string) => void;
-  rejectOrder: (id: string) => void;
-  addDiscountTier: (tier: Omit<DiscountTier, "id">) => void;
-  updateDiscountTier: (id: number, updates: Partial<DiscountTier>) => void;
-  toggleDiscountTier: (id: number) => void;
+  updateOrderStatus: (id: string, status: OrderStatus) => Promise<void>;
+  acceptOrder: (id: string) => Promise<void>;
+  rejectOrder: (id: string) => Promise<void>;
+  fetchOrderDetails: (id: string) => Promise<void>;
+  dashboardStats: {
+    stats: { new: number; processing: number; ready: number; delivering: number; done: number; cancelled: number; revenue: number };
+    capacityPct: number;
+    outForDeliveryCount: number;
+    urgentOrders: any[];
+    revenueChart: { date: string; revenue: number }[];
+  } | null;
+  fetchDashboard: () => Promise<void>;
+  addDiscountTier: (tier: Omit<DiscountTier, "id">) => Promise<void>;
+  updateDiscountTier: (id: string, updates: Partial<DiscountTier>) => Promise<void>;
+  toggleDiscountTier: (id: string) => Promise<void>;
+  deleteDiscountTier: (id: string) => Promise<void>;
   updateSpecialEntity: (id: string, updates: Partial<SpecialEntity>) => void;
-  saveSpecialEntities: () => void;
+  saveSpecialEntities: () => Promise<void>;
   markNotificationRead: (id: number) => void;
   markAllNotificationsRead: () => void;
   updateProfile: (updates: Partial<ProviderProfile>) => void;
   unreadCount: number;
   orderStats: { new: number; processing: number; ready: number; delivering: number; done: number; cancelled: number; revenue: number };
+  defaultOrderTab: string;
+  setDefaultOrderTab: (tab: string) => void;
 }
 
 const ProviderContext = createContext<ProviderContextValue | null>(null);
 
 export function ProviderProvider({ children }: { children: ReactNode }) {
-  const [categories, setCategories] = useState(initialCategories);
+  const [categories, setCategories] = useState<ServiceCategory[]>([]);
   const [orderCategories, setOrderCategories] = useState(initialOrderCategories);
-  const [services, setServices] = useState(initialServices);
-  const [orders, setOrders] = useState(initialOrders);
-  const [discountTiers, setDiscountTiers] = useState(initialTiers);
-  const [specialEntities, setSpecialEntities] = useState(initialSpecialEntities);
+  const [services, setServices] = useState<Service[]>([]);
+  const [servicesLoading, setServicesLoading] = useState(false);
+  const activeCategoryRef = useRef<string | null>(null);
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [dashboardStats, setDashboardStats] = useState<any | null>(null);
+  const [discountTiers, setDiscountTiers] = useState<DiscountTier[]>([]);
+  const [specialEntities, setSpecialEntities] = useState<SpecialEntity[]>([]);
   const [notifications, setNotifications] = useState(initialNotifications);
   const [profile, setProfile] = useState(initialProfile);
   const [pickupEnabled, setPickupEnabled] = useState(true);
@@ -195,12 +215,271 @@ export function ProviderProvider({ children }: { children: ReactNode }) {
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [toast, setToast] = useState<ToastMessage | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [defaultOrderTab, setDefaultOrderTab] = useState("all");
 
   useEffect(() => {
     if (!toast) return;
     const t = setTimeout(() => setToast(null), 3000);
     return () => clearTimeout(t);
   }, [toast]);
+
+  // ── Status mapping helpers ───────────────────────────────────
+  const backendToFrontendStatus = (s: string): OrderStatus => {
+    const map: Record<string, OrderStatus> = {
+      pending: "new",
+      accepted: "processing",
+      in_progress: "processing",
+      ready: "ready",
+      out_for_delivery: "delivering",
+      delivered: "done",
+      cancelled: "cancelled",
+    };
+    return map[s] ?? "new";
+  };
+
+  const frontendToBackendStatus = (s: OrderStatus): string => {
+    const map: Record<OrderStatus, string> = {
+      new: "pending",
+      processing: "accepted",
+      ready: "ready",
+      delivering: "out_for_delivery",
+      done: "delivered",
+      cancelled: "cancelled",
+    };
+    return map[s];
+  };
+
+  // ── Fetch orders ─────────────────────────────────────────────
+  const fetchOrders = useCallback(async () => {
+    try {
+      const res = await fetch(`${BASE_URL}/provider/orders`);
+      const json = await res.json();
+      if (json.success) {
+        const mapped: Order[] = json.data.map((o: any) => ({
+          id: o._id,
+          customerName: o.client?.name ?? "عميل",
+          tag: null,
+          items: "اضغط لعرض التفاصيل",
+          itemCount: 0,
+          time: `الاستلام: ${new Date(o.pickup_time).toLocaleDateString("ar-SA")}`,
+          price: o.total_price ?? 0,
+          status: backendToFrontendStatus(o.status),
+          location: o.address?.address ?? "",
+          address: o.address?.address ?? "",
+          phone: o.client?.phone ?? "",
+          notes: o.notes ?? "",
+          categoryId: "clothes",
+          urgent: o.status === "pending",
+          itemsList: [],
+        }));
+        setOrders(mapped);
+      }
+    } catch (e) {
+      console.error("Failed to fetch orders", e);
+    }
+  }, []);
+
+  // ── Fetch order details (items) ──────────────────────────────
+  const fetchOrderDetails = useCallback(async (id: string) => {
+    try {
+      const res = await fetch(`${BASE_URL}/provider/orders/${id}`);
+      const json = await res.json();
+      if (json.success) {
+        const o = json.data;
+        const itemsList = (o.items ?? []).map((item: any) => ({
+          name: item.service?.name ?? "خدمة",
+          qty: `× ${item.quantity}`,
+        }));
+        const itemCount = (o.items ?? []).reduce((s: number, i: any) => s + (i.quantity ?? 1), 0);
+        const serviceNames = [
+          ...new Set((o.items ?? []).map((i: any) => i.service?.name).filter(Boolean)),
+        ] as string[];
+
+        setOrders((prev) => prev.map((order) =>
+          order.id === id
+            ? {
+                ...order,
+                itemsList,
+                itemCount,
+                items: itemCount > 0
+                  ? `${itemCount} قطعة (${serviceNames.join("، ")})`
+                  : "لا توجد عناصر",
+                notes: o.notes ?? order.notes,
+                address: o.address?.address ?? order.address,
+                phone: o.client?.phone ?? order.phone,
+              }
+            : order
+        ));
+      }
+    } catch (e) {
+      console.error("Failed to fetch order details", e);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchOrders();
+  }, [fetchOrders]);
+
+  // ── Dashboard SSE — real-time updates ───────────────────────
+  const fetchDashboard = useCallback(async () => {
+    try {
+      const res = await fetch(`${BASE_URL}/provider/dashboard`);
+      const json = await res.json();
+      if (json.success) setDashboardStats(json.data);
+    } catch (e) {
+      console.error("Failed to fetch dashboard", e);
+    }
+  }, []);
+
+  useEffect(() => {
+    // initial fetch
+    fetchDashboard();
+
+    // SSE for real-time updates
+    const es = new EventSource(`${BASE_URL}/provider/dashboard/live`);
+    es.onmessage = (e) => {
+      try {
+        const data = JSON.parse(e.data);
+        setDashboardStats(data);
+      } catch (err) {
+        console.error("SSE parse error", err);
+      }
+    };
+    es.onerror = () => {
+      console.warn("SSE connection error — falling back to polling");
+      es.close();
+    };
+
+    return () => es.close(); // cleanup on unmount
+  }, []);
+
+  // ── Fetch discount tiers ─────────────────────────────────────
+  const fetchDiscountTiers = useCallback(async () => {
+    try {
+      const res = await fetch(`${BASE_URL}/provider/discounts/tiers`);
+      const json = await res.json();
+      if (json.success) {
+        const mapped: DiscountTier[] = json.data.map((t: any) => ({
+          id: t._id,
+          name: t.name,
+          minQty: t.minQty,
+          maxQty: t.maxQty,
+          discount: t.discount,
+          color: t.color ?? "bg-slate-300",
+          active: t.is_active,
+        }));
+        setDiscountTiers(mapped);
+      }
+    } catch (e) {
+      console.error("Failed to fetch discount tiers", e);
+    }
+  }, []);
+
+  // ── Fetch special entities ───────────────────────────────────
+  const fetchSpecialEntities = useCallback(async () => {
+    try {
+      const res = await fetch(`${BASE_URL}/provider/discounts/special-entities`);
+      const json = await res.json();
+      if (json.success && json.data.length > 0) {
+        const bgMap: Record<string, string> = {
+          mosque: "bg-emerald-50",
+          school: "bg-blue-50",
+          hospital: "bg-red-50",
+        };
+        const colorMap: Record<string, string> = {
+          mosque: "text-emerald-600",
+          school: "text-blue-600",
+          hospital: "text-red-600",
+        };
+        const mapped: SpecialEntity[] = json.data.map((e: any) => ({
+          id: e._id,
+          entityKey: e.entityKey,
+          icon: e.icon,
+          label: e.label,
+          sub: e.sub ?? "",
+          value: e.discount,
+          bg: bgMap[e.entityKey] ?? "bg-slate-50",
+          color: colorMap[e.entityKey] ?? "text-slate-600",
+          enabled: e.is_enabled,
+        }));
+        setSpecialEntities(mapped);
+      }
+    } catch (e) {
+      console.error("Failed to fetch special entities", e);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchDiscountTiers();
+    fetchSpecialEntities();
+  }, [fetchDiscountTiers, fetchSpecialEntities]);
+
+  // ── Fetch categories on mount ────────────────────────────────
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const res = await fetch(`${BASE_URL}/provider/services/categories`);
+        const json = await res.json();
+        if (json.success) {
+          const mapped: ServiceCategory[] = json.data.map((c: any) => ({
+            id: c._id,
+            label: c.name,
+            icon: c.icon || "category",
+            count: c.count,
+            isBasic: c.isBasic,
+          }));
+          setCategories(mapped);
+          // set first category as active default
+          if (mapped.length > 0 && !activeCategoryRef.current) {
+            activeCategoryRef.current = mapped[0].id;
+          }
+        }
+      } catch (e) {
+        console.error("Failed to fetch categories", e);
+      }
+    };
+    fetchCategories();
+  }, []);
+
+  // ── Fetch services on mount ──────────────────────────────────
+  const fetchServices = useCallback(async (categoryId?: string) => {
+    setServicesLoading(true);
+    try {
+      const url = categoryId
+        ? `${BASE_URL}/provider/services?category=${categoryId}`
+        : `${BASE_URL}/provider/services`;
+      const res = await fetch(url);
+      const json = await res.json();
+      if (json.success) {
+        const mapped: Service[] = json.data.map((ps: any) => ({
+          id: ps._id,
+          categoryId: ps.service?.parent?._id ?? "",
+          icon: ps.service?.icon || "dry_cleaning",
+          name: ps.service?.name ?? "",
+          description: ps.service?.description ?? "",
+          durationHours: ps.service?.duration_hours ?? 24,
+          duration: ps.service?.duration_hours
+            ? ps.service.duration_hours < 24
+              ? `الوقت المتوقع: ${ps.service.duration_hours} ساعة`
+              : `الوقت المتوقع: ${Math.floor(ps.service.duration_hours / 24)} ${Math.floor(ps.service.duration_hours / 24) === 1 ? "يوم" : "أيام"}`
+            : "الوقت المتوقع: 1 يوم",
+          price: String(ps.price),
+          fastService: ps.fast_service ?? false,
+          multiplier: ps.fast_multiplier ? `x${ps.fast_multiplier}` : "x1.5",
+          active: ps.is_active ?? true,
+        }));
+        setServices(mapped);
+      }
+    } catch (e) {
+      console.error("Failed to fetch services", e);
+    } finally {
+      setServicesLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchServices();
+  }, [fetchServices]);
 
   const showToast = useCallback((message: string, type: ToastMessage["type"] = "success") => {
     setToast({ message, type });
@@ -213,59 +492,150 @@ export function ProviderProvider({ children }: { children: ReactNode }) {
     ]);
   }, []);
 
-  const addService = useCallback((form: NewServiceForm) => {
-    setServices((prev) => {
-      const newId = Math.max(0, ...prev.map((s) => s.id)) + 1;
-      const newService: Service = {
-        id: newId, categoryId: form.categoryId, icon: form.icon, name: form.name,
-        description: form.description, durationHours: form.durationHours,
-        duration: form.active ? formatDuration(form.durationHours) : "غير متاح مؤقتاً",
-        price: form.price, fastService: form.fastService,
-        multiplier: form.fastService ? form.multiplier : "--", active: form.active,
-      };
-      setCategories((cats) =>
-        cats.map((cat) => cat.id === form.categoryId ? { ...cat, count: cat.count + 1 } : cat)
-      );
-      return [...prev, newService];
-    });
-    pushNotification("تمت إضافة خدمة جديدة", `تم إضافة "${form.name}" إلى قائمة الخدمات`);
-    showToast("تمت إضافة الخدمة بنجاح");
+  const addService = useCallback(async (form: NewServiceForm) => {
+    try {
+      const multiplierNum = parseFloat(form.multiplier.replace("x", ""));
+      const res = await fetch(`${BASE_URL}/provider/services`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          categoryId: form.categoryId,
+          name: form.name,
+          description: form.description,
+          icon: form.icon,
+          duration_hours: form.durationHours,
+          price: parseFloat(form.price),
+          fast_service: form.fastService,
+          fast_multiplier: multiplierNum,
+          is_active: form.active,
+        }),
+      });
+      const json = await res.json();
+      if (json.success) {
+        // add new service to state immediately from response
+        const ps = json.data;
+        const newSvc: Service = {
+          id: ps._id,
+          categoryId: ps.service?.parent?._id ?? form.categoryId,
+          icon: ps.service?.icon || form.icon,
+          name: ps.service?.name ?? form.name,
+          description: ps.service?.description ?? form.description,
+          durationHours: ps.service?.duration_hours ?? form.durationHours,
+          duration: form.durationHours < 24
+            ? `الوقت المتوقع: ${form.durationHours} ساعة`
+            : `الوقت المتوقع: ${Math.floor(form.durationHours / 24)} ${Math.floor(form.durationHours / 24) === 1 ? "يوم" : "أيام"}`,
+          price: String(ps.price),
+          fastService: ps.fast_service ?? false,
+          multiplier: `x${ps.fast_multiplier ?? 1.5}`,
+          active: ps.is_active ?? true,
+        };
+        setServices((prev) => [...prev, newSvc]);
+        setCategories((prev) => prev.map((cat) =>
+          cat.id === form.categoryId ? { ...cat, count: cat.count + 1 } : cat
+        ));
+        pushNotification("تمت إضافة خدمة جديدة", `تم إضافة "${form.name}" إلى قائمة الخدمات`);
+        showToast("تمت إضافة الخدمة بنجاح");
+      } else {
+        showToast(json.message || "حدث خطأ", "error");
+      }
+    } catch (e) {
+      showToast("تعذر الاتصال بالسيرفر", "error");
+    }
   }, [pushNotification, showToast]);
 
-  const deleteService = useCallback((id: number) => {
-    setServices((prev) => {
-      const svc = prev.find((s) => s.id === id);
-      if (svc) {
-        setCategories((cats) =>
-          cats.map((cat) => cat.id === svc.categoryId ? { ...cat, count: Math.max(0, cat.count - 1) } : cat)
-        );
+  const deleteService = useCallback(async (id: string) => {
+    // optimistic update
+    setServices((prev) => prev.filter((s) => s.id !== id));
+    setCategories((prev) => prev.map((cat) => {
+      const svc = services.find((s) => s.id === id);
+      return svc && cat.id === svc.categoryId ? { ...cat, count: Math.max(0, cat.count - 1) } : cat;
+    }));
+    try {
+      const res = await fetch(`${BASE_URL}/provider/services/${id}`, { method: "DELETE" });
+      const json = await res.json();
+      if (json.success) {
+        showToast("تم حذف الخدمة");
+      } else {
+        // revert on failure
+        await fetchServices();
+        showToast(json.message || "حدث خطأ", "error");
       }
-      return prev.filter((s) => s.id !== id);
-    });
-    showToast("تم حذف الخدمة");
-  }, [showToast]);
+    } catch (e) {
+      await fetchServices();
+      showToast("تعذر الاتصال بالسيرفر", "error");
+    }
+  }, [services, fetchServices, showToast]);
 
-  const updateService = useCallback((id: number, updates: Partial<Service>) => {
+  const updateService = useCallback(async (id: string, updates: Partial<Service>) => {
+    // optimistic update — UI changes instantly
     setServices((prev) => prev.map((s) => (s.id === id ? { ...s, ...updates } : s)));
-  }, []);
+    try {
+      const body: any = {};
+      if (updates.price !== undefined) body.price = parseFloat(String(updates.price));
+      if (updates.fastService !== undefined) body.fast_service = updates.fastService;
+      if (updates.multiplier !== undefined) body.fast_multiplier = parseFloat(updates.multiplier.replace("x", ""));
+      if (updates.active !== undefined) body.is_active = updates.active;
+      if (updates.name !== undefined) body.name = updates.name;
+      if (updates.description !== undefined) body.description = updates.description;
+      if (updates.durationHours !== undefined) body.duration_hours = updates.durationHours;
 
-  const addServiceCategory = useCallback((label: string, icon: string) => {
-    const id = label.replace(/\s+/g, "-").toLowerCase() + "-" + Date.now();
-    setCategories((prev) => [...prev, { id, label, icon, count: 0 }]);
-    showToast(`تمت إضافة تصنيف "${label}"`);
-    return id;
+      const res = await fetch(`${BASE_URL}/provider/services/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      const json = await res.json();
+      if (!json.success) {
+        // revert on failure
+        await fetchServices();
+        showToast(json.message || "حدث خطأ", "error");
+      }
+    } catch (e) {
+      await fetchServices();
+      showToast("تعذر الاتصال بالسيرفر", "error");
+    }
+  }, [fetchServices, showToast]);
+
+  const addServiceCategory = useCallback(async (label: string, icon: string) => {
+    try {
+      const res = await fetch(`${BASE_URL}/provider/services/categories`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: label, icon }),
+      });
+      const json = await res.json();
+      if (json.success) {
+        const newId = json.data._id;
+        setCategories((prev) => [...prev, { id: newId, label, icon, count: 0, isBasic: false }]);
+        showToast(`تمت إضافة تصنيف "${label}"`);
+        return newId;
+      } else {
+        showToast(json.message || "حدث خطأ", "error");
+        return "";
+      }
+    } catch (e) {
+      showToast("تعذر الاتصال بالسيرفر", "error");
+      return "";
+    }
   }, [showToast]);
 
-  const deleteServiceCategory = useCallback((id: string) => {
-    const hasServices = services.some((s) => s.categoryId === id);
-    if (hasServices) {
-      showToast("لا يمكن حذف التصنيف — يحتوي على خدمات", "error");
+  const deleteServiceCategory = useCallback(async (id: string) => {
+    try {
+      const res = await fetch(`${BASE_URL}/provider/services/categories/${id}`, { method: "DELETE" });
+      const json = await res.json();
+      if (json.success) {
+        setCategories((prev) => prev.filter((c) => c.id !== id));
+        showToast("تم حذف التصنيف");
+        return true;
+      } else {
+        showToast(json.message || "حدث خطأ", "error");
+        return false;
+      }
+    } catch (e) {
+      showToast("تعذر الاتصال بالسيرفر", "error");
       return false;
     }
-    setCategories((prev) => prev.filter((c) => c.id !== id));
-    showToast("تم حذف التصنيف");
-    return true;
-  }, [services, showToast]);
+  }, [showToast]);
 
   const addOrderCategory = useCallback((label: string, icon: string, color: string) => {
     const id = label.replace(/\s+/g, "-").toLowerCase() + "-" + Date.now();
@@ -284,49 +654,191 @@ export function ProviderProvider({ children }: { children: ReactNode }) {
     return true;
   }, [orders, showToast]);
 
-  const updateOrderStatus = useCallback((id: string, status: OrderStatus) => {
-    setOrders((prev) => prev.map((o) => (o.id === id ? { ...o, status } : o)));
-    showToast("تم تحديث حالة الطلب");
-  }, [showToast]);
+  const updateOrderStatus = useCallback(async (id: string, status: OrderStatus) => {
+    // optimistic update
+    setOrders((prev) => prev.map((o) => o.id === id ? { ...o, status } : o));
+    try {
+      const backendStatus = frontendToBackendStatus(status);
+      const res = await fetch(`${BASE_URL}/provider/orders/${id}/status`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: backendStatus }),
+      });
+      const json = await res.json();
+      if (!json.success) {
+        await fetchOrders();
+        showToast(json.message || "حدث خطأ", "error");
+      } else {
+        showToast("تم تحديث حالة الطلب");
+      }
+    } catch (e) {
+      await fetchOrders();
+      showToast("تعذر الاتصال بالسيرفر", "error");
+    }
+  }, [fetchOrders, showToast]);
 
-  const acceptOrder = useCallback((id: string) => {
-    updateOrderStatus(id, "processing");
-    pushNotification("تم قبول طلب", `تم قبول الطلب #${id.replace("ORD-", "")}`, "order");
-  }, [updateOrderStatus, pushNotification]);
+  const acceptOrder = useCallback(async (id: string) => {
+    // optimistic update
+    setOrders((prev) => prev.map((o) => o.id === id ? { ...o, status: "processing" as OrderStatus } : o));
+    try {
+      const res = await fetch(`${BASE_URL}/provider/orders/${id}/accept`, { method: "POST" });
+      const json = await res.json();
+      if (!json.success) {
+        await fetchOrders();
+        showToast(json.message || "حدث خطأ", "error");
+      } else {
+        await fetchDashboard(); // refresh urgent orders list
+        pushNotification("تم قبول طلب", `تم قبول الطلب`, "order");
+        showToast("تم قبول الطلب بنجاح");
+      }
+    } catch (e) {
+      await fetchOrders();
+      showToast("تعذر الاتصال بالسيرفر", "error");
+    }
+  }, [fetchOrders, fetchDashboard, pushNotification, showToast]);
 
-  const rejectOrder = useCallback((id: string) => {
-    updateOrderStatus(id, "cancelled");
-    pushNotification("تم رفض طلب", `تم رفض الطلب #${id.replace("ORD-", "")}`, "order");
-    showToast("تم رفض الطلب", "error");
-  }, [updateOrderStatus, pushNotification, showToast]);
+  const rejectOrder = useCallback(async (id: string) => {
+    // optimistic update
+    setOrders((prev) => prev.map((o) => o.id === id ? { ...o, status: "cancelled" as OrderStatus } : o));
+    try {
+      const res = await fetch(`${BASE_URL}/provider/orders/${id}/reject`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ cancel_reason: "رُفض من قبل المغسلة" }),
+      });
+      const json = await res.json();
+      if (!json.success) {
+        await fetchOrders();
+        showToast(json.message || "حدث خطأ", "error");
+      } else {
+        await fetchDashboard(); // refresh urgent orders list
+        showToast("تم رفض الطلب", "error");
+      }
+    } catch (e) {
+      await fetchOrders();
+      showToast("تعذر الاتصال بالسيرفر", "error");
+    }
+  }, [fetchOrders, fetchDashboard, showToast]);
 
-  const addDiscountTier = useCallback((tier: Omit<DiscountTier, "id">) => {
-    setDiscountTiers((prev) => {
-      const newId = Math.max(0, ...prev.map((t) => t.id)) + 1;
-      return [...prev, { ...tier, id: newId }];
-    });
-    showToast("تمت إضافة مستوى خصم جديد");
-  }, [showToast]);
+  const addDiscountTier = useCallback(async (tier: Omit<DiscountTier, "id">) => {
+    try {
+      const res = await fetch(`${BASE_URL}/provider/discounts/tiers`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: tier.name,
+          minQty: tier.minQty,
+          maxQty: tier.maxQty,
+          discount: tier.discount,
+          color: tier.color,
+          is_active: tier.active,
+        }),
+      });
+      const json = await res.json();
+      if (json.success) {
+        await fetchDiscountTiers();
+        showToast("تمت إضافة مستوى الخصم");
+      } else {
+        showToast(json.message || "حدث خطأ", "error");
+      }
+    } catch (e) {
+      showToast("تعذر الاتصال بالسيرفر", "error");
+    }
+  }, [fetchDiscountTiers, showToast]);
 
-  const updateDiscountTier = useCallback((id: number, updates: Partial<DiscountTier>) => {
-    setDiscountTiers((prev) => prev.map((t) => (t.id === id ? { ...t, ...updates } : t)));
-    showToast("تم تحديث مستوى الخصم");
-  }, [showToast]);
+  const updateDiscountTier = useCallback(async (id: string, updates: Partial<DiscountTier>) => {
+    // optimistic
+    setDiscountTiers((prev) => prev.map((t) => t.id === id ? { ...t, ...updates } : t));
+    try {
+      const body: any = {};
+      if (updates.name !== undefined) body.name = updates.name;
+      if (updates.discount !== undefined) body.discount = updates.discount;
+      if (updates.active !== undefined) body.is_active = updates.active;
+      if (updates.color !== undefined) body.color = updates.color;
+      if (updates.minQty !== undefined) body.minQty = updates.minQty;
+      if (updates.maxQty !== undefined) body.maxQty = updates.maxQty;
+      const res = await fetch(`${BASE_URL}/provider/discounts/tiers/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      const json = await res.json();
+      if (!json.success) {
+        await fetchDiscountTiers();
+        showToast(json.message || "حدث خطأ", "error");
+      } else {
+        showToast("تم تحديث مستوى الخصم");
+      }
+    } catch (e) {
+      await fetchDiscountTiers();
+      showToast("تعذر الاتصال بالسيرفر", "error");
+    }
+  }, [fetchDiscountTiers, showToast]);
 
-  const toggleDiscountTier = useCallback((id: number) => {
-    setDiscountTiers((prev) =>
-      prev.map((t) => (t.id === id ? { ...t, active: !t.active } : t))
-    );
-    showToast("تم تغيير حالة المستوى");
-  }, [showToast]);
+  const toggleDiscountTier = useCallback(async (id: string) => {
+    // optimistic
+    setDiscountTiers((prev) => prev.map((t) => t.id === id ? { ...t, active: !t.active } : t));
+    try {
+      const res = await fetch(`${BASE_URL}/provider/discounts/tiers/${id}/toggle`, { method: "PATCH" });
+      const json = await res.json();
+      if (!json.success) {
+        await fetchDiscountTiers();
+        showToast(json.message || "حدث خطأ", "error");
+      }
+    } catch (e) {
+      await fetchDiscountTiers();
+      showToast("تعذر الاتصال بالسيرفر", "error");
+    }
+  }, [fetchDiscountTiers, showToast]);
+
+  const deleteDiscountTier = useCallback(async (id: string) => {
+    // optimistic
+    setDiscountTiers((prev) => prev.filter((t) => t.id !== id));
+    try {
+      const res = await fetch(`${BASE_URL}/provider/discounts/tiers/${id}`, { method: "DELETE" });
+      const json = await res.json();
+      if (!json.success) {
+        await fetchDiscountTiers();
+        showToast(json.message || "حدث خطأ", "error");
+      } else {
+        showToast("تم حذف مستوى الخصم");
+      }
+    } catch (e) {
+      await fetchDiscountTiers();
+      showToast("تعذر الاتصال بالسيرفر", "error");
+    }
+  }, [fetchDiscountTiers, showToast]);
 
   const updateSpecialEntity = useCallback((id: string, updates: Partial<SpecialEntity>) => {
-    setSpecialEntities((prev) => prev.map((e) => (e.id === id ? { ...e, ...updates } : e)));
+    // local only — user saves all at once via saveSpecialEntities
+    setSpecialEntities((prev) => prev.map((e) => e.id === id ? { ...e, ...updates } : e));
   }, []);
 
-  const saveSpecialEntities = useCallback(() => {
-    showToast("تم حفظ خصومات الجهات الخاصة");
-  }, [showToast]);
+  const saveSpecialEntities = useCallback(async () => {
+    try {
+      const entities = specialEntities.map((e) => ({
+        entityKey: e.entityKey,
+        label: e.label,
+        icon: e.icon,
+        sub: e.sub,
+        discount: e.value,
+        is_enabled: e.enabled,
+      }));
+      const res = await fetch(`${BASE_URL}/provider/discounts/special-entities/save-all`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ entities }),
+      });
+      const json = await res.json();
+      if (json.success) {
+        showToast("تم حفظ خصومات الجهات الخاصة");
+      } else {
+        showToast(json.message || "حدث خطأ", "error");
+      }
+    } catch (e) {
+      showToast("تعذر الاتصال بالسيرفر", "error");
+    }
+  }, [specialEntities, showToast]);
 
   const markNotificationRead = useCallback((id: number) => {
     setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, read: true } : n)));
@@ -360,13 +872,14 @@ export function ProviderProvider({ children }: { children: ReactNode }) {
         addServiceOpen, notificationsOpen, toast,
         setAddServiceOpen, setNotificationsOpen, setPickupEnabled, setLaundryCapacity,
         searchQuery, setSearchQuery,
-        showToast, addService, deleteService, updateService,
+        showToast, servicesLoading, fetchServices, addService, deleteService, updateService,
         addServiceCategory, deleteServiceCategory, addOrderCategory, deleteOrderCategory,
-        updateOrderStatus, acceptOrder, rejectOrder,
-        addDiscountTier, updateDiscountTier, toggleDiscountTier,
+        updateOrderStatus, acceptOrder, rejectOrder, fetchOrderDetails,
+        dashboardStats, fetchDashboard,
+        addDiscountTier, updateDiscountTier, toggleDiscountTier, deleteDiscountTier,
         updateSpecialEntity, saveSpecialEntities,
         markNotificationRead, markAllNotificationsRead, updateProfile,
-        unreadCount, orderStats,
+        unreadCount, orderStats, defaultOrderTab, setDefaultOrderTab,
       }}
     >
       {children}
