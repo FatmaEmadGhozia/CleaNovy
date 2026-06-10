@@ -1,4 +1,5 @@
- import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
 import ProtectedRoute from "./ProtectedRoute";
 import ForgotPassword from "../Pages/Auth/ForgotPassword";
@@ -22,11 +23,13 @@ export default function AppRoutes() {
         
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
-         <Route path="/login" element={<LoginPage />} />
-        <Route path="/signup" element={<SignUpPage />} /> 
-        <Route path="/provider" element={<ProviderLayout />} /> 
-         <Route path="*" element={<Navigate to="/provider" replace />} />
-         {/* <Route path="/provider" element={<Provider />} /> */}
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/signup" element={<SignUpPage />} />
+
+        {/* Provider Routes */}
+        <Route path="/provider/*" element={<ProviderLayout />} />
+        <Route path="/provider" element={<Navigate to="/provider/dashboard" replace />} />
+
         {/* Protected Routes */}
         <Route
           path="/dashboard"
