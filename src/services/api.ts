@@ -25,7 +25,7 @@ export async function createOrder(payload: {
   couponCode: string | null;
   paymentMethod: string;
   deliveryType: "pickup" | "delivery";
-  deliveryAddress: string;
+  deliveryAddress: string | null;
 }) {
   return request<any>("/orders", {
     method: "POST",
@@ -46,6 +46,7 @@ export async function createOrder(payload: {
     }),
   });
 }
+
 // ── Pay Order ─────────────────────────────────────────
 export async function payOrder(orderId: string, payload: {
   paymentMethod: string;
@@ -79,3 +80,4 @@ export async function validateCoupon(code: string, orderAmount: number) {
     }),
   });
 }
+
