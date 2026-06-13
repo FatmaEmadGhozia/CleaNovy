@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { useLocation } from "react-router-dom";
 import type { PayMethod } from "./types";
-import { createOrder, payOrder } from "../../services/api";
+ import { createOrder, payOrder } from "../../services/api";
 
 import CheckoutHeader      from "../../components/orders/CheckoutHeader";
 import InstitutionalBanner from "../../components/orders/InstitutionalBanner";

@@ -1,6 +1,4 @@
 
-
-
 import type { Page } from "../types";
 
 interface Props {

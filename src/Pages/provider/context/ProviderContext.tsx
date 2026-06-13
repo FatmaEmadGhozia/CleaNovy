@@ -16,114 +16,11 @@ import type {
   ToastMessage,
 } from "../types";
 
-function formatDuration(hours: number): string {
-  if (hours <= 0) return "غير متاح مؤقتاً";
-  if (hours < 24) return `الوقت المتوقع: ${hours} ساعة`;
-  const days = Math.floor(hours / 24);
-  return `الوقت المتوقع: ${days} ${days === 1 ? "يوم" : "أيام"}`;
-}
-
-const initialCategories: ServiceCategory[] = [
-  { id: "clothes", label: "الملابس", icon: "checkroom", count: 3 },
-  { id: "carpet", label: "السجاد والموكيت", icon: "grid_view", count: 0 },
-  { id: "curtains", label: "الستائر", icon: "texture", count: 0 },
-  { id: "bedding", label: "المفارش والأغطية", icon: "bed", count: 0 },
-  { id: "special", label: "خدمات خاصة", icon: "settings_backup_restore", count: 0 },
-];
-
 const initialOrderCategories: OrderCategory[] = [
   { id: "clothes", label: "ملابس", icon: "checkroom", color: "bg-[#006B5D]" },
   { id: "dry-clean", label: "تنظيف جاف", icon: "dry_cleaning", color: "bg-[#765B00]" },
   { id: "carpet", label: "سجاد", icon: "grid_view", color: "bg-blue-500" },
   { id: "urgent", label: "مستعجل", icon: "bolt", color: "bg-red-500" },
-];
-
-const initialServices: Service[] = [
-  {
-    id: "1", categoryId: "clothes", icon: "dry_cleaning", name: "غسيل وكوي (ثوب/قميص)",
-    description: "غسيل وكوي احترافي للثوب والقميص", durationHours: 24,
-    duration: "الوقت المتوقع: 24 ساعة", price: "15.00", fastService: true, multiplier: "x1.5", active: true,
-  },
-  {
-    id: "2", categoryId: "clothes", icon: "iron", name: "كوي فقط",
-    description: "كوي فقط بدون غسيل", durationHours: 12,
-    duration: "الوقت المتوقع: 12 ساعة", price: "8.00", fastService: true, multiplier: "x1.2", active: true,
-  },
-  {
-    id: "3", categoryId: "clothes", icon: "checkroom", name: "غسيل جاف (فستان سهرة)",
-    description: "تنظيف جاف للأزياء الراقية", durationHours: 48,
-    duration: "غير متاح مؤقتاً", price: "45.00", fastService: false, multiplier: "--", active: false,
-  },
-];
-
-const initialOrders: Order[] = [
-  {
-    id: "ORD-8821", customerName: "عبدالله العتيبي", tag: "محول من مغسلة الفجر",
-    items: "15 قطعة (غسيل وكوي)", itemCount: 15, time: "الاستلام: اليوم، 4:00 م",
-    price: 145, status: "new", location: "يبعد 3.2 كم • حي النرجس، الرياض",
-    address: "الرياض، حي النرجس، شارع رقم 12، فيلا رقم 4", phone: "٠٥٠ ١١١ ٢٢٢٢",
-    notes: "يرجى الانتباه للأزرار في البدلة الرمادية، واستخدام نشاء خفيف للثياب.",
-    categoryId: "urgent", urgent: true,
-    itemsList: [
-      { name: "ثوب سعودي (غسيل وكوي)", qty: "× 10" },
-      { name: "شماغ (كوي بخار)", qty: "× 2" },
-      { name: "بدلة رسمية (تنظيف جاف)", qty: "× 3" },
-    ],
-  },
-  {
-    id: "ORD-8820", customerName: "سارة الغامدي", tag: null,
-    items: "8 قطع (تنظيف جاف)", itemCount: 8, time: "الاستلام: 22 مايو، 11:00 ص",
-    price: 89, status: "processing", location: "يبعد 1.5 كم • حي الملقا، الرياض",
-    address: "الرياض، حي الملقا، شارع الأمير سلطان", phone: "٠٥٠ ٣٣٣ ٤٤٤٤",
-    notes: "", categoryId: "dry-clean", urgent: false,
-    itemsList: [
-      { name: "فستان سهرة", qty: "× 2" },
-      { name: "عباءة", qty: "× 3" },
-      { name: "جاكيت جلد", qty: "× 3" },
-    ],
-  },
-  {
-    id: "ORD-8819", customerName: "خالد الشمري", tag: null,
-    items: "22 قطعة (شامل)", itemCount: 22, time: "الاستلام: أمس",
-    price: 210, status: "ready", location: "يبعد 5.8 كم • حي الياسمين، الرياض",
-    address: "الرياض، حي الياسمين، مجمع سكني ٥", phone: "٠٥٠ ٥٥٥ ٦٦٦٦",
-    notes: "التوصيل بعد الساعة ٥ مساءً", categoryId: "clothes", urgent: false,
-    itemsList: [
-      { name: "ثوب", qty: "× 15" },
-      { name: "قميص", qty: "× 5" },
-      { name: "بنطلون", qty: "× 2" },
-    ],
-  },
-  {
-    id: "ORD-8818", customerName: "نورة القحطاني", tag: null,
-    items: "6 قطع (سجاد)", itemCount: 6, time: "الاستلام: اليوم، 9:00 ص",
-    price: 320, status: "delivering", location: "يبعد 2.1 كم • حي الورود، الرياض",
-    address: "الرياض، حي الورود، فيلا ١٢", phone: "٠٥٠ ٧٧٧ ٨٨٨٨",
-    notes: "", categoryId: "carpet", urgent: false,
-    itemsList: [{ name: "سجاد صلاة", qty: "× 4" }, { name: "موكيت غرفة", qty: "× 2" }],
-  },
-  {
-    id: "ORD-8817", customerName: "فهد الدوسري", tag: null,
-    items: "10 قطع", itemCount: 10, time: "الاستلام: أمس",
-    price: 95, status: "done", location: "يبعد 4.0 كم • حي الصحافة، الرياض",
-    address: "الرياض، حي الصحافة", phone: "٠٥٠ ٩٩٩ ٠٠٠٠",
-    notes: "", categoryId: "clothes", urgent: false,
-    itemsList: [{ name: "ثوب", qty: "× 10" }],
-  },
-];
-
-const initialTiers: DiscountTier[] = [
-  { id: "1", name: "Standard", minQty: 0, maxQty: 10, discount: 0, color: "bg-slate-300", active: true },
-  { id: "2", name: "Bronze", minQty: 11, maxQty: 30, discount: 10, color: "bg-orange-400", active: true },
-  { id: "3", name: "Silver", minQty: 31, maxQty: 60, discount: 15, color: "bg-slate-400", active: true },
-  { id: "4", name: "Gold", minQty: 61, maxQty: 100, discount: 20, color: "bg-yellow-500", active: true },
-  { id: "5", name: "Platinum", minQty: 101, maxQty: null, discount: 25, color: "bg-cyan-400", active: false },
-];
-
-const initialSpecialEntities: SpecialEntity[] = [
-  { id: "mosque", entityKey: "mosque", icon: "mosque", label: "المساجد", sub: "خصم ثابت للخدمات", value: 50, bg: "bg-emerald-100", color: "text-emerald-700", enabled: true },
-  { id: "school", entityKey: "school", icon: "school", label: "المدارس", sub: "خصم الزي المدرسي", value: 30, bg: "bg-blue-100", color: "text-blue-700", enabled: true },
-  { id: "hospital", entityKey: "hospital", icon: "medical_services", label: "المستشفيات", sub: "خصم التعقيم الخاص", value: 40, bg: "bg-red-100", color: "text-red-700", enabled: false },
 ];
 
 const initialNotifications: Notification[] = [
@@ -188,7 +85,9 @@ interface ProviderContextValue {
   saveSpecialEntities: () => Promise<void>;
   markNotificationRead: (id: number) => void;
   markAllNotificationsRead: () => void;
-  updateProfile: (updates: Partial<ProviderProfile>) => void;
+  updateProfile: (updates: Partial<ProviderProfile>) => Promise<void>;
+  settings: { openTime: string; closeTime: string; acceptOrders: boolean; fastServiceDefault: boolean; orderAlerts: boolean; emailNotifications: boolean; smsNotifications: boolean; language: "ar" | "en" };
+  saveSettings: (s: { openTime: string; closeTime: string; acceptOrders: boolean; fastServiceDefault: boolean; orderAlerts: boolean; emailNotifications: boolean; smsNotifications: boolean; language: "ar" | "en" }) => Promise<void>;
   unreadCount: number;
   orderStats: { new: number; processing: number; ready: number; delivering: number; done: number; cancelled: number; revenue: number };
   defaultOrderTab: string;
@@ -848,9 +747,122 @@ export function ProviderProvider({ children }: { children: ReactNode }) {
     setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
   }, []);
 
-  const updateProfile = useCallback((updates: Partial<ProviderProfile>) => {
-    setProfile((prev) => ({ ...prev, ...updates }));
+  // ── Fetch profile from API ───────────────────────────────────
+  const fetchProfile = useCallback(async () => {
+    try {
+      const res = await fetch(`${BASE_URL}/provider/profile`);
+      const json = await res.json();
+      if (json.success) {
+        setProfile((prev) => ({
+          ...prev,
+          name: json.data.name || prev.name,
+          email: json.data.email || prev.email,
+          phone: json.data.phone || prev.phone,
+          role: json.data.role || prev.role,
+          businessName: json.data.businessName || prev.businessName,
+          businessAddress: json.data.businessAddress || prev.businessAddress,
+        }));
+      }
+    } catch (e) {
+      console.error("Failed to fetch profile", e);
+    }
   }, []);
+
+  useEffect(() => { fetchProfile(); }, [fetchProfile]);
+
+  // ── Settings state ───────────────────────────────────────────
+  const [settings, setSettings] = useState({
+    openTime: "08:00",
+    closeTime: "22:00",
+    acceptOrders: true,
+    fastServiceDefault: true,
+    orderAlerts: true,
+    emailNotifications: true,
+    smsNotifications: false,
+    language: "ar" as "ar" | "en",
+  });
+
+  const fetchSettings = useCallback(async () => {
+    try {
+      const res = await fetch(`${BASE_URL}/provider/settings`);
+      const json = await res.json();
+      if (json.success) {
+        setSettings({
+          openTime: json.data.openTime || "08:00",
+          closeTime: json.data.closeTime || "22:00",
+          acceptOrders: json.data.acceptOrders ?? true,
+          fastServiceDefault: json.data.fastServiceDefault ?? true,
+          orderAlerts: json.data.orderAlerts ?? true,
+          emailNotifications: json.data.emailNotifications ?? true,
+          smsNotifications: json.data.smsNotifications ?? false,
+          language: json.data.language || "ar",
+        });
+        // also update profile with shop info
+        setProfile((prev) => ({
+          ...prev,
+          businessName: json.data.businessName || prev.businessName,
+          businessAddress: json.data.businessAddress || prev.businessAddress,
+          phone: json.data.phone || prev.phone,
+          email: json.data.email || prev.email,
+        }));
+      }
+    } catch (e) {
+      console.error("Failed to fetch settings", e);
+    }
+  }, []);
+
+  useEffect(() => { fetchSettings(); }, [fetchSettings]);
+
+  const updateProfile = useCallback(async (updates: Partial<ProviderProfile>) => {
+    // optimistic update
+    setProfile((prev) => ({ ...prev, ...updates }));
+    try {
+      const res = await fetch(`${BASE_URL}/provider/profile`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: updates.name,
+          email: updates.email,
+          phone: updates.phone,
+          businessAddress: updates.businessAddress,
+        }),
+      });
+      const json = await res.json();
+      if (!json.success) {
+        showToast(json.message || "حدث خطأ", "error");
+      }
+    } catch (e) {
+      showToast("تعذر الاتصال بالسيرفر", "error");
+    }
+  }, [showToast]);
+
+  const saveSettings = useCallback(async (s: typeof settings) => {
+    try {
+      const res = await fetch(`${BASE_URL}/provider/settings`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          openTime: s.openTime,
+          closeTime: s.closeTime,
+          acceptOrders: s.acceptOrders,
+          fastServiceDefault: s.fastServiceDefault,
+          orderAlerts: s.orderAlerts,
+          emailNotifications: s.emailNotifications,
+          smsNotifications: s.smsNotifications,
+          language: s.language,
+        }),
+      });
+      const json = await res.json();
+      if (json.success) {
+        setSettings(s);
+        showToast("تم حفظ الإعدادات بنجاح");
+      } else {
+        showToast(json.message || "حدث خطأ", "error");
+      }
+    } catch (e) {
+      showToast("تعذر الاتصال بالسيرفر", "error");
+    }
+  }, [showToast]);
 
   const unreadCount = notifications.filter((n) => !n.read).length;
 
@@ -879,6 +891,7 @@ export function ProviderProvider({ children }: { children: ReactNode }) {
         addDiscountTier, updateDiscountTier, toggleDiscountTier, deleteDiscountTier,
         updateSpecialEntity, saveSpecialEntities,
         markNotificationRead, markAllNotificationsRead, updateProfile,
+        settings, saveSettings,
         unreadCount, orderStats, defaultOrderTab, setDefaultOrderTab,
       }}
     >

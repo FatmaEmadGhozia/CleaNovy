@@ -1,5 +1,5 @@
 // components/DatePicker.tsx
-import { DAYS_AR, MONTHS_AR } from"../../Pages/orders/types";
+import { DAYS_AR } from"../../Pages/orders/types";
 
 interface Props {
   days:        Date[];

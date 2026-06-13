@@ -24,7 +24,7 @@ export default function Discounts() {
   const {
     discountTiers, specialEntities,
     addDiscountTier, updateDiscountTier, toggleDiscountTier, deleteDiscountTier,
-    updateSpecialEntity, saveSpecialEntities, showToast,
+    updateSpecialEntity, saveSpecialEntities,
   } = useProvider();
 
   const [qty, setQty] = useState(35);

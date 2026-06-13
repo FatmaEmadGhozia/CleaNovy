@@ -1,9 +1,14 @@
 import { useState, useEffect } from "react";
-import { Navigation, Menu, X, ShoppingBag } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { Navigation, Menu, X } from "lucide-react";
+
+
 import { useLocation, useNavigate } from "react-router-dom";
-import { useAuth } from "@/context/AuthContext";
+
+import { Button } from "../../components/ui/button";
+import { cn } from "../../lib/utils";
+import {useAuth} from "../../context/AuthContext";
+
+
 
 const SCROLL_LINKS = [
   { label: "الرئيسية", href: "hero" },
