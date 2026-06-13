@@ -188,7 +188,9 @@ interface ProviderContextValue {
   saveSpecialEntities: () => Promise<void>;
   markNotificationRead: (id: number) => void;
   markAllNotificationsRead: () => void;
-  updateProfile: (updates: Partial<ProviderProfile>) => void;
+  updateProfile: (updates: Partial<ProviderProfile>) => Promise<void>;
+  settings: { openTime: string; closeTime: string; acceptOrders: boolean; fastServiceDefault: boolean; orderAlerts: boolean; emailNotifications: boolean; smsNotifications: boolean; language: "ar" | "en" };
+  saveSettings: (s: { openTime: string; closeTime: string; acceptOrders: boolean; fastServiceDefault: boolean; orderAlerts: boolean; emailNotifications: boolean; smsNotifications: boolean; language: "ar" | "en" }) => Promise<void>;
   unreadCount: number;
   orderStats: { new: number; processing: number; ready: number; delivering: number; done: number; cancelled: number; revenue: number };
   defaultOrderTab: string;
@@ -848,9 +850,122 @@ export function ProviderProvider({ children }: { children: ReactNode }) {
     setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
   }, []);
 
-  const updateProfile = useCallback((updates: Partial<ProviderProfile>) => {
-    setProfile((prev) => ({ ...prev, ...updates }));
+  // ── Fetch profile from API ───────────────────────────────────
+  const fetchProfile = useCallback(async () => {
+    try {
+      const res = await fetch(`${BASE_URL}/provider/profile`);
+      const json = await res.json();
+      if (json.success) {
+        setProfile((prev) => ({
+          ...prev,
+          name: json.data.name || prev.name,
+          email: json.data.email || prev.email,
+          phone: json.data.phone || prev.phone,
+          role: json.data.role || prev.role,
+          businessName: json.data.businessName || prev.businessName,
+          businessAddress: json.data.businessAddress || prev.businessAddress,
+        }));
+      }
+    } catch (e) {
+      console.error("Failed to fetch profile", e);
+    }
   }, []);
+
+  useEffect(() => { fetchProfile(); }, [fetchProfile]);
+
+  // ── Settings state ───────────────────────────────────────────
+  const [settings, setSettings] = useState({
+    openTime: "08:00",
+    closeTime: "22:00",
+    acceptOrders: true,
+    fastServiceDefault: true,
+    orderAlerts: true,
+    emailNotifications: true,
+    smsNotifications: false,
+    language: "ar" as "ar" | "en",
+  });
+
+  const fetchSettings = useCallback(async () => {
+    try {
+      const res = await fetch(`${BASE_URL}/provider/settings`);
+      const json = await res.json();
+      if (json.success) {
+        setSettings({
+          openTime: json.data.openTime || "08:00",
+          closeTime: json.data.closeTime || "22:00",
+          acceptOrders: json.data.acceptOrders ?? true,
+          fastServiceDefault: json.data.fastServiceDefault ?? true,
+          orderAlerts: json.data.orderAlerts ?? true,
+          emailNotifications: json.data.emailNotifications ?? true,
+          smsNotifications: json.data.smsNotifications ?? false,
+          language: json.data.language || "ar",
+        });
+        // also update profile with shop info
+        setProfile((prev) => ({
+          ...prev,
+          businessName: json.data.businessName || prev.businessName,
+          businessAddress: json.data.businessAddress || prev.businessAddress,
+          phone: json.data.phone || prev.phone,
+          email: json.data.email || prev.email,
+        }));
+      }
+    } catch (e) {
+      console.error("Failed to fetch settings", e);
+    }
+  }, []);
+
+  useEffect(() => { fetchSettings(); }, [fetchSettings]);
+
+  const updateProfile = useCallback(async (updates: Partial<ProviderProfile>) => {
+    // optimistic update
+    setProfile((prev) => ({ ...prev, ...updates }));
+    try {
+      const res = await fetch(`${BASE_URL}/provider/profile`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: updates.name,
+          email: updates.email,
+          phone: updates.phone,
+          businessAddress: updates.businessAddress,
+        }),
+      });
+      const json = await res.json();
+      if (!json.success) {
+        showToast(json.message || "حدث خطأ", "error");
+      }
+    } catch (e) {
+      showToast("تعذر الاتصال بالسيرفر", "error");
+    }
+  }, [showToast]);
+
+  const saveSettings = useCallback(async (s: typeof settings) => {
+    try {
+      const res = await fetch(`${BASE_URL}/provider/settings`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          openTime: s.openTime,
+          closeTime: s.closeTime,
+          acceptOrders: s.acceptOrders,
+          fastServiceDefault: s.fastServiceDefault,
+          orderAlerts: s.orderAlerts,
+          emailNotifications: s.emailNotifications,
+          smsNotifications: s.smsNotifications,
+          language: s.language,
+        }),
+      });
+      const json = await res.json();
+      if (json.success) {
+        setSettings(s);
+        showToast("تم حفظ الإعدادات بنجاح");
+      } else {
+        showToast(json.message || "حدث خطأ", "error");
+      }
+    } catch (e) {
+      showToast("تعذر الاتصال بالسيرفر", "error");
+    }
+  }, [showToast]);
 
   const unreadCount = notifications.filter((n) => !n.read).length;
 
@@ -879,6 +994,7 @@ export function ProviderProvider({ children }: { children: ReactNode }) {
         addDiscountTier, updateDiscountTier, toggleDiscountTier, deleteDiscountTier,
         updateSpecialEntity, saveSpecialEntities,
         markNotificationRead, markAllNotificationsRead, updateProfile,
+        settings, saveSettings,
         unreadCount, orderStats, defaultOrderTab, setDefaultOrderTab,
       }}
     >

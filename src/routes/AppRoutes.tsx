@@ -1,20 +1,22 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"
 
-import ProtectedRoute from "./ProtectedRoute"
-import ForgotPassword from "../Pages/Auth/ForgotPassword"
-import ResetPassword from "../Pages/Auth/ResetPassword"
-import LandingPage from "@/components/landing/LandingPage"
-import LoginPage from "../Pages/Auth/LoginPage"
-import SignUpPage from "@/Pages/Auth/SignUpPage"
-import ProviderLayout from "@/Pages/provider/ProviderLayout"
-import CartPage from "@/Pages/orders/CartPage"
-import SchedulePage from "@/Pages/orders/SchedulePage"
-import CheckoutPage from "@/Pages/orders/CheckoutPage"
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
-import AboutPage from "@/Pages/AboutPage/AboutPage"
-import ContactPage from "@/Pages/ContactPage/ContactPage"
-import Settingspage from "@/Pages/Settingspage/Settingspage"
+import ProtectedRoute from "./ProtectedRoute";
+import ForgotPassword from "../Pages/Auth/ForgotPassword";
+import ResetPassword from "../Pages/Auth/ResetPassword";
+import LandingPage from "../components/landing/LandingPage";
+import LoginPage from "../Pages/Auth/LoginPage";
+import SignUpPage from "../Pages/Auth/SignUpPage";
+import ProviderLayout from "../Pages/provider/ProviderLayout";
+import AboutPage from "../Pages/AboutPage/AboutPage";
+import ContactPage from "../Pages/ContactPage/ContactPage";
+import Settingspage from "../Pages/Settingspage/Settingspage";
+import { CleannovyPage } from "../Pages/CleannovyPage";
 
+
+import CartPage from "../Pages/orders/CartPage"
+import SchedulePage from "../Pages/orders/SchedulePage"
+import CheckoutPage from "../Pages/orders/CheckoutPage"
 export default function AppRoutes() {
   return (
     <BrowserRouter>
@@ -42,6 +44,8 @@ export default function AppRoutes() {
           path="/provider"
           element={<Navigate to="/provider/dashboard" replace />}
         />
+        <Route path="/cleannovy" element={<CleannovyPage/>} />
+        <Route path="/provider" element={<ProviderLayout />} />
 
         {/* Protected Routes */}
         <Route

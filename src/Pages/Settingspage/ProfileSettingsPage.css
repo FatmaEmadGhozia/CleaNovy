@@ -1,0 +1,388 @@
+/* ═══════════════════════════════════════════════════════
+   ProfileSettingsPage.css
+   Design: matches the dark navy + teal theme from the screenshot
+   ═══════════════════════════════════════════════════════ */
+
+:root {
+  --navy: #1a2740;
+  --teal: #0d9488;
+  --teal-light: #14b8a6;
+  --bg: #f0f4f8;
+  --card-bg: #ffffff;
+  --text-primary: #1e293b;
+  --text-secondary: #64748b;
+  --border: #e2e8f0;
+  --input-bg: #f8fafc;
+  --danger: #ef4444;
+  --danger-light: #fef2f2;
+  --success: #10b981;
+}
+
+/*   Page wrapper  */
+.settings-page {
+  min-height: 100vh;
+  background: var(--bg);
+  padding: 24px 20px 48px;
+  font-family: "Tajawal", "Cairo", sans-serif;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 680px;
+  margin: 0 auto;
+}
+
+/* ─── Loading ──────────────────────────────────────────── */
+.settings-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  gap: 12px;
+  color: var(--text-secondary);
+  font-family: "Tajawal", sans-serif;
+}
+
+.spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid var(--border);
+  border-top-color: var(--teal);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ─── Toast ────────────────────────────────────────────── */
+.toast {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+  padding: 12px 24px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  animation: slideDown 0.3s ease;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+}
+
+.toast-success {
+  background: var(--success);
+  color: #fff;
+}
+
+.toast-error {
+  background: var(--danger);
+  color: #fff;
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateX(-50%) translateY(-12px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+/* ═══════════════════════════════════════════════════════
+   PROFILE HEADER CARD
+   ═══════════════════════════════════════════════════════ */
+.profile-header {
+  background: var(--card-bg);
+  border-radius: 18px;
+  padding: 28px 24px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+}
+
+/* Avatar */
+.avatar-wrapper {
+  position: relative;
+  width: 96px;
+  height: 96px;
+}
+
+.avatar-img {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid var(--teal);
+}
+
+.avatar-edit-btn {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  width: 28px;
+  height: 28px;
+  background: var(--teal);
+  color: #fff;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.avatar-edit-btn:hover {
+  background: var(--teal-light);
+}
+
+/* Name */
+.profile-name {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+/* ─── Completed Orders Card (full width, prominent) ─── */
+.orders-card {
+  width: 100%;
+  background: var(--navy);
+  border-radius: 14px;
+  padding: 20px 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  color: #fff;
+  margin-top: 4px;
+}
+
+.orders-icon {
+  color: var(--teal-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.orders-count {
+  font-size: 38px;
+  font-weight: 800;
+  line-height: 1;
+  color: #fff;
+}
+
+.orders-label {
+  font-size: 14px;
+  color: rgba(255,255,255,0.7);
+  font-weight: 500;
+}
+
+/* ═══════════════════════════════════════════════════════
+   ACCOUNT INFO FORM CARD
+   ═══════════════════════════════════════════════════════ */
+.account-form-card {
+  background: var(--card-bg);
+  border-radius: 18px;
+  padding: 24px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.form-title {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 4px;
+  text-align: right;
+}
+
+/* Form group */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-align: right;
+}
+
+.input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-icon {
+  position: absolute;
+  right: 14px;
+  color: var(--text-secondary);
+  pointer-events: none;
+  flex-shrink: 0;
+}
+
+.form-input {
+  width: 100%;
+  background: var(--input-bg);
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 42px 12px 14px;
+  font-size: 14px;
+  font-family: "Tajawal", sans-serif;
+  color: var(--text-primary);
+  transition: border-color 0.2s, box-shadow 0.2s;
+  box-sizing: border-box;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: var(--teal);
+  box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.1);
+}
+
+.form-input.readonly {
+  background: #f1f5f9;
+  color: var(--text-secondary);
+  cursor: not-allowed;
+}
+
+.field-hint {
+  font-size: 11px;
+  color: var(--text-secondary);
+  text-align: right;
+}
+
+/* Save button */
+.save-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: var(--teal);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 13px 24px;
+  font-size: 15px;
+  font-weight: 700;
+  font-family: "Tajawal", sans-serif;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.15s;
+  margin-top: 4px;
+}
+
+.save-btn:hover:not(:disabled) {
+  background: var(--teal-light);
+  transform: translateY(-1px);
+}
+
+.save-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ═══════════════════════════════════════════════════════
+   LOGOUT SECTION
+   ═══════════════════════════════════════════════════════ */
+.logout-section {
+  background: var(--card-bg);
+  border-radius: 18px;
+  padding: 20px 24px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+}
+
+.logout-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+  border: 1.5px solid var(--danger);
+  color: var(--danger);
+  border-radius: 10px;
+  padding: 11px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: "Tajawal", sans-serif;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.logout-btn:hover {
+  background: var(--danger-light);
+}
+
+/* Confirm state */
+.logout-confirm {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.logout-confirm p {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--danger);
+  text-align: right;
+}
+
+.logout-hint {
+  font-size: 12px !important;
+  color: var(--text-secondary) !important;
+  font-weight: 400 !important;
+}
+
+.confirm-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.confirm-logout-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--danger);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 9px 18px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: "Tajawal", sans-serif;
+  cursor: pointer;
+}
+
+.cancel-btn {
+  background: var(--border);
+  color: var(--text-primary);
+  border: none;
+  border-radius: 8px;
+  padding: 9px 18px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: "Tajawal", sans-serif;
+  cursor: pointer;
+}
+/* ─── Avatar Placeholder (when no image) ─────────────── */
+.avatar-placeholder {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  background: var(--teal);
+  border: 3px solid var(--teal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 36px;
+  font-weight: 700;
+  font-family: "Cairo", sans-serif;
+  text-transform: uppercase;
+}

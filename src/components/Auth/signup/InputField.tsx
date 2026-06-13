@@ -17,7 +17,7 @@ const InputField: React.FC<InputFieldProps> = ({
   onChange,
   type = "text",
   error,
-  delay,
+  // delay,
 }) => {
   const [hovered, setHovered] = useState(false);
 

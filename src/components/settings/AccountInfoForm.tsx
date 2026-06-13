@@ -1,5 +1,6 @@
 import React from "react";
-import { Mail, Phone, MapPin, Lock } from "lucide-react";
+
+import { Phone, MapPin, Lock } from "lucide-react";
 
 interface AccountInfoFormProps {
   name: string;

@@ -1,5 +1,4 @@
 
-
 export type Page = "dashboard" | "orders" | "services" | "discounts" | "profile";
 
 export type OrderStatus = "new" | "processing" | "ready" | "delivering" | "done" | "cancelled";

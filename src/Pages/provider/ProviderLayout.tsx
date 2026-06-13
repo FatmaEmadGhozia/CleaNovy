@@ -1,43 +1,48 @@
+import { useEffect } from "react"
+import {
+  Routes,
+  Route,
+  Navigate,
+  useNavigate,
+  useLocation,
+} from "react-router-dom"
+import Sidebar from "./components/Sidebar"
+import TopBar from "./components/TopBar"
+import AddServiceModal from "./components/AddServiceModal"
+import NotificationsPanel from "./components/NotificationsPanel"
+import Toast from "./components/Toast"
+import { ProviderProvider } from "./context/ProviderContext"
 
+import Orders from "./Orders"
+import Services from "./Services"
+import Discounts from "./Discounts"
+import Dashboard from "./Dashboard"
+import Profile from "./Profile"
 
-import { Routes, Route, Navigate, useNavigate, useLocation } from "react-router-dom";
-import Sidebar from "./components/Sidebar";
-import TopBar from "./components/TopBar";
-import AddServiceModal from "./components/AddServiceModal";
-import NotificationsPanel from "./components/NotificationsPanel";
-import Toast from "./components/Toast";
-import { ProviderProvider } from "./context/ProviderContext";
-
-import Orders from "./Orders";
-import Services from "./Services";
-import Discounts from "./Discounts";
-import Dashboard from "./Dashboard";
-import Profile from "./Profile";
-
-import type { Page } from "./types";
-export type { Page };
+import type { Page } from "./types"
+export type { Page }
 
 function ProviderContent() {
-  const navigate = useNavigate();
-  const location = useLocation();
+  const navigate = useNavigate()
+  const location = useLocation()
 
   // derive current page from URL
   const pathToPage = (path: string): Page => {
-    if (path.includes("/orders")) return "orders";
-    if (path.includes("/services")) return "services";
-    if (path.includes("/discounts")) return "discounts";
-    if (path.includes("/profile")) return "profile";
-    return "dashboard";
-  };
+    if (path.includes("/orders")) return "orders"
+    if (path.includes("/services")) return "services"
+    if (path.includes("/discounts")) return "discounts"
+    if (path.includes("/profile")) return "profile"
+    return "dashboard"
+  }
 
-  const page = pathToPage(location.pathname);
+  const page = pathToPage(location.pathname)
 
   const setPage = (p: Page) => {
-    navigate(`/provider/${p === "dashboard" ? "dashboard" : p}`);
-  };
+    navigate(`/provider/${p === "dashboard" ? "dashboard" : p}`)
+  }
 
   return (
-    <div className="bg-[#F6FAFF] text-[#171C21] min-h-screen" dir="rtl">
+    <div className="min-h-screen bg-[#F6FAFF] text-[#171C21]" dir="rtl">
       <Sidebar page={page} setPage={setPage} />
       <main className="mr-64 min-h-screen">
         <TopBar page={page} setPage={setPage} />
@@ -54,7 +59,7 @@ function ProviderContent() {
       <NotificationsPanel />
       <Toast />
     </div>
-  );
+  )
 }
 
 export default function ProviderLayout() {
@@ -62,5 +67,5 @@ export default function ProviderLayout() {
     <ProviderProvider>
       <ProviderContent />
     </ProviderProvider>
-  );
+  )
 }
