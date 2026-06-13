@@ -386,20 +386,37 @@ const TAB_LABELS: Record<TabKey, string> = {
 };
 
 export function OrdersManagement() {
-  const [activeTab, setActiveTab]   = useState<TabKey>("all");
-  const [searchQuery, setSearchQuery] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
+  const [activeTab, setActiveTab]       = useState<TabKey>("all");
+  const [searchQuery, setSearchQuery]   = useState("");
+  const [selectedProvider, setSelectedProvider] = useState("");
+  const [currentPage, setCurrentPage]   = useState(1);
 
-  const [orders, setOrders]           = useState<OrderListItem[]>([]);
-  const [counts, setCounts]           = useState({ all: 0, pending: 0, processing: 0, completed: 0, cancelled: 0 });
-  const [totalPages, setTotalPages]   = useState(1);
-  const [isLoading, setIsLoading]     = useState(true);
-  const [error, setError]             = useState<string | null>(null);
+  const [orders, setOrders]             = useState<OrderListItem[]>([]);
+  const [counts, setCounts]             = useState({ all: 0, pending: 0, processing: 0, completed: 0, cancelled: 0 });
+  const [totalPages, setTotalPages]     = useState(1);
+  const [isLoading, setIsLoading]       = useState(true);
+  const [error, setError]               = useState<string | null>(null);
+
+  const [laundries, setLaundries]       = useState<{ id: string; name: string }[]>([]);
 
   const [selectedOrder, setSelectedOrder] = useState<OrderDetail | null>(null);
   const [loadingDetail, setLoadingDetail] = useState(false);
 
   const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+
+  // ── Fetch laundries list for dropdown ──────────────────────────────────────
+  useEffect(() => {
+    fetch(`${API_BASE_URL}/api/admin/laundries?status=all&limit=1000`)
+      .then((r) => r.json())
+      .then((json) => {
+        if (json.status === "success") {
+          setLaundries(
+            json.data.laundries.map((l: any) => ({ id: String(l.id), name: l.name }))
+          );
+        }
+      })
+      .catch(() => {});
+  }, [API_BASE_URL]);
 
   // ── Fetch list ─────────────────────────────────────────────────────────────
   const fetchOrders = useCallback(async () => {
@@ -411,7 +428,8 @@ export function OrdersManagement() {
         page:  String(currentPage),
         limit: String(ITEMS_PER_PAGE),
       });
-      if (searchQuery.trim()) params.set("search", searchQuery.trim());
+      if (searchQuery.trim())  params.set("search",   searchQuery.trim());
+      if (selectedProvider)    params.set("provider", selectedProvider);
 
       const res = await fetch(`${API_BASE_URL}/api/admin/orders?${params}`);
       if (!res.ok) throw new Error("فشل تحميل الطلبات");
@@ -438,7 +456,7 @@ export function OrdersManagement() {
     } finally {
       setIsLoading(false);
     }
-  }, [activeTab, currentPage, searchQuery, API_BASE_URL]);
+  }, [activeTab, currentPage, searchQuery, selectedProvider, API_BASE_URL]);
 
   useEffect(() => {
     fetchOrders();
@@ -496,6 +514,11 @@ export function OrdersManagement() {
     setCurrentPage(1);
   }
 
+  function handleProviderChange(id: string) {
+    setSelectedProvider(id);
+    setCurrentPage(1);
+  }
+
   const TAB_STYLES: Record<TabKey, { active: string; inactive: string }> = {
     all:        { active: "bg-[#0D1F3C] text-white", inactive: "bg-white text-[#777779] border border-[#F4F6F9] hover:border-[#0D1F3C]" },
     pending:    { active: "bg-[#F4C542] text-[#0D1F3C]", inactive: "bg-white text-[#777779] border border-[#F4F6F9] hover:border-[#F4C542]" },
@@ -531,24 +554,49 @@ export function OrdersManagement() {
         ))}
       </div>
 
-      {/* Search */}
-      <div className="flex items-center gap-3">
-        <div className="relative max-w-xs">
+      {/* Search + Provider Filter */}
+      <div className="flex flex-wrap items-center gap-3">
+        {/* Search by order number */}
+        <div className="relative">
           <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#777779]" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => handleSearch(e.target.value)}
             placeholder="ابحث برقم الطلب..."
-            className="pr-9 pl-4 py-2 border border-[#F4F6F9] rounded-lg focus:outline-none focus:border-[#00C9B1] bg-white text-sm w-full"
+            className="pr-9 pl-4 py-2 border border-[#F4F6F9] rounded-lg focus:outline-none focus:border-[#00C9B1] bg-white text-sm w-52"
           />
         </div>
-        {searchQuery && (
-          <button
-            onClick={() => handleSearch("")}
-            className="text-sm text-[#777779] hover:text-[#FF4D4D] transition-colors"
+
+        {/* Laundry filter dropdown */}
+        <div className="relative">
+          <Store className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#777779] pointer-events-none" />
+          <select
+            value={selectedProvider}
+            onChange={(e) => handleProviderChange(e.target.value)}
+            aria-label="فلتر بالمغسلة"
+            className="pr-9 pl-8 py-2 border border-[#F4F6F9] rounded-lg focus:outline-none focus:border-[#00C9B1] bg-white text-sm appearance-none cursor-pointer text-[#0D1F3C] w-52"
           >
-            مسح البحث
+            <option value="">كل المغاسل</option>
+            {laundries.map((l) => (
+              <option key={l.id} value={l.id}>{l.name}</option>
+            ))}
+          </select>
+          <div className="pointer-events-none absolute left-2 top-1/2 -translate-y-1/2">
+            <svg className="w-4 h-4 text-[#777779]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+          </div>
+        </div>
+
+        {/* Clear filters */}
+        {(searchQuery || selectedProvider) && (
+          <button
+            onClick={() => { handleSearch(""); handleProviderChange(""); }}
+            className="flex items-center gap-1 text-sm text-[#777779] hover:text-[#FF4D4D] transition-colors"
+          >
+            <X className="w-3.5 h-3.5" />
+            مسح الفلاتر
           </button>
         )}
       </div>

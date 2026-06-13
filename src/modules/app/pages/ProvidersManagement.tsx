@@ -11,7 +11,6 @@ export interface LaundryProfile {
   rating: number;
   joinDate: string;
   isActive: boolean;
-  documents?: string;
 }
 
 export interface Provider {
@@ -20,52 +19,7 @@ export interface Provider {
   profile: LaundryProfile;
 }
 
-// ─── Mock Data ─────────────────────────────────────────────────────────────────
-const initialProviders: Provider[] = [
-  {
-    id: 1, status: "approved",
-    profile: { name: "مغسلة النظافة المثالية", email: "info@cleanpro.sa", phone: "+966 50 111 2222", location: "الرياض، حي النرجس", services: "غسيل ملابس، كوي", rating: 4.8, joinDate: "2026-01-10", isActive: true }
-  },
-  {
-    id: 2, status: "approved",
-    profile: { name: "مغسلة الماسية", email: "contact@diamond.sa", phone: "+966 55 222 3333", location: "جدة، حي الزهراء", services: "تنظيف جاف، تنظيف سجاد", rating: 4.9, joinDate: "2026-02-15", isActive: true }
-  },
-  {
-    id: 3, status: "approved",
-    profile: { name: "مغسلة السريعة", email: "hello@quick.sa", phone: "+966 50 333 4444", location: "الدمام، حي الفيصلية", services: "غسيل ملابس", rating: 4.6, joinDate: "2026-03-01", isActive: false }
-  },
-  {
-    id: 4, status: "approved",
-    profile: { name: "مغسلة النخبة", email: "info@elite.sa", phone: "+966 55 444 5555", location: "مكة، حي العزيزية", services: "تنظيف جاف، كوي، تنظيف ستائر", rating: 4.9, joinDate: "2026-03-20", isActive: true }
-  },
-  {
-    id: 5, status: "pending",
-    profile: { name: "مغسلة اللمعان", email: "contact@sparkle.sa", phone: "+966 50 555 6666", location: "المدينة المنورة، حي السلام", services: "غسيل ملابس، كوي", rating: 0, joinDate: "2026-05-14", isActive: true, documents: "مكتمل" }
-  },
-  {
-    id: 6, status: "pending",
-    profile: { name: "مغسلة التنظيف الفاخر", email: "info@premium.sa", phone: "+966 55 666 7777", location: "الطائف، حي الشفا", services: "تنظيف جاف، تنظيف سجاد", rating: 0, joinDate: "2026-05-15", isActive: true, documents: "مكتمل" }
-  },
-  {
-    id: 7, status: "pending",
-    profile: { name: "مغسلة النظافة السريعة", email: "hello@fresh.sa", phone: "+966 50 777 8888", location: "أبها، حي الموظفين", services: "غسيل ملابس، عناية بالحقائب", rating: 0, joinDate: "2026-05-16", isActive: true, documents: "قيد الانتظار" }
-  },
-];
-
 const ITEMS_PER_PAGE = 5;
-
-// ─── Document Badge ────────────────────────────────────────────────────────────
-function DocumentBadge({ status }: { status: string }) {
-  const styles: Record<string, string> = {
-    "قيد الانتظار": "bg-[#F4C542] text-[#0D1F3C]",
-    "مكتمل": "bg-[#00C9B1] text-white",
-  };
-  return (
-    <span className={`px-3 py-1 rounded-full text-xs font-medium ${styles[status] ?? "bg-gray-100 text-gray-600"}`}>
-      {status}
-    </span>
-  );
-}
 
 // ─── Confirm Suspend Modal ─────────────────────────────────────────────────────
 function ConfirmSuspendModal({ onConfirm, onCancel }: { onConfirm: () => void; onCancel: () => void }) {
@@ -145,7 +99,6 @@ function LaundryProfileModal({ data, onClose }: LaundryProfileModalProps) {
                 <Star className="w-3 h-3 fill-yellow-400 stroke-yellow-500" /> {profile.rating}
               </span>
             )}
-            {profile.documents && <DocumentBadge status={profile.documents} />}
           </div>
         </div>
 
@@ -184,7 +137,7 @@ function LaundryProfileModal({ data, onClose }: LaundryProfileModalProps) {
               <Wrench className="w-5 h-5 text-[#00C9B1] shrink-0 mt-0.5" />
               <div>
                 <span className="block text-xs font-medium text-[#777779] mb-1">الخدمات المقدمة</span>
-                <span className="text-sm font-semibold text-[#0D1F3C]">{profile.services}</span>
+                <span className="text-sm font-semibold text-[#0D1F3C]">{profile.services || "لم يتم تحديد الخدمات"}</span>
               </div>
             </div>
 
@@ -287,7 +240,6 @@ export function ProvidersManagement() {
             rating: 0,
             joinDate: l.appliedAt ? l.appliedAt.split("T")[0] : "",
             isActive: true,
-            documents: "مكتمل",
           }
         }));
       }
@@ -602,11 +554,7 @@ export function ProvidersManagement() {
                     </div>
                     <div>
                       <div className="text-xs text-[#777779] mb-1">الخدمات المقدمة</div>
-                      <div className="text-sm text-[#0D1F3C]">{provider.profile.services}</div>
-                    </div>
-                    <div>
-                      <div className="text-xs text-[#777779] mb-1">حالة المستندات</div>
-                      {provider.profile.documents && <DocumentBadge status={provider.profile.documents} />}
+                      <div className="text-sm text-[#0D1F3C]">{provider.profile.services || "لم يتم تحديد الخدمات"}</div>
                     </div>
                   </div>
                 </div>
