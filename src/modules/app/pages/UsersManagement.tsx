@@ -1,17 +1,136 @@
 import { useState } from "react";
-import { Search, Eye, Trash2, X } from "lucide-react";
+import { Search, Eye, Trash2, X, User as UserIcon, Mail, Phone, Shield, Calendar, CreditCard, RotateCcw } from "lucide-react";
 
-const laundries = ["مغسلة النظافة المثالية", "مغسلة الماسية", "مغسلة السريعة", "مغسلة النخبة", "مغسلة اللمعان", "مغسلة التنظيف الفاخر"];
+export interface UserProfile {
+  name: string;
+  username: string | null;
+  email: string;
+  phone: string;
+  nationalId: string | null;
+  image: string | null;
+  isActive: boolean;
+  isBanned: boolean;
+  joinedAt: string;
+}
 
-const usersData = [
-  { id: 1, name: "سارة أحمد الشمري", email: "sarah.a@email.sa", phone: "+966 50 123 4567", joinDate: "2026-01-15", laundry: "مغسلة النظافة المثالية", avatar: "س" },
-  { id: 2, name: "محمد علي السعيد", email: "mohammed.ali@email.sa", phone: "+966 55 234 5678", joinDate: "2026-02-20", laundry: "مغسلة الماسية", avatar: "م" },
-  { id: 3, name: "فاطمة خالد المطيري", email: "fatima.k@email.sa", phone: "+966 50 345 6789", joinDate: "2026-03-10", laundry: "مغسلة السريعة", avatar: "ف" },
-  { id: 4, name: "عبدالله محمود العتيبي", email: "abdullah.m@email.sa", phone: "+966 55 456 7890", joinDate: "2026-03-25", laundry: "مغسلة النخبة", avatar: "ع" },
-  { id: 5, name: "نورة سعد القحطاني", email: "noura.s@email.sa", phone: "+966 50 567 8901", joinDate: "2026-04-05", laundry: "مغسلة النظافة المثالية", avatar: "ن" },
-  { id: 6, name: "خالد عبدالعزيز الدوسري", email: "khaled.a@email.sa", phone: "+966 55 678 9012", joinDate: "2026-04-18", laundry: "مغسلة اللمعان", avatar: "خ" },
-  { id: 7, name: "مريم حسن الغامدي", email: "maryam.h@email.sa", phone: "+966 50 789 0123", joinDate: "2026-05-01", laundry: "مغسلة التنظيف الفاخر", avatar: "م" },
-  { id: 8, name: "يوسف إبراهيم العمري", email: "yousef.i@email.sa", phone: "+966 55 890 1234", joinDate: "2026-05-12", laundry: "مغسلة الماسية", avatar: "ي" },
+export interface User {
+  id: number;
+  profile: UserProfile;
+}
+
+const usersData: User[] = [
+  {
+    id: 1,
+    profile: {
+      name: "سارة أحمد الشمري",
+      username: "sarah_sh",
+      email: "sarah.a@email.sa",
+      phone: "+966 50 123 4567",
+      nationalId: "1092837465",
+      image: null,
+      isActive: true,
+      isBanned: false,
+      joinedAt: "2026-01-15T08:30:00Z"
+    }
+  },
+  {
+    id: 2,
+    profile: {
+      name: "محمد علي السعيد",
+      username: null,
+      email: "mohammed.ali@email.sa",
+      phone: "+966 55 234 5678",
+      nationalId: null,
+      image: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&h=150&q=80",
+      isActive: true,
+      isBanned: false,
+      joinedAt: "2026-02-20T14:15:00Z"
+    }
+  },
+  {
+    id: 3,
+    profile: {
+      name: "فاطمة خالد المطيري",
+      username: "fatima_k",
+      email: "fatima.k@email.sa",
+      phone: "+966 50 345 6789",
+      nationalId: "1082736452",
+      image: null,
+      isActive: false,
+      isBanned: false,
+      joinedAt: "2026-03-10T11:00:00Z"
+    }
+  },
+  {
+    id: 4,
+    profile: {
+      name: "عبدالله محمود العتيبي",
+      username: "abdullah_m",
+      email: "abdullah.m@email.sa",
+      phone: "+966 55 456 7890",
+      nationalId: "1072635481",
+      image: null,
+      isActive: true,
+      isBanned: true,
+      joinedAt: "2026-03-25T09:45:00Z"
+    }
+  },
+  {
+    id: 5,
+    profile: {
+      name: "نورة سعد القحطاني",
+      username: null,
+      email: "noura.s@email.sa",
+      phone: "+966 50 567 8901",
+      nationalId: null,
+      image: null,
+      isActive: true,
+      isBanned: false,
+      joinedAt: "2026-04-05T16:20:00Z"
+    }
+  },
+  {
+    id: 6,
+    profile: {
+      name: "خالد عبدالعزيز الدوسري",
+      username: "khaled_d",
+      email: "khaled.a@email.sa",
+      phone: "+966 55 678 9012",
+      nationalId: "1062534897",
+      image: "https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?auto=format&fit=crop&w=150&h=150&q=80",
+      isActive: true,
+      isBanned: false,
+      joinedAt: "2026-04-18T12:00:00Z"
+    }
+  },
+  {
+    id: 7,
+    profile: {
+      name: "مريم حسن الغامدي",
+      username: "maryam_g",
+      email: "maryam.h@email.sa",
+      phone: "+966 50 789 0123",
+      nationalId: null,
+      image: null,
+      isActive: false,
+      isBanned: true,
+      joinedAt: "2026-05-01T15:10:00Z"
+    }
+  },
+  {
+    id: 8,
+    profile: {
+      name: "يوسف إبراهيم العمري",
+      username: "yousef_o",
+      email: "yousef.i@email.sa",
+      phone: "+966 55 890 1234",
+      nationalId: "1052435768",
+      image: null,
+      isActive: true,
+      isBanned: false,
+      joinedAt: "2026-05-12T10:05:00Z"
+    }
+  }
 ];
 
 function ConfirmDeleteModal({ onConfirm, onCancel }: { onConfirm: () => void; onCancel: () => void }) {
@@ -47,23 +166,180 @@ function ConfirmDeleteModal({ onConfirm, onCancel }: { onConfirm: () => void; on
   );
 }
 
+interface UserProfileModalProps {
+  data: User;
+  onClose: () => void;
+}
+
+function UserProfileModal({ data, onClose }: UserProfileModalProps) {
+  const { profile } = data;
+  const formattedDate = profile.joinedAt ? profile.joinedAt.split("T")[0] : "—";
+  const avatarLetter = profile.name ? profile.name.trim().charAt(0) : "U";
+
+  return (
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-xs flex items-center justify-center z-50 animate-fade-in" onClick={onClose}>
+      <div
+        className="bg-white rounded-2xl shadow-2xl w-full max-w-lg mx-4 overflow-hidden transform transition-all duration-300 scale-100 relative"
+        onClick={(e) => e.stopPropagation()}
+        dir="rtl"
+      >
+        {/* Decorative Top Accent Bar */}
+        <div className="h-2 bg-gradient-to-r from-[#00C9B1] to-[#00A896]" />
+
+        {/* Close Button */}
+        <button
+          onClick={onClose}
+          aria-label="إغلاق"
+          className="absolute top-4 left-4 p-2 hover:bg-[#F4F6F9] rounded-full transition-colors group"
+        >
+          <X className="w-5 h-5 text-[#777779] group-hover:text-[#0D1F3C]" />
+        </button>
+
+        {/* Modal Header & Avatar */}
+        <div className="p-6 pb-4 flex flex-col items-center border-b border-[#F4F6F9] text-center">
+          <div className="relative mb-5">
+            {profile.image ? (
+              <img
+                src={profile.image}
+                alt={profile.name}
+                className="w-24 h-24 rounded-full object-cover border-4 border-white shadow-md"
+              />
+            ) : (
+              <div className="w-24 h-24 rounded-full bg-gradient-to-tr from-[#00C9B1] to-[#00A896] text-white flex items-center justify-center text-3xl font-bold border-4 border-white shadow-md">
+                {avatarLetter}
+              </div>
+            )}
+          </div>
+
+          <h2 className="text-xl font-bold text-[#0D1F3C] mb-1">{profile.name}</h2>
+          <p className="text-sm text-[#777779] mb-4">
+            {profile.username ? `@${profile.username}` : "سجل عبر OAuth (No Username)"}
+          </p>
+
+          {/* Badges */}
+          <div className="flex gap-2 justify-center">
+            {profile.isActive ? (
+              <span className="px-3 py-1 rounded-full text-xs font-semibold bg-green-50 text-green-700 border border-green-200 shadow-xs">
+                نشط (Active)
+              </span>
+            ) : (
+              <span className="px-3 py-1 rounded-full text-xs font-semibold bg-red-50 text-red-700 border border-red-200 shadow-xs">
+                معطل (Suspended)
+              </span>
+            )}
+            {profile.isBanned && (
+              <span className="px-3 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-700 border border-gray-300 shadow-xs">
+                محظور (Banned)
+              </span>
+            )}
+          </div>
+        </div>
+
+        {/* Modal Body / Profile Fields */}
+        <div className="p-6 space-y-4 max-h-[60vh] overflow-y-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Full Name */}
+            <div className="bg-[#F8FAFC] p-3.5 rounded-xl border border-[#F4F6F9] flex items-start gap-3">
+              <UserIcon className="w-5 h-5 text-[#00C9B1] shrink-0 mt-0.5" />
+              <div>
+                <span className="block text-xs font-medium text-[#777779] mb-1">الاسم الكامل (Full Name)</span>
+                <span className="text-sm font-semibold text-[#0D1F3C]">{profile.name}</span>
+              </div>
+            </div>
+
+            {/* Username */}
+            <div className="bg-[#F8FAFC] p-3.5 rounded-xl border border-[#F4F6F9] flex items-start gap-3">
+              <UserIcon className="w-5 h-5 text-[#00C9B1] shrink-0 mt-0.5" />
+              <div>
+                <span className="block text-xs font-medium text-[#777779] mb-1">اسم المستخدم (Username)</span>
+                <span className={`text-sm font-semibold ${profile.username ? 'text-[#0D1F3C]' : 'text-gray-400 italic'}`}>
+                  {profile.username || "غير متوفر (OAuth User)"}
+                </span>
+              </div>
+            </div>
+
+            {/* Email */}
+            <div className="bg-[#F8FAFC] p-3.5 rounded-xl border border-[#F4F6F9] flex items-start gap-3">
+              <Mail className="w-5 h-5 text-[#00C9B1] shrink-0 mt-0.5" />
+              <div>
+                <span className="block text-xs font-medium text-[#777779] mb-1">البريد الإلكتروني (Email Address)</span>
+                <span className="text-sm font-semibold text-[#0D1F3C] select-all">{profile.email}</span>
+              </div>
+            </div>
+
+            {/* Phone */}
+            <div className="bg-[#F8FAFC] p-3.5 rounded-xl border border-[#F4F6F9] flex items-start gap-3">
+              <Phone className="w-5 h-5 text-[#00C9B1] shrink-0 mt-0.5" />
+              <div>
+                <span className="block text-xs font-medium text-[#777779] mb-1">رقم الجوال (Phone Number)</span>
+                <span className="text-sm font-semibold text-[#0D1F3C] select-all" dir="ltr">{profile.phone}</span>
+              </div>
+            </div>
+
+            {/* National ID */}
+            <div className="bg-[#F8FAFC] p-3.5 rounded-xl border border-[#F4F6F9] flex items-start gap-3">
+              <CreditCard className="w-5 h-5 text-[#00C9B1] shrink-0 mt-0.5" />
+              <div>
+                <span className="block text-xs font-medium text-[#777779] mb-1">الهوية الوطنية (National ID)</span>
+                <span className={`text-sm font-semibold ${profile.nationalId ? 'text-[#0D1F3C]' : 'text-gray-400 italic'}`}>
+                  {profile.nationalId || "غير متوفر (N/A)"}
+                </span>
+              </div>
+            </div>
+
+            {/* Joined Date */}
+            <div className="bg-[#F8FAFC] p-3.5 rounded-xl border border-[#F4F6F9] flex items-start gap-3">
+              <Calendar className="w-5 h-5 text-[#00C9B1] shrink-0 mt-0.5" />
+              <div>
+                <span className="block text-xs font-medium text-[#777779] mb-1">تاريخ الانضمام (Joined Date)</span>
+                <span className="text-sm font-semibold text-[#0D1F3C]">{formattedDate}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Modal Footer */}
+        <div className="p-4 bg-[#F8FAFC] border-t border-[#F4F6F9] flex justify-end">
+          <button
+            onClick={onClose}
+            className="px-6 py-2 bg-[#0D1F3C] hover:bg-[#162F56] text-white text-sm font-semibold rounded-lg transition-colors shadow-md"
+          >
+            إغلاق (Close)
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function UsersManagement() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedLaundry, setSelectedLaundry] = useState("");
   const [deleteTarget, setDeleteTarget] = useState<number | null>(null);
+  const [selectedUserForView, setSelectedUserForView] = useState<User | null>(null);
   const [users, setUsers] = useState(usersData);
 
   const filteredUsers = users.filter((user) => {
     const matchesSearch =
-      user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesLaundry = selectedLaundry === "" || user.laundry === selectedLaundry;
-    return matchesSearch && matchesLaundry;
+      user.profile.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      user.profile.email.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesSearch;
   });
 
   function handleDelete(id: number) {
-    setUsers((prev) => prev.filter((u) => u.id !== id));
+    setUsers((prev) =>
+      prev.map((u) =>
+        u.id === id ? { ...u, profile: { ...u.profile, isActive: false } } : u
+      )
+    );
     setDeleteTarget(null);
+  }
+
+  function handleRestore(id: number) {
+    setUsers((prev) =>
+      prev.map((u) =>
+        u.id === id ? { ...u, profile: { ...u.profile, isActive: true } } : u
+      )
+    );
   }
 
   return (
@@ -75,9 +351,16 @@ export function UsersManagement() {
         />
       )}
 
+      {selectedUserForView && (
+        <UserProfileModal
+          data={selectedUserForView}
+          onClose={() => setSelectedUserForView(null)}
+        />
+      )}
+
       <h1 className="text-3xl text-[#0D1F3C]">إدارة المستخدمين</h1>
 
-      {/* Search and Filter */}
+      {/* Search */}
       <div className="flex gap-4 items-center">
         <div className="relative flex-1 max-w-md">
           <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#777779] w-5 h-5" />
@@ -89,16 +372,6 @@ export function UsersManagement() {
             className="w-full pr-10 pl-4 py-2 border border-[#F4F6F9] rounded-lg focus:outline-none focus:border-[#00C9B1] bg-white"
           />
         </div>
-        <select
-          value={selectedLaundry}
-          onChange={(e) => setSelectedLaundry(e.target.value)} aria-label="تصفية حسب اسم المغسلة"
-          className="px-4 py-2 border border-[#F4F6F9] rounded-lg focus:outline-none focus:border-[#00C9B1] bg-white text-[#777779]"
-        >
-          <option value="">تصفية حسب المغسلة</option>
-          {laundries.map((l) => (
-            <option key={l} value={l}>{l}</option>
-          ))}
-        </select>
       </div>
 
       {/* Users Table */}
@@ -112,48 +385,75 @@ export function UsersManagement() {
                 <th className="text-right text-[#777779] text-sm py-4 px-6">البريد الإلكتروني</th>
                 <th className="text-right text-[#777779] text-sm py-4 px-6">رقم الجوال</th>
                 <th className="text-right text-[#777779] text-sm py-4 px-6">تاريخ الانضمام</th>
-                <th className="text-right text-[#777779] text-sm py-4 px-6">المغسلة التابعة لها</th>
                 <th className="text-right text-[#777779] text-sm py-4 px-6">الإجراءات</th>
               </tr>
             </thead>
             <tbody>
-              {filteredUsers.map((user, index) => (
-                <tr
-                  key={user.id}
-                  className={`border-b border-[#F4F6F9] hover:bg-[#F4F6F9] transition-colors ${
-                    index % 2 === 0 ? "bg-white" : "bg-[#F4F6F9]/50"
-                  }`}
-                >
-                  <td className="py-4 px-6">
-                    <div className="w-10 h-10 rounded-full bg-[#00C9B1] flex items-center justify-center text-white font-medium">
-                      {user.avatar}
-                    </div>
-                  </td>
-                  <td className="py-4 px-6 text-[#0D1F3C] font-medium">{user.name}</td>
-                  <td className="py-4 px-6 text-[#777779]">{user.email}</td>
-                  <td className="py-4 px-6 text-[#777779]">{user.phone}</td>
-                  <td className="py-4 px-6 text-[#777779]">{user.joinDate}</td>
-                  <td className="py-4 px-6">
-                    <span className="px-3 py-1 rounded-full text-xs font-medium bg-[#00C9B1]/10 text-[#00C9B1] border border-[#00C9B1]/20">
-                      {user.laundry}
-                    </span>
-                  </td>
-                  <td className="py-4 px-6">
-                    <div className="flex gap-2">
-                      <button className="p-2 hover:bg-[#00C9B1]/10 rounded-lg transition-colors" title="عرض">
-                        <Eye className="w-4 h-4 text-[#00C9B1]" />
-                      </button>
-                      <button
-                        className="p-2 hover:bg-[#FF4D4D]/10 rounded-lg transition-colors"
-                        title="حذف"
-                        onClick={() => setDeleteTarget(user.id)}
-                      >
-                        <Trash2 className="w-4 h-4 text-[#FF4D4D]" />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
+              {filteredUsers.map((user, index) => {
+                const formattedDate = user.profile.joinedAt ? user.profile.joinedAt.split("T")[0] : "—";
+                const avatarLetter = user.profile.name ? user.profile.name.trim().charAt(0) : "U";
+
+                return (
+                  <tr
+                    key={user.id}
+                    className={`border-b border-[#F4F6F9] hover:bg-[#F4F6F9] transition-colors ${
+                      !user.profile.isActive
+                        ? "bg-gray-50/80 opacity-60 text-gray-400"
+                        : index % 2 === 0 ? "bg-white" : "bg-[#F4F6F9]/50"
+                    }`}
+                  >
+                    <td className="py-4 px-6">
+                      {user.profile.image ? (
+                        <img
+                          src={user.profile.image}
+                          alt={user.profile.name}
+                          className={`w-10 h-10 rounded-full object-cover border border-[#F4F6F9] ${
+                            !user.profile.isActive ? "grayscale opacity-85" : ""
+                          }`}
+                        />
+                      ) : (
+                        <div className={`w-10 h-10 rounded-full bg-[#00C9B1] flex items-center justify-center text-white font-medium ${
+                          !user.profile.isActive ? "opacity-75" : ""
+                        }`}>
+                          {avatarLetter}
+                        </div>
+                      )}
+                    </td>
+                    <td className="py-4 px-6 text-[#0D1F3C] font-medium">{user.profile.name}</td>
+                    <td className="py-4 px-6 text-[#777779]">{user.profile.email}</td>
+                    <td className="py-4 px-6 text-[#777779]">{user.profile.phone}</td>
+                    <td className="py-4 px-6 text-[#777779]">{formattedDate}</td>
+                    <td className="py-4 px-6">
+                      <div className="flex gap-2">
+                        <button
+                          className="p-2 hover:bg-[#00C9B1]/10 rounded-lg transition-colors"
+                          title="عرض"
+                          onClick={() => setSelectedUserForView(user)}
+                        >
+                          <Eye className="w-4 h-4 text-[#00C9B1]" />
+                        </button>
+                        {user.profile.isActive ? (
+                          <button
+                            className="p-2 hover:bg-[#FF4D4D]/10 rounded-lg transition-colors"
+                            title="حذف"
+                            onClick={() => setDeleteTarget(user.id)}
+                          >
+                            <Trash2 className="w-4 h-4 text-[#FF4D4D]" />
+                          </button>
+                        ) : (
+                          <button
+                            className="p-2 hover:bg-teal-50 rounded-lg transition-colors"
+                            title="استعادة"
+                            onClick={() => handleRestore(user.id)}
+                          >
+                            <RotateCcw className="w-4 h-4 text-teal-600" />
+                          </button>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
