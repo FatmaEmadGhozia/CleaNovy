@@ -42,7 +42,6 @@ export default function AppRoutes() {
           path="/provider"
           element={<Navigate to="/provider/dashboard" replace />}
         />
-
         {/* Protected Routes */}
         <Route
           path="/settings"
