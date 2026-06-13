@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Search, Eye, Trash2, X, User as UserIcon, Mail, Phone, Shield, Calendar, CreditCard, RotateCcw } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Search, Eye, Ban, X, User as UserIcon, Mail, Phone, Calendar, CreditCard, RotateCcw } from "lucide-react";
 
 export interface UserProfile {
   name: string;
@@ -14,126 +14,126 @@ export interface UserProfile {
 }
 
 export interface User {
-  id: number;
+  id: string;
   profile: UserProfile;
 }
 
-const usersData: User[] = [
-  {
-    id: 1,
-    profile: {
-      name: "سارة أحمد الشمري",
-      username: "sarah_sh",
-      email: "sarah.a@email.sa",
-      phone: "+966 50 123 4567",
-      nationalId: "1092837465",
-      image: null,
-      isActive: true,
-      isBanned: false,
-      joinedAt: "2026-01-15T08:30:00Z"
-    }
-  },
-  {
-    id: 2,
-    profile: {
-      name: "محمد علي السعيد",
-      username: null,
-      email: "mohammed.ali@email.sa",
-      phone: "+966 55 234 5678",
-      nationalId: null,
-      image: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&h=150&q=80",
-      isActive: true,
-      isBanned: false,
-      joinedAt: "2026-02-20T14:15:00Z"
-    }
-  },
-  {
-    id: 3,
-    profile: {
-      name: "فاطمة خالد المطيري",
-      username: "fatima_k",
-      email: "fatima.k@email.sa",
-      phone: "+966 50 345 6789",
-      nationalId: "1082736452",
-      image: null,
-      isActive: false,
-      isBanned: false,
-      joinedAt: "2026-03-10T11:00:00Z"
-    }
-  },
-  {
-    id: 4,
-    profile: {
-      name: "عبدالله محمود العتيبي",
-      username: "abdullah_m",
-      email: "abdullah.m@email.sa",
-      phone: "+966 55 456 7890",
-      nationalId: "1072635481",
-      image: null,
-      isActive: true,
-      isBanned: true,
-      joinedAt: "2026-03-25T09:45:00Z"
-    }
-  },
-  {
-    id: 5,
-    profile: {
-      name: "نورة سعد القحطاني",
-      username: null,
-      email: "noura.s@email.sa",
-      phone: "+966 50 567 8901",
-      nationalId: null,
-      image: null,
-      isActive: true,
-      isBanned: false,
-      joinedAt: "2026-04-05T16:20:00Z"
-    }
-  },
-  {
-    id: 6,
-    profile: {
-      name: "خالد عبدالعزيز الدوسري",
-      username: "khaled_d",
-      email: "khaled.a@email.sa",
-      phone: "+966 55 678 9012",
-      nationalId: "1062534897",
-      image: "https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?auto=format&fit=crop&w=150&h=150&q=80",
-      isActive: true,
-      isBanned: false,
-      joinedAt: "2026-04-18T12:00:00Z"
-    }
-  },
-  {
-    id: 7,
-    profile: {
-      name: "مريم حسن الغامدي",
-      username: "maryam_g",
-      email: "maryam.h@email.sa",
-      phone: "+966 50 789 0123",
-      nationalId: null,
-      image: null,
-      isActive: false,
-      isBanned: true,
-      joinedAt: "2026-05-01T15:10:00Z"
-    }
-  },
-  {
-    id: 8,
-    profile: {
-      name: "يوسف إبراهيم العمري",
-      username: "yousef_o",
-      email: "yousef.i@email.sa",
-      phone: "+966 55 890 1234",
-      nationalId: "1052435768",
-      image: null,
-      isActive: true,
-      isBanned: false,
-      joinedAt: "2026-05-12T10:05:00Z"
-    }
-  }
-];
+// const usersData: User[] = [
+//   {
+//     id: "1",
+//     profile: {
+//       name: "سارة أحمد الشمري",
+//       username: "sarah_sh",
+//       email: "sarah.a@email.sa",
+//       phone: "+966 50 123 4567",
+//       nationalId: "1092837465",
+//       image: null,
+//       isActive: true,
+//       isBanned: false,
+//       joinedAt: "2026-01-15T08:30:00Z"
+//     }
+//   },
+//   {
+//     id: "2",
+//     profile: {
+//       name: "محمد علي السعيد",
+//       username: null,
+//       email: "mohammed.ali@email.sa",
+//       phone: "+966 55 234 5678",
+//       nationalId: null,
+//       image: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&h=150&q=80",
+//       isActive: true,
+//       isBanned: false,
+//       joinedAt: "2026-02-20T14:15:00Z"
+//     }
+//   },
+//   {
+//     id: "3",
+//     profile: {
+//       name: "فاطمة خالد المطيري",
+//       username: "fatima_k",
+//       email: "fatima.k@email.sa",
+//       phone: "+966 50 345 6789",
+//       nationalId: "1082736452",
+//       image: null,
+//       isActive: false,
+//       isBanned: false,
+//       joinedAt: "2026-03-10T11:00:00Z"
+//     }
+//   },
+//   {
+//     id: "4",
+//     profile: {
+//       name: "عبدالله محمود العتيبي",
+//       username: "abdullah_m",
+//       email: "abdullah.m@email.sa",
+//       phone: "+966 55 456 7890",
+//       nationalId: "1072635481",
+//       image: null,
+//       isActive: true,
+//       isBanned: true,
+//       joinedAt: "2026-03-25T09:45:00Z"
+//     }
+//   },
+//   {
+//     id: "5",
+//     profile: {
+//       name: "نورة سعد القحطاني",
+//       username: null,
+//       email: "noura.s@email.sa",
+//       phone: "+966 50 567 8901",
+//       nationalId: null,
+//       image: null,
+//       isActive: true,
+//       isBanned: false,
+//       joinedAt: "2026-04-05T16:20:00Z"
+//     }
+//   },
+//   {
+//     id: "6",
+//     profile: {
+//       name: "خالد عبدالعزيز الدوسري",
+//       username: "khaled_d",
+//       email: "khaled.a@email.sa",
+//       phone: "+966 55 678 9012",
+//       nationalId: "1062534897",
+//       image: "https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?auto=format&fit=crop&w=150&h=150&q=80",
+//       isActive: true,
+//       isBanned: false,
+//       joinedAt: "2026-04-18T12:00:00Z"
+//     }
+//   },
+//   {
+//     id: "7",
+//     profile: {
+//       name: "مريم حسن الغامدي",
+//       username: "maryam_g",
+//       email: "maryam.h@email.sa",
+//       phone: "+966 50 789 0123",
+//       nationalId: null,
+//       image: null,
+//       isActive: false,
+//       isBanned: true,
+//       joinedAt: "2026-05-01T15:10:00Z"
+//     }
+//   },
+//   {
+//     id: "8",
+//     profile: {
+//       name: "يوسف إبراهيم العمري",
+//       username: "yousef_o",
+//       email: "yousef.i@email.sa",
+//       phone: "+966 55 890 1234",
+//       nationalId: "1052435768",
+//       image: null,
+//       isActive: true,
+//       isBanned: false,
+//       joinedAt: "2026-05-12T10:05:00Z"
+//     }
+//   }
+// ];
 
-function ConfirmDeleteModal({ onConfirm, onCancel }: { onConfirm: () => void; onCancel: () => void }) {
+function ConfirmSuspendModal({ onConfirm, onCancel }: { onConfirm: () => void; onCancel: () => void }) {
   return (
     <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50" onClick={onCancel}>
       <div
@@ -141,18 +141,18 @@ function ConfirmDeleteModal({ onConfirm, onCancel }: { onConfirm: () => void; on
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-medium text-[#0D1F3C]">تأكيد الحذف</h3>
+          <h3 className="text-lg font-medium text-[#0D1F3C]">تأكيد التعطيل</h3>
           <button onClick={onCancel} aria-label="إغلاق النافذة" className="p-1 hover:bg-[#F4F6F9] rounded-lg transition-colors">
             <X className="w-5 h-5 text-[#777779]" />
           </button>
         </div>
-        <p className="text-[#777779] mb-6">هل أنت متأكد أنك تريد حذف هذا العنصر؟</p>
+        <p className="text-[#777779] mb-6">هل أنت متأكد أنك تريد تعطيل هذا المستخدم؟</p>
         <div className="flex gap-3">
           <button
             onClick={onConfirm}
             className="flex-1 bg-[#FF4D4D] text-white py-2 rounded-lg hover:bg-red-600 transition-colors font-medium"
           >
-            حذف
+            تعطيل
           </button>
           <button
             onClick={onCancel}
@@ -312,11 +312,54 @@ function UserProfileModal({ data, onClose }: UserProfileModalProps) {
   );
 }
 
+const ITEMS_PER_PAGE = 5;
+
 export function UsersManagement() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [deleteTarget, setDeleteTarget] = useState<number | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [suspendTarget, setSuspendTarget] = useState<string | null>(null);
   const [selectedUserForView, setSelectedUserForView] = useState<User | null>(null);
-  const [users, setUsers] = useState(usersData);
+  const [users, setUsers] = useState<User[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+
+  const fetchUsers = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      const res = await fetch(`${API_BASE_URL}/api/admin/users?status=all&limit=1000`);
+      if (!res.ok) throw new Error("Failed to fetch users");
+      const result = await res.json();
+      if (result.status === "success" && result.data?.users) {
+        const mapped = result.data.users.map((u: any) => ({
+          id: String(u.id),
+          profile: {
+            name: u.name || "مستخدم جديد",
+            username: u.username || null,
+            email: u.email || "",
+            phone: u.phone || "",
+            nationalId: u.nationalId || null,
+            image: u.image || null,
+            isActive: u.isActive !== undefined ? u.isActive : true,
+            isBanned: u.isBanned !== undefined ? u.isBanned : false,
+            joinedAt: u.joinedAt || new Date().toISOString(),
+          }
+        }));
+        setUsers(mapped);
+      }
+    } catch (err: any) {
+      console.error(err);
+      setError(err.message || "حدث خطأ أثناء تحميل البيانات");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
 
   const filteredUsers = users.filter((user) => {
     const matchesSearch =
@@ -325,29 +368,64 @@ export function UsersManagement() {
     return matchesSearch;
   });
 
-  function handleDelete(id: number) {
+  const totalPages = Math.max(1, Math.ceil(filteredUsers.length / ITEMS_PER_PAGE));
+  const paginatedUsers = filteredUsers.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
+
+  function handleSearchChange(value: string) {
+    setSearchQuery(value);
+    setCurrentPage(1);
+  }
+
+  async function handleSuspend(id: string) {
+    const previousUsers = [...users];
     setUsers((prev) =>
       prev.map((u) =>
         u.id === id ? { ...u, profile: { ...u.profile, isActive: false } } : u
       )
     );
-    setDeleteTarget(null);
+    setSuspendTarget(null);
+
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/admin/users/${id}`, {
+        method: "DELETE",
+      });
+      if (!res.ok) throw new Error("Failed to suspend user");
+    } catch (err: any) {
+      console.error(err);
+      setUsers(previousUsers);
+      alert("حدث خطأ أثناء تعطيل المستخدم، يرجى المحاولة مرة أخرى.");
+    }
   }
 
-  function handleRestore(id: number) {
+  async function handleRestore(id: string) {
+    const previousUsers = [...users];
     setUsers((prev) =>
       prev.map((u) =>
         u.id === id ? { ...u, profile: { ...u.profile, isActive: true } } : u
       )
     );
+
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/admin/users/${id}/restore`, {
+        method: "PATCH",
+      });
+      if (!res.ok) throw new Error("Failed to restore user");
+    } catch (err: any) {
+      console.error(err);
+      setUsers(previousUsers);
+      alert("حدث خطأ أثناء استعادة المستخدم، يرجى المحاولة مرة أخرى.");
+    }
   }
 
   return (
     <div className="space-y-6" dir="rtl">
-      {deleteTarget !== null && (
-        <ConfirmDeleteModal
-          onConfirm={() => handleDelete(deleteTarget)}
-          onCancel={() => setDeleteTarget(null)}
+      {suspendTarget !== null && (
+        <ConfirmSuspendModal
+          onConfirm={() => handleSuspend(suspendTarget)}
+          onCancel={() => setSuspendTarget(null)}
         />
       )}
 
@@ -368,7 +446,7 @@ export function UsersManagement() {
             type="text"
             placeholder="بحث عن مستخدم بالاسم أو البريد الإلكتروني..."
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={(e) => handleSearchChange(e.target.value)}
             className="w-full pr-10 pl-4 py-2 border border-[#F4F6F9] rounded-lg focus:outline-none focus:border-[#00C9B1] bg-white"
           />
         </div>
@@ -389,71 +467,91 @@ export function UsersManagement() {
               </tr>
             </thead>
             <tbody>
-              {filteredUsers.map((user, index) => {
-                const formattedDate = user.profile.joinedAt ? user.profile.joinedAt.split("T")[0] : "—";
-                const avatarLetter = user.profile.name ? user.profile.name.trim().charAt(0) : "U";
+              {isLoading ? (
+                <tr>
+                  <td colSpan={6} className="py-8 text-center text-[#777779]">
+                    جاري تحميل المستخدمين...
+                  </td>
+                </tr>
+              ) : error ? (
+                <tr>
+                  <td colSpan={6} className="py-8 text-center text-[#FF4D4D] font-medium">
+                    {error}
+                  </td>
+                </tr>
+              ) : paginatedUsers.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="py-8 text-center text-[#777779]">
+                    لا يوجد مستخدمين.
+                  </td>
+                </tr>
+              ) : (
+                paginatedUsers.map((user, index) => {
+                  const formattedDate = user.profile.joinedAt ? user.profile.joinedAt.split("T")[0] : "—";
+                  const avatarLetter = user.profile.name ? user.profile.name.trim().charAt(0) : "U";
 
-                return (
-                  <tr
-                    key={user.id}
-                    className={`border-b border-[#F4F6F9] hover:bg-[#F4F6F9] transition-colors ${
-                      !user.profile.isActive
-                        ? "bg-gray-50/80 opacity-60 text-gray-400"
-                        : index % 2 === 0 ? "bg-white" : "bg-[#F4F6F9]/50"
-                    }`}
-                  >
-                    <td className="py-4 px-6">
-                      {user.profile.image ? (
-                        <img
-                          src={user.profile.image}
-                          alt={user.profile.name}
-                          className={`w-10 h-10 rounded-full object-cover border border-[#F4F6F9] ${
-                            !user.profile.isActive ? "grayscale opacity-85" : ""
-                          }`}
-                        />
-                      ) : (
-                        <div className={`w-10 h-10 rounded-full bg-[#00C9B1] flex items-center justify-center text-white font-medium ${
-                          !user.profile.isActive ? "opacity-75" : ""
-                        }`}>
-                          {avatarLetter}
-                        </div>
-                      )}
-                    </td>
-                    <td className="py-4 px-6 text-[#0D1F3C] font-medium">{user.profile.name}</td>
-                    <td className="py-4 px-6 text-[#777779]">{user.profile.email}</td>
-                    <td className="py-4 px-6 text-[#777779]">{user.profile.phone}</td>
-                    <td className="py-4 px-6 text-[#777779]">{formattedDate}</td>
-                    <td className="py-4 px-6">
-                      <div className="flex gap-2">
-                        <button
-                          className="p-2 hover:bg-[#00C9B1]/10 rounded-lg transition-colors"
-                          title="عرض"
-                          onClick={() => setSelectedUserForView(user)}
-                        >
-                          <Eye className="w-4 h-4 text-[#00C9B1]" />
-                        </button>
-                        {user.profile.isActive ? (
-                          <button
-                            className="p-2 hover:bg-[#FF4D4D]/10 rounded-lg transition-colors"
-                            title="حذف"
-                            onClick={() => setDeleteTarget(user.id)}
-                          >
-                            <Trash2 className="w-4 h-4 text-[#FF4D4D]" />
-                          </button>
+                  return (
+                    <tr
+                      key={user.id}
+                      className={`border-b border-[#F4F6F9] hover:bg-[#F4F6F9] transition-colors ${
+                        !user.profile.isActive
+                          ? "bg-gray-50/80 opacity-60 text-gray-400"
+                          : index % 2 === 0 ? "bg-white" : "bg-[#F4F6F9]/50"
+                      }`}
+                    >
+                      <td className="py-4 px-6">
+                        {user.profile.image ? (
+                          <img
+                            src={user.profile.image}
+                            alt={user.profile.name}
+                            className={`w-10 h-10 rounded-full object-cover border border-[#F4F6F9] ${
+                              !user.profile.isActive ? "grayscale opacity-85" : ""
+                            }`}
+                          />
                         ) : (
-                          <button
-                            className="p-2 hover:bg-teal-50 rounded-lg transition-colors"
-                            title="استعادة"
-                            onClick={() => handleRestore(user.id)}
-                          >
-                            <RotateCcw className="w-4 h-4 text-teal-600" />
-                          </button>
+                          <div className={`w-10 h-10 rounded-full bg-[#00C9B1] flex items-center justify-center text-white font-medium ${
+                            !user.profile.isActive ? "opacity-75" : ""
+                          }`}>
+                            {avatarLetter}
+                          </div>
                         )}
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })}
+                      </td>
+                      <td className="py-4 px-6 text-[#0D1F3C] font-medium">{user.profile.name}</td>
+                      <td className="py-4 px-6 text-[#777779]">{user.profile.email}</td>
+                      <td className="py-4 px-6 text-[#777779]">{user.profile.phone}</td>
+                      <td className="py-4 px-6 text-[#777779]">{formattedDate}</td>
+                      <td className="py-4 px-6">
+                        <div className="flex gap-2">
+                          <button
+                            className="p-2 hover:bg-[#00C9B1]/10 rounded-lg transition-colors"
+                            title="عرض"
+                            onClick={() => setSelectedUserForView(user)}
+                          >
+                            <Eye className="w-4 h-4 text-[#00C9B1]" />
+                          </button>
+                          {user.profile.isActive ? (
+                            <button
+                              className="p-2 hover:bg-[#FF4D4D]/10 rounded-lg transition-colors"
+                              title="تعطيل"
+                              onClick={() => setSuspendTarget(user.id)}
+                            >
+                              <Ban className="w-4 h-4 text-[#FF4D4D]" />
+                            </button>
+                          ) : (
+                            <button
+                              className="p-2 hover:bg-teal-50 rounded-lg transition-colors"
+                              title="استعادة"
+                              onClick={() => handleRestore(user.id)}
+                            >
+                              <RotateCcw className="w-4 h-4 text-teal-600" />
+                            </button>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
             </tbody>
           </table>
         </div>
@@ -462,17 +560,39 @@ export function UsersManagement() {
       {/* Pagination */}
       <div className="flex justify-between items-center">
         <p className="text-[#777779] text-sm">
-          عرض {filteredUsers.length} من {users.length} مستخدم
+          عرض {Math.min((currentPage - 1) * ITEMS_PER_PAGE + 1, filteredUsers.length)}–{Math.min(currentPage * ITEMS_PER_PAGE, filteredUsers.length)} من {filteredUsers.length} مستخدم
         </p>
-        <div className="flex gap-2">
-          <button className="px-4 py-2 border border-[#F4F6F9] rounded-lg text-[#777779] hover:bg-[#F4F6F9]">
+        <div className="flex gap-2 items-center">
+          {/* Previous */}
+          <button
+            onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+            disabled={currentPage === 1}
+            className="px-4 py-2 border border-[#F4F6F9] rounded-lg text-[#777779] hover:bg-[#F4F6F9] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+          >
             السابق
           </button>
-          <button className="px-4 py-2 bg-[#00C9B1] text-white rounded-lg">1</button>
-          <button className="px-4 py-2 border border-[#F4F6F9] rounded-lg text-[#777779] hover:bg-[#F4F6F9]">
-            2
-          </button>
-          <button className="px-4 py-2 border border-[#F4F6F9] rounded-lg text-[#777779] hover:bg-[#F4F6F9]">
+
+          {/* Page Numbers */}
+          {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+            <button
+              key={page}
+              onClick={() => setCurrentPage(page)}
+              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                page === currentPage
+                  ? "bg-[#00C9B1] text-white shadow-sm"
+                  : "border border-[#F4F6F9] text-[#777779] hover:bg-[#F4F6F9]"
+              }`}
+            >
+              {page}
+            </button>
+          ))}
+
+          {/* Next */}
+          <button
+            onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+            disabled={currentPage === totalPages}
+            className="px-4 py-2 border border-[#F4F6F9] rounded-lg text-[#777779] hover:bg-[#F4F6F9] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+          >
             التالي
           </button>
         </div>
