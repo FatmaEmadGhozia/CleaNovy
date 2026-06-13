@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { Users, Store, ShoppingBag, Check, X } from "lucide-react";
+import { Link } from "react-router";
+import { Users, Store, ShoppingBag, Check, X, ArrowLeft } from "lucide-react";
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from "recharts";
 
 type OrderStatus =
@@ -73,32 +74,68 @@ function formatDate(iso: string): string {
   return d.toLocaleDateString("ar-EG", { year: "numeric", month: "short", day: "numeric" });
 }
 
+type FinancialPeriod = "all" | "monthly" | "yearly";
+
 export function Dashboard() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [financial, setFinancial] = useState<FinancialData | null>(null);
   const [recentOrders, setRecentOrders] = useState<RecentOrder[]>([]);
   const [pendingLaundries, setPendingLaundries] = useState<PendingLaundry[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isFinancialLoading, setIsFinancialLoading] = useState(false);
+
+  // فلاتر الملخص المالي
+  const [financialPeriod, setFinancialPeriod] = useState<FinancialPeriod>("all");
+  const [financialProvider, setFinancialProvider] = useState("all");
+  const [laundries, setLaundries] = useState<{ id: string; name: string }[]>([]);
 
   const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+
+  // جيب قائمة المغاسل للـ dropdown
+  useEffect(() => {
+    fetch(`${API_BASE_URL}/api/admin/laundries?status=all&limit=1000`)
+      .then((r) => r.json())
+      .then((json) => {
+        if (json.status === "success") {
+          setLaundries(json.data.laundries.map((l: any) => ({ id: String(l.id), name: l.name })));
+        }
+      })
+      .catch(() => {});
+  }, [API_BASE_URL]);
+
+  // fetch الملخص المالي مع الفلاتر
+  useEffect(() => {
+    const fetchFinancial = async () => {
+      try {
+        setIsFinancialLoading(true);
+        const params = new URLSearchParams({ period: financialPeriod, provider: financialProvider });
+        const res = await fetch(`${API_BASE_URL}/api/admin/dashboard/financial?${params}`);
+        const json = await res.json();
+        if (json.status === "success") setFinancial(json.data);
+      } catch (err) {
+        console.error("Financial fetch error:", err);
+      } finally {
+        setIsFinancialLoading(false);
+      }
+    };
+    fetchFinancial();
+  }, [API_BASE_URL, financialPeriod, financialProvider]);
 
   useEffect(() => {
     const fetchAll = async () => {
       try {
         setIsLoading(true);
-        const [statsRes, financialRes, ordersRes, pendingRes] = await Promise.all([
+        const [statsRes, ordersRes, pendingRes] = await Promise.all([
           fetch(`${API_BASE_URL}/api/admin/dashboard/stats`),
-          fetch(`${API_BASE_URL}/api/admin/dashboard/financial`),
           fetch(`${API_BASE_URL}/api/admin/dashboard/recent-orders`),
           fetch(`${API_BASE_URL}/api/admin/dashboard/pending-laundries`),
         ]);
 
-        const [statsJson, financialJson, ordersJson, pendingJson] = await Promise.all([
-          statsRes.json(), financialRes.json(), ordersRes.json(), pendingRes.json(),
+        const [statsJson, ordersJson, pendingJson] = await Promise.all([
+          statsRes.json(), ordersRes.json(), pendingRes.json(),
         ]);
 
         if (statsJson.status === "success") setStats(statsJson.data);
-        if (financialJson.status === "success") setFinancial(financialJson.data);
         if (ordersJson.status === "success") setRecentOrders(ordersJson.data);
         if (pendingJson.status === "success") setPendingLaundries(pendingJson.data);
       } catch (err) {
@@ -148,7 +185,16 @@ export function Dashboard() {
     { label: "إجمالي الطلبات",   value: stats?.totalOrders,   accent: "#F4C542", icon: ShoppingBag },
   ];
 
-  const financialChartData = financial
+  // الـ pie يظهر فيه القسمة بس (90% + 10%) — مش مدفوعات المستخدمين علشان متحسبش مرتين
+  const pieData = financial
+    ? [
+        { name: "أرباح المغاسل", value: financial.totalProviderEarnings, color: "#0D1F3C" },
+        { name: "أرباح الأدمن",  value: financial.totalAdminCommission,  color: "#F4C542" },
+      ]
+    : [];
+
+  // الـ bars بتعرض الثلاثة مع بعض كمرجع
+  const barData = financial
     ? [
         { name: "مدفوعات المستخدمين", value: financial.totalRevenue,          color: "#00C9B1" },
         { name: "أرباح المغاسل",      value: financial.totalProviderEarnings, color: "#0D1F3C" },
@@ -156,7 +202,8 @@ export function Dashboard() {
       ]
     : [];
 
-  const totalAmount = financialChartData.reduce((s, d) => s + d.value, 0);
+  // الإجمالي = ما دفعه اليوزر (100%)
+  const totalAmount = financial?.totalRevenue || 0;
 
   return (
     <div className="space-y-6" dir="rtl">
@@ -192,18 +239,58 @@ export function Dashboard() {
 
       {/* Financial Summary Pie Chart */}
       <div className="bg-white rounded-xl p-6 shadow-[0_2px_12px_rgba(0,0,0,0.07)]">
-        <h2 className="text-xl text-[#0D1F3C] mb-6">الملخص المالي</h2>
-        {isLoading ? (
+        {/* Header + Filters */}
+        <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
+          <h2 className="text-xl text-[#0D1F3C]">الملخص المالي</h2>
+          <div className="flex flex-wrap items-center gap-3">
+
+            {/* Period toggle */}
+            <div className="flex rounded-lg border border-[#F4F6F9] overflow-hidden text-sm">
+              {(["all", "monthly", "yearly"] as FinancialPeriod[]).map((p) => {
+                const label = p === "all" ? "الكل" : p === "monthly" ? "الشهر الحالي" : "السنة الحالية";
+                return (
+                  <button
+                    key={p}
+                    type="button"
+                    onClick={() => setFinancialPeriod(p)}
+                    className={`px-3 py-1.5 transition-colors ${
+                      financialPeriod === p
+                        ? "bg-[#00C9B1] text-white"
+                        : "bg-white text-[#777779] hover:bg-[#F4F6F9]"
+                    }`}
+                  >
+                    {label}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Laundry dropdown */}
+            <select
+              value={financialProvider}
+              onChange={(e) => setFinancialProvider(e.target.value)}
+              aria-label="فلتر بالمغسلة"
+              className="pr-3 pl-7 py-1.5 border border-[#F4F6F9] rounded-lg text-sm bg-white text-[#0D1F3C] focus:outline-none focus:border-[#00C9B1] appearance-none cursor-pointer"
+            >
+              <option value="all">كل المغاسل</option>
+              {laundries.map((l) => (
+                <option key={l.id} value={l.id}>{l.name}</option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        {isLoading || isFinancialLoading ? (
           <div className="h-64 flex items-center justify-center">
             <div className="w-8 h-8 border-4 border-[#00C9B1] border-t-transparent rounded-full animate-spin" />
           </div>
         ) : totalAmount > 0 ? (
           <div className="flex flex-col lg:flex-row items-center gap-8">
             <div className="w-full lg:w-1/2 h-64">
-              <ResponsiveContainer width="100%" height="100%">
+              <ResponsiveContainer key={`${financialPeriod}-${financialProvider}-${totalAmount}`} width="100%" height="100%">
                 <PieChart>
                   <Pie
-                    data={financialChartData}
+                    data={pieData}
                     cx="50%"
                     cy="50%"
                     innerRadius={60}
@@ -211,7 +298,7 @@ export function Dashboard() {
                     paddingAngle={3}
                     dataKey="value"
                   >
-                    {financialChartData.map((entry, index) => (
+                    {pieData.map((entry, index) => (
                       <Cell key={index} fill={entry.color} stroke="none" />
                     ))}
                   </Pie>
@@ -238,7 +325,7 @@ export function Dashboard() {
               </ResponsiveContainer>
             </div>
             <div className="w-full lg:w-1/2 space-y-4">
-              {financialChartData.map((item) => {
+              {barData.map((item) => {
                 const pct = totalAmount > 0 ? ((item.value / totalAmount) * 100).toFixed(1) : "0.0";
                 return (
                   <div key={item.name} className="flex items-center gap-4">
@@ -314,8 +401,19 @@ export function Dashboard() {
         </div>
 
         {/* Pending Provider Requests */}
-        <div className="bg-white rounded-xl p-6 shadow-[0_2px_12px_rgba(0,0,0,0.07)]">
-          <h2 className="text-xl text-[#0D1F3C] mb-4">طلبات المغاسل قيد الانتظار</h2>
+        <div className="bg-white rounded-xl p-6 shadow-[0_2px_12px_rgba(0,0,0,0.07)] flex flex-col">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl text-[#0D1F3C]">طلبات المغاسل قيد الانتظار</h2>
+            {pendingLaundries.length > 0 && (
+              <Link
+                to="/providers"
+                className="text-sm text-[#00C9B1] hover:text-[#00b39d] flex items-center gap-1 transition-colors"
+              >
+                عرض الكل
+                <ArrowLeft className="w-3.5 h-3.5" />
+              </Link>
+            )}
+          </div>
           {isLoading ? (
             <div className="py-8 flex justify-center">
               <div className="w-6 h-6 border-4 border-[#00C9B1] border-t-transparent rounded-full animate-spin" />
@@ -323,41 +421,49 @@ export function Dashboard() {
           ) : pendingLaundries.length === 0 ? (
             <p className="text-[#777779] text-sm text-center py-6">لا توجد طلبات معلقة</p>
           ) : (
-            <div className="space-y-4">
-              {pendingLaundries.map((provider) => (
-                <div
-                  key={provider.id}
-                  className="border border-[#F4F6F9] rounded-lg p-4 hover:shadow-md transition-shadow"
-                >
-                  <div className="flex justify-between items-start mb-2">
-                    <div>
-                      <h3 className="text-[#0D1F3C] font-medium">{provider.name}</h3>
-                      <p className="text-[#777779] text-sm">{provider.email}</p>
+            <>
+              <div className="space-y-3 flex-1">
+                {pendingLaundries.map((provider) => (
+                  <div
+                    key={provider.id}
+                    className="border border-[#F4F6F9] rounded-lg p-4 hover:shadow-md transition-shadow"
+                  >
+                    <div className="flex justify-between items-start mb-2">
+                      <div>
+                        <h3 className="text-[#0D1F3C] font-medium text-sm">{provider.name}</h3>
+                        <p className="text-[#777779] text-xs">{provider.email}</p>
+                      </div>
+                      <span className="text-xs text-[#777779] shrink-0">{formatDate(provider.createdAt)}</span>
                     </div>
-                    <span className="text-xs text-[#777779]">{formatDate(provider.createdAt)}</span>
+                    <div className="flex gap-2 mt-3">
+                      <button
+                        type="button"
+                        onClick={() => handleApprove(String(provider.id))}
+                        className="flex-1 bg-[#00C9B1] text-white px-3 py-1.5 rounded-lg hover:bg-[#00b39d] transition-colors flex items-center justify-center gap-1.5 text-sm"
+                      >
+                        <Check className="w-3.5 h-3.5" />
+                        قبول
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleReject(String(provider.id))}
+                        className="flex-1 border-2 border-[#FF4D4D] text-[#FF4D4D] px-3 py-1.5 rounded-lg hover:bg-[#FF4D4D] hover:text-white transition-colors flex items-center justify-center gap-1.5 text-sm"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                        رفض
+                      </button>
+                    </div>
                   </div>
-                  <p className="text-sm text-[#777779] mb-3">{provider.services}</p>
-                  <div className="flex gap-2">
-                    <button
-                      type="button"
-                      onClick={() => handleApprove(String(provider.id))}
-                      className="flex-1 bg-[#00C9B1] text-white px-4 py-2 rounded-lg hover:bg-[#00b39d] transition-colors flex items-center justify-center gap-2"
-                    >
-                      <Check className="w-4 h-4" />
-                      قبول
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleReject(String(provider.id))}
-                      className="flex-1 border-2 border-[#FF4D4D] text-[#FF4D4D] px-4 py-2 rounded-lg hover:bg-[#FF4D4D] hover:text-white transition-colors flex items-center justify-center gap-2"
-                    >
-                      <X className="w-4 h-4" />
-                      رفض
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+              <Link
+                to="/providers"
+                className="mt-4 pt-4 border-t border-[#F4F6F9] text-center text-sm text-[#00C9B1] hover:text-[#00b39d] transition-colors flex items-center justify-center gap-1"
+              >
+                عرض جميع الطلبات المعلقة
+                <ArrowLeft className="w-3.5 h-3.5" />
+              </Link>
+            </>
           )}
         </div>
       </div>

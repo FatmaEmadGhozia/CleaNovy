@@ -312,7 +312,7 @@ function UserProfileModal({ data, onClose }: UserProfileModalProps) {
   );
 }
 
-const ITEMS_PER_PAGE = 5;
+const ITEMS_PER_PAGE = 8;
 
 export function UsersManagement() {
   const [searchQuery, setSearchQuery] = useState("");
