@@ -81,6 +81,7 @@ import Services from "./Services";
 import Discounts from "./Discounts";
 import Dashboard from "./Dashboard";
 import Profile from "./Profile";
+import Reviews from "./Reviews";
 
 import type { Page } from "./types";
 export type { Page };
@@ -93,6 +94,7 @@ function ProviderContent() {
   const pathToPage = (path: string): Page => {
     if (path.includes("/orders")) return "orders";
     if (path.includes("/services")) return "services";
+    if (path.includes("/reviews")) return "reviews";
     if (path.includes("/discounts")) return "discounts";
     if (path.includes("/profile")) return "profile";
     return "dashboard";
@@ -115,6 +117,7 @@ function ProviderContent() {
           <Route path="services" element={<Services />} />
           <Route path="discounts" element={<Discounts />} />
           <Route path="profile" element={<Profile />} />
+          <Route path="reviews" element={<Reviews />} />
           <Route path="*" element={<Navigate to="dashboard" replace />} />
         </Routes>
       </main>
