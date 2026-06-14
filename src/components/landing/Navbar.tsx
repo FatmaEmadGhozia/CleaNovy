@@ -111,7 +111,7 @@ export default function Navbar() {
           <button
             aria-label="تحديد موقعي"
             className="p-2.5 rounded-xl text-[#0D1F3C]/70 hover:text-[rgb(0,201,177)] hover:bg-[rgb(0,201,177)]/10 transition-all duration-200"
-            onClick={() => navigator.geolocation?.getCurrentPosition(() => {})}
+            onClick={() => navigator.geolocation?.getCurrentPosition(() => { })}
           >
             <Navigation className="h-5 w-5" />
           </button>

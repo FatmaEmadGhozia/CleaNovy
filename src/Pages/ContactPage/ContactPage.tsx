@@ -7,13 +7,41 @@ export default function ContactPage() {
   const [form, setForm] = useState({ name: "", email: "", message: "" });
   const [sent, setSent] = useState(false);
 
-  const handleSubmit = (e: React.MouseEvent) => {
-    e.preventDefault();
-    if (!form.name || !form.email || !form.message) return;
-    setSent(true);
-    setTimeout(() => setSent(false), 3000);
-    setForm({ name: "", email: "", message: "" });
-  };
+  // const handleSubmit = (e: React.MouseEvent) => {
+  //   e.preventDefault();
+  //   if (!form.name || !form.email || !form.message) return;
+  //   setSent(true);
+  //   setTimeout(() => setSent(false), 3000);
+  //   setForm({ name: "", email: "", message: "" });
+  // };
+
+  const handleSubmit = async (e: React.MouseEvent) => {
+  e.preventDefault();
+  if (!form.name || !form.email || !form.message) return;
+
+  try {
+    const response = await fetch(
+      `${import.meta.env.VITE_API_URL}/api/v1/contact/submit`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      }
+    );
+
+    const data = await response.json();
+
+    if (response.ok) {
+      setSent(true);
+      setForm({ name: "", email: "", message: "" });
+      setTimeout(() => setSent(false), 3000);
+    } else {
+      alert(data.error || "فشل الإرسال، حاول مرة أخرى");
+    }
+  } catch {
+    alert("حدث خطأ في الاتصال بالسيرفر");
+  }
+};
 
   return (
     <div

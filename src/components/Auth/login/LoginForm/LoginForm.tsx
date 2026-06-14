@@ -144,13 +144,12 @@ const LoginForm = ({ role: _role }: LoginFormProps) => {
   };
 
   return (
-    <form className="login-form" onSubmit={handleSubmit} noValidate aria-label="نموذج تسجيل الدخول">
-      {serverError && (
-        <div className="login-form__error-banner" role="alert">
-          <AlertIcon />
-          <span>{serverError}</span>
-        </div>
-      )}
+    <form className="login-form" onSubmit={handleSubmit} noValidate aria-label="نموذج تسجيل الدخول" autoComplete="off">      {serverError && (
+      <div className="login-form__error-banner" role="alert">
+        <AlertIcon />
+        <span>{serverError}</span>
+      </div>
+    )}
 
       <div className="login-form__field">
         <label className="login-form__label" htmlFor="identifier">
@@ -162,7 +161,7 @@ const LoginForm = ({ role: _role }: LoginFormProps) => {
             id="identifier" name="identifier" type="text"
             value={values.identifier} onChange={handleChange}
             placeholder="example@cleanovy.com"
-            className="login-form__input" autoComplete="username" dir="ltr"
+            className="login-form__input" autoComplete="username" dir="auto"
             aria-invalid={!!errors.identifier}
           />
         </div>
@@ -178,7 +177,7 @@ const LoginForm = ({ role: _role }: LoginFormProps) => {
             type={showPassword ? "text" : "password"}
             value={values.password} onChange={handleChange}
             placeholder="••••••••" className="login-form__input"
-            autoComplete="current-password" dir="ltr"
+            autoComplete="off" dir="auto"
             aria-invalid={!!errors.password}
           />
           <button type="button" className="login-form__eye-btn"

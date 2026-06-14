@@ -7,6 +7,7 @@ import Button from "./Button";
 import SuccessScreen from "./SuccessScreen";
 
 type AccountType = "customer" | "owner";
+type Step = 1 | 2;
 
 interface FormState {
   accountType: AccountType;
@@ -17,7 +18,14 @@ interface FormState {
   agreed: boolean;
 }
 
+interface LaundryForm {
+  laundryName: string;
+  description: string;
+  address: string;
+}
+
 type Errors = Partial<Record<keyof FormState, string>>;
+type LaundryErrors = Partial<Record<keyof LaundryForm, string>>;
 
 const INITIAL_FORM: FormState = {
   accountType: "customer",
@@ -28,7 +36,12 @@ const INITIAL_FORM: FormState = {
   agreed: false,
 };
 
-// Password rules - must match backend: min 8 chars + at least one digit
+const INITIAL_LAUNDRY: LaundryForm = {
+  laundryName: "",
+  description: "",
+  address: "",
+};
+
 interface PasswordRule {
   id: string;
   label: string;
@@ -41,42 +54,91 @@ const PASSWORD_RULES: PasswordRule[] = [
   { id: "letter", label: "يحتوي على حرف واحد على الأقل", test: (pw) => /[a-zA-Z]/.test(pw) },
 ];
 
-function validate(form: FormState): Errors {
+function validateStep1(form: FormState): Errors {
   const e: Errors = {};
-
   if (!form.fullName.trim() || form.fullName.trim().length < 3)
     e.fullName = "الاسم يجب أن يكون 3 أحرف على الأقل";
-
   if (!form.phone.trim())
     e.phone = "رقم الهاتف مطلوب";
   else if (!/^01[0125]\d{8}$/.test(form.phone.trim()))
     e.phone = "رقم الهاتف يجب أن يبدأ بـ 010 أو 011 أو 012 أو 015 ويتكون من 11 رقم";
-
   if (!form.email.trim())
     e.email = "البريد الإلكتروني مطلوب";
   else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email))
     e.email = "البريد الإلكتروني غير صالح";
-
   if (!form.password)
     e.password = "كلمة المرور مطلوبة";
   else if (form.password.length < 8)
     e.password = "كلمة المرور يجب أن تكون 8 أحرف على الأقل";
   else if (!/\d/.test(form.password))
     e.password = "كلمة المرور يجب أن تحتوي على رقم واحد على الأقل";
-
   if (!form.agreed) e.agreed = "يجب الموافقة على الشروط";
-
   return e;
+}
+
+function validateLaundry(laundry: LaundryForm): LaundryErrors {
+  const e: LaundryErrors = {};
+  if (!laundry.laundryName.trim() || laundry.laundryName.trim().length < 2)
+    e.laundryName = "اسم المغسلة مطلوب (2 أحرف على الأقل)";
+  if (!laundry.address.trim() || laundry.address.trim().length < 5)
+    e.address = "العنوان مطلوب (5 أحرف على الأقل)";
+  return e;
+}
+
+// Step indicator component
+function StepIndicator({ step }: { step: Step }) {
+  return (
+    <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, marginBottom: 8 }}>
+      {/* Step 1 */}
+      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
+        <div style={{
+          width: 32, height: 32, borderRadius: "50%",
+          background: step >= 1 ? "linear-gradient(135deg, #2563eb, #2dd4bf)" : "#e2e8f0",
+          color: step >= 1 ? "#fff" : "#94a3b8",
+          display: "flex", alignItems: "center", justifyContent: "center",
+          fontSize: 14, fontWeight: 700, fontFamily: "Cairo",
+          transition: "all 0.3s",
+        }}>1</div>
+        <span style={{ fontSize: 11, color: step >= 1 ? "#2563eb" : "#94a3b8", fontFamily: "Cairo", fontWeight: 600 }}>
+          بيانات الحساب
+        </span>
+      </div>
+
+      {/* Connector */}
+      <div style={{
+        flex: 1, height: 2, maxWidth: 60, marginBottom: 18,
+        background: step >= 2 ? "linear-gradient(to right, #2563eb, #2dd4bf)" : "#e2e8f0",
+        transition: "background 0.3s",
+      }} />
+
+      {/* Step 2 */}
+      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
+        <div style={{
+          width: 32, height: 32, borderRadius: "50%",
+          background: step >= 2 ? "linear-gradient(135deg, #2563eb, #2dd4bf)" : "#e2e8f0",
+          color: step >= 2 ? "#fff" : "#94a3b8",
+          display: "flex", alignItems: "center", justifyContent: "center",
+          fontSize: 14, fontWeight: 700, fontFamily: "Cairo",
+          transition: "all 0.3s",
+        }}>2</div>
+        <span style={{ fontSize: 11, color: step >= 2 ? "#2563eb" : "#94a3b8", fontFamily: "Cairo", fontWeight: 600 }}>
+          بيانات المغسلة
+        </span>
+      </div>
+    </div>
+  );
 }
 
 export default function SignUpForm(): React.ReactElement {
   const [form, setForm] = useState<FormState>(INITIAL_FORM);
+  const [laundry, setLaundry] = useState<LaundryForm>(INITIAL_LAUNDRY);
   const [errors, setErrors] = useState<Errors>({});
+  const [laundryErrors, setLaundryErrors] = useState<LaundryErrors>({});
+  const [step, setStep] = useState<Step>(1);
   const [loading, setLoading] = useState<boolean>(false);
   const [success, setSuccess] = useState<boolean>(false);
   const [serverError, setServerError] = useState<string>("");
 
-  // Check which password rules pass
   const passwordRules = PASSWORD_RULES.map((rule) => ({
     ...rule,
     passed: rule.test(form.password),
@@ -87,20 +149,42 @@ export default function SignUpForm(): React.ReactElement {
     setForm((prev) => ({ ...prev, [field]: value }));
     setServerError("");
     if (errors[field]) {
-      setErrors((prev) => {
-        const newErrs = { ...prev };
-        delete newErrs[field];
-        return newErrs;
-      });
+      setErrors((prev) => { const n = { ...prev }; delete n[field]; return n; });
     }
   };
 
-  const handleSubmit = async () => {
-    const validationErrors = validate(form);
+  const handleLaundryChange = (field: keyof LaundryForm, value: string) => {
+    setLaundry((prev) => ({ ...prev, [field]: value }));
+    if (laundryErrors[field]) {
+      setLaundryErrors((prev) => { const n = { ...prev }; delete n[field]; return n; });
+    }
+  };
 
+  // لما يضغط Next بعد step 1 (صاحب مغسلة)
+  const handleNext = () => {
+    const validationErrors = validateStep1(form);
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
       return;
+    }
+    setStep(2);
+  };
+
+  const handleSubmit = async () => {
+    // لو عميل عادي - validate step1 وابعت
+    if (form.accountType === "customer") {
+      const validationErrors = validateStep1(form);
+      if (Object.keys(validationErrors).length > 0) {
+        setErrors(validationErrors);
+        return;
+      }
+    } else {
+      // لو صاحب مغسلة - validate laundry step
+      const laundryValidationErrors = validateLaundry(laundry);
+      if (Object.keys(laundryValidationErrors).length > 0) {
+        setLaundryErrors(laundryValidationErrors);
+        return;
+      }
     }
 
     setLoading(true);
@@ -113,6 +197,7 @@ export default function SignUpForm(): React.ReactElement {
         owner: "laundry_owner",
       };
 
+      // Step 1: Register user
       const response = await fetch(`${API_URL}/api/v1/auth/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -127,11 +212,35 @@ export default function SignUpForm(): React.ReactElement {
 
       const data = await response.json();
 
-      if (response.ok) {
-        setSuccess(true);
-      } else {
+      if (!response.ok) {
         setServerError(data.message || "حدث خطأ أثناء إنشاء الحساب");
+        return;
       }
+
+      // Step 2: لو صاحب مغسلة - ابعت بيانات المغسلة
+      if (form.accountType === "owner") {
+        const accessToken = data.data?.accessToken;
+        const laundryResponse = await fetch(`${API_URL}/api/v1/auth/laundry-shop`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
+          body: JSON.stringify({
+            name: laundry.laundryName,
+            description: laundry.description,
+            address: laundry.address,
+          }),
+        });
+
+        if (!laundryResponse.ok) {
+          const laundryData = await laundryResponse.json();
+          setServerError(laundryData.message || "حدث خطأ أثناء حفظ بيانات المغسلة");
+          return;
+        }
+      }
+
+      setSuccess(true);
     } catch {
       setServerError("حدث خطأ في الاتصال بالسيرفر. تأكد من تشغيل الباك اند");
     } finally {
@@ -142,8 +251,11 @@ export default function SignUpForm(): React.ReactElement {
   const handleReset = () => {
     setSuccess(false);
     setForm(INITIAL_FORM);
+    setLaundry(INITIAL_LAUNDRY);
     setErrors({});
+    setLaundryErrors({});
     setServerError("");
+    setStep(1);
   };
 
   if (success) {
@@ -156,145 +268,240 @@ export default function SignUpForm(): React.ReactElement {
       {/* Server error */}
       {serverError && (
         <div style={{
-          background: "#ffdad6",
-          border: "1px solid #ba1a1a",
-          borderRadius: 10,
-          padding: "10px 14px",
-          color: "#ba1a1a",
-          fontSize: 13,
-          fontFamily: "Cairo, sans-serif",
-          display: "flex",
-          alignItems: "center",
-          gap: 8,
+          background: "#ffdad6", border: "1px solid #ba1a1a", borderRadius: 10,
+          padding: "10px 14px", color: "#ba1a1a", fontSize: 13,
+          fontFamily: "Cairo, sans-serif", display: "flex", alignItems: "center", gap: 8,
         }}>
-          <span>⚠</span>
-          <span>{serverError}</span>
+          <span>⚠</span><span>{serverError}</span>
         </div>
       )}
 
-      {/* Account type selector */}
-      <AccountTypeSelector
-        value={form.accountType}
-        onChange={(type: AccountType) => handleChange("accountType", type)}
-        delay=".12s"
-      />
-
-      {/* Input fields */}
-      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-        <InputField
-          label="الاسم الكامل"
-          placeholder="أدخل اسمك (3 أحرف على الأقل)"
-          value={form.fullName}
-          onChange={(e: ChangeEvent<HTMLInputElement>) => handleChange("fullName", e.target.value)}
-          error={errors.fullName}
-          delay=".20s"
+      {/* Account type selector - يظهر دايمًا في step 1 */}
+      {step === 1 && (
+        <AccountTypeSelector
+          value={form.accountType}
+          onChange={(type: AccountType) => {
+            handleChange("accountType", type);
+          }}
+          delay=".12s"
         />
+      )}
 
-        <InputField
-          label="رقم الهاتف"
-          placeholder="01xxxxxxxxx"
-          value={form.phone}
-          onChange={(e: ChangeEvent<HTMLInputElement>) => handleChange("phone", e.target.value)}
-          error={errors.phone}
-          delay=".30s"
-        />
+      {/* ─── STEP 1: بيانات الحساب ─── */}
+      {step === 1 && (
+        <>
+          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            <InputField
+              label="الاسم الكامل"
+              placeholder="أدخل اسمك (3 أحرف على الأقل)"
+              value={form.fullName}
+              onChange={(e: ChangeEvent<HTMLInputElement>) => handleChange("fullName", e.target.value)}
+              error={errors.fullName}
+              delay=".20s"
+            />
+            <InputField
+              label="رقم الهاتف"
+              placeholder="01xxxxxxxxx"
+              value={form.phone}
+              onChange={(e: ChangeEvent<HTMLInputElement>) => handleChange("phone", e.target.value)}
+              error={errors.phone}
+              delay=".30s"
+            />
+            <InputField
+              label="البريد الإلكتروني"
+              placeholder="example@mail.com"
+              type="email"
+              value={form.email}
+              onChange={(e: ChangeEvent<HTMLInputElement>) => handleChange("email", e.target.value)}
+              error={errors.email}
+              delay=".40s"
+            />
+            <InputField
+              label="كلمة المرور"
+              placeholder="أدخل كلمة مرور قوية"
+              type="password"
+              value={form.password}
+              onChange={(e: ChangeEvent<HTMLInputElement>) => handleChange("password", e.target.value)}
+              error={errors.password}
+              delay=".50s"
+            />
 
-        <InputField
-          label="البريد الإلكتروني"
-          placeholder="example@mail.com"
-          type="email"
-          value={form.email}
-          onChange={(e: ChangeEvent<HTMLInputElement>) => handleChange("email", e.target.value)}
-          error={errors.email}
-          delay=".40s"
-        />
-
-        {/* Password field with live rules */}
-        <InputField
-          label="كلمة المرور"
-          placeholder="أدخل كلمة مرور قوية"
-          type="password"
-          value={form.password}
-          onChange={(e: ChangeEvent<HTMLInputElement>) => handleChange("password", e.target.value)}
-          error={errors.password}
-          delay=".50s"
-        />
-
-        {/* Password rules - shown while typing */}
-        {showPasswordRules && (
-          <div style={{
-            background: "#f8fafc",
-            border: "1px solid #e2e8f0",
-            borderRadius: 10,
-            padding: "10px 14px",
-            display: "flex",
-            flexDirection: "column",
-            gap: 6,
-          }}>
-            <p style={{ fontSize: 12, color: "#64748b", fontFamily: "Cairo", fontWeight: 600, marginBottom: 2 }}>
-              متطلبات كلمة المرور:
-            </p>
-            {passwordRules.map((rule) => (
-              <div key={rule.id} style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 8,
-                flexDirection: "row-reverse",
-                justifyContent: "flex-start",
+            {showPasswordRules && (
+              <div style={{
+                background: "#f8fafc", border: "1px solid #e2e8f0",
+                borderRadius: 10, padding: "10px 14px",
+                display: "flex", flexDirection: "column", gap: 6,
               }}>
-                <span style={{
-                  width: 18,
-                  height: 18,
-                  borderRadius: "50%",
-                  background: rule.passed ? "#dcfce7" : "#f1f5f9",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontSize: 11,
-                  flexShrink: 0,
-                  transition: "background 0.3s",
-                }}>
-                  {rule.passed ? "✓" : "○"}
-                </span>
-                <span style={{
-                  fontSize: 12,
-                  fontFamily: "Cairo, sans-serif",
-                  color: rule.passed ? "#16a34a" : "#64748b",
-                  transition: "color 0.3s",
-                }}>
-                  {rule.label}
-                </span>
+                <p style={{ fontSize: 12, color: "#64748b", fontFamily: "Cairo", fontWeight: 600, marginBottom: 2 }}>
+                  متطلبات كلمة المرور:
+                </p>
+                {passwordRules.map((rule) => (
+                  <div key={rule.id} style={{
+                    display: "flex", alignItems: "center", gap: 8,
+                    flexDirection: "row-reverse", justifyContent: "flex-start",
+                  }}>
+                    <span style={{
+                      width: 18, height: 18, borderRadius: "50%",
+                      background: rule.passed ? "#dcfce7" : "#f1f5f9",
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      fontSize: 11, flexShrink: 0, transition: "background 0.3s",
+                    }}>
+                      {rule.passed ? "✓" : "○"}
+                    </span>
+                    <span style={{
+                      fontSize: 12, fontFamily: "Cairo, sans-serif",
+                      color: rule.passed ? "#16a34a" : "#64748b",
+                      transition: "color 0.3s",
+                    }}>
+                      {rule.label}
+                    </span>
+                  </div>
+                ))}
               </div>
-            ))}
+            )}
           </div>
-        )}
-      </div>
 
-      {/* Terms checkbox */}
-      <Checkbox
-        checked={form.agreed}
-        onChange={(e: ChangeEvent<HTMLInputElement>) => handleChange("agreed", e.target.checked)}
-        error={errors.agreed}
-        delay=".60s"
-        label={
-          <span>
-            أوافق على{" "}
-            <a href="#" style={{ color: "#14b8a6", fontWeight: 700, textDecoration: "none" }}>
-              الشروط والأحكام
-            </a>{" "}
-            و{" "}
-            <a href="#" style={{ color: "#14b8a6", fontWeight: 700, textDecoration: "none" }}>
-              سياسة الخصوصية
-            </a>
-          </span>
-        }
-      />
+          <Checkbox
+            checked={form.agreed}
+            onChange={(e: ChangeEvent<HTMLInputElement>) => handleChange("agreed", e.target.checked)}
+            error={errors.agreed}
+            delay=".60s"
+            label={
+              <span>
+                أوافق على{" "}
+                <a href="#" style={{ color: "#14b8a6", fontWeight: 700, textDecoration: "none" }}>
+                  الشروط والأحكام
+                </a>{" "}
+                و{" "}
+                <a href="#" style={{ color: "#14b8a6", fontWeight: 700, textDecoration: "none" }}>
+                  سياسة الخصوصية
+                </a>
+              </span>
+            }
+          />
 
-      {/* Submit button */}
-      <Button onClick={handleSubmit} loading={loading}>
-        إنشاء حساب
-      </Button>
+          {/* لو صاحب مغسلة: زر Next - لو عميل: زر إنشاء حساب */}
+          {form.accountType === "owner" ? (
+            <Button onClick={handleNext}>
+              التالي ← بيانات المغسلة
+            </Button>
+          ) : (
+            <Button onClick={handleSubmit} loading={loading}>
+              إنشاء حساب
+            </Button>
+          )}
+        </>
+      )}
 
+      {/* ─── STEP 2: بيانات المغسلة (صاحب مغسلة فقط) ─── */}
+      {step === 2 && (
+        <>
+          {/* Step indicator */}
+          <StepIndicator step={2} />
+
+          {/* Header */}
+          <div style={{
+            background: "linear-gradient(135deg, #eff6ff, #f0fdfa)",
+            border: "1px solid #bfdbfe",
+            borderRadius: 12,
+            padding: "14px 16px",
+            textAlign: "center",
+          }}>
+            <div style={{ fontSize: 28, marginBottom: 4 }}>🏪</div>
+            <p style={{ fontFamily: "Cairo, sans-serif", fontSize: 14, fontWeight: 700, color: "#1e3a5f" }}>
+              بيانات المغسلة
+            </p>
+            <p style={{ fontFamily: "Cairo, sans-serif", fontSize: 12, color: "#64748b", marginTop: 2 }}>
+              أدخل معلومات مغسلتك لإتمام التسجيل
+            </p>
+          </div>
+
+          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            <InputField
+              label="اسم المغسلة"
+              placeholder="مثال: مغسلة النور"
+              value={laundry.laundryName}
+              onChange={(e: ChangeEvent<HTMLInputElement>) => handleLaundryChange("laundryName", e.target.value)}
+              error={laundryErrors.laundryName}
+              delay=".10s"
+            />
+
+            {/* Description - textarea custom */}
+            <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+              <label style={{
+                fontFamily: "Cairo, sans-serif", fontSize: 13,
+                fontWeight: 700, color: "#374151",
+              }}>
+                وصف المغسلة <span style={{ color: "#94a3b8", fontWeight: 400 }}>(اختياري)</span>
+              </label>
+              <textarea
+                placeholder="مثال: نقدم خدمات غسيل وكوي احترافية بأسعار مناسبة"
+                value={laundry.description}
+                onChange={(e) => handleLaundryChange("description", e.target.value)}
+                rows={3}
+                style={{
+                  width: "100%",
+                  padding: "10px 14px",
+                  borderRadius: 10,
+                  border: "1.5px solid #e2e8f0",
+                  fontFamily: "Cairo, sans-serif",
+                  fontSize: 13,
+                  color: "#1e293b",
+                  resize: "vertical",
+                  outline: "none",
+                  background: "#fafbfc",
+                  transition: "border-color 0.2s",
+                  direction: "rtl",
+                }}
+                onFocus={(e) => { e.target.style.borderColor = "#2563eb"; }}
+                onBlur={(e) => { e.target.style.borderColor = "#e2e8f0"; }}
+              />
+            </div>
+
+            <InputField
+              label="عنوان المغسلة"
+              placeholder="مثال: 15 شارع الجمهورية، المعادي، القاهرة"
+              value={laundry.address}
+              onChange={(e: ChangeEvent<HTMLInputElement>) => handleLaundryChange("address", e.target.value)}
+              error={laundryErrors.address}
+              delay=".30s"
+            />
+          </div>
+
+          {/* Buttons */}
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            <Button onClick={handleSubmit} loading={loading}>
+              إنشاء الحساب والمغسلة
+            </Button>
+
+            <button
+              onClick={() => { setStep(1); setServerError(""); }}
+              style={{
+                background: "transparent",
+                border: "1.5px solid #e2e8f0",
+                borderRadius: 50,
+                padding: "10px 20px",
+                fontFamily: "Cairo, sans-serif",
+                fontSize: 13,
+                fontWeight: 600,
+                color: "#64748b",
+                cursor: "pointer",
+                transition: "all 0.2s",
+              }}
+              onMouseEnter={(e) => {
+                (e.target as HTMLButtonElement).style.borderColor = "#2563eb";
+                (e.target as HTMLButtonElement).style.color = "#2563eb";
+              }}
+              onMouseLeave={(e) => {
+                (e.target as HTMLButtonElement).style.borderColor = "#e2e8f0";
+                (e.target as HTMLButtonElement).style.color = "#64748b";
+              }}
+            >
+              ← رجوع لبيانات الحساب
+            </button>
+          </div>
+        </>
+      )}
     </div>
   );
 }
