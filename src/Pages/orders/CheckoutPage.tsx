@@ -36,13 +36,21 @@ export default function CheckoutPage() {
   const pickupTime    = state?.pickupTime    ?? "";
   const deliveryTime  = state?.deliveryTime  ?? "";
   const selectedSlot  = state?.selectedSlot  ?? "";
+  const providerId    = state?.providerId    ?? "";
   const totalQty      = cart.reduce((s: number, i: any) => s + i.quantity, 0);
 
   // ── Validation & confirm ───────────────────────────
   const handleConfirm = async () => {
   setError("");
 
-  // Validation
+  // Validation — عنوان التوصيل
+  const deliveryType = state?.deliveryType ?? "delivery";
+  const deliveryAddress = state?.deliveryAddress ?? "";
+  if (deliveryType === "delivery" && !deliveryAddress.trim()) {
+    setError("من فضلك ارجع وادخل عنوان التوصيل");
+    return;
+  }
+
   if (payMethod === "card") {
     if (!cardNum || cardNum.replace(/\s/g, "").length < 16) { setError("ادخل رقم البطاقة كاملاً"); return; }
     if (!expiry)                                             { setError("ادخل تاريخ الانتهاء");    return; }
@@ -55,14 +63,7 @@ export default function CheckoutPage() {
   setLoading(true);
   try {
     // 1. Create order
-    // const orderRes = await createOrder({
-    //   cart,
-    //   pickupTime:    pickupTime,
-    //   deliveryTime:  deliveryTime,
-    //   shippingPrice: shippingPrice,
-    //   couponCode:    null,
-    //   paymentMethod: payMethod,
-    // });
+   
 const orderRes = await createOrder({
   cart,
   pickupTime,
@@ -72,6 +73,7 @@ const orderRes = await createOrder({
   paymentMethod:   payMethod,
   deliveryType:    state?.deliveryType    ?? "delivery",
   deliveryAddress: state?.deliveryAddress ?? "",
+  providerId:      providerId,
 });
     const orderId = orderRes.data.order._id;
 
@@ -98,6 +100,8 @@ const orderRes = await createOrder({
         pickupTime={pickupTime}
         deliveryTime={deliveryTime}
         selectedSlot={selectedSlot}
+        shippingPrice={shippingPrice}
+
         total={total}
       />
     );

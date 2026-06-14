@@ -1,6 +1,6 @@
 // CartPage.tsx — يجمع كل الـ components مع بعض
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 // import { ALL_SERVICES, SHIPPING, TIERS, getTier } from "./types";
 import { ALL_SERVICES, TIERS, getTier } from "./types";
@@ -16,6 +16,12 @@ import DeliverySelector from "../../components/orders/DeliverySelector";
 
 export default function CartPage() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const incomingState = location.state as any;
+
+  // providerId يجي من صفحة اختيار المغسلة
+  //const providerId: string = incomingState?.providerId ?? "";
+  const providerId: string = incomingState?.providerId ?? "dd0000000000000000000001";
 
   // ── State ──────────────────────────────────────────
   const [cart, setCart] = useState<CartItem[]>([
@@ -90,6 +96,7 @@ export default function CartPage() {
         total, shippingPrice: SHIPPING,
         deliveryType,
         deliveryAddress,
+        providerId,
       },
     });
   };
@@ -154,7 +161,7 @@ export default function CartPage() {
             tierPct={tier.pct}
             couponDisc={couponDisc}
             totalDisc={totalDisc}
-            total={total}
+            total={total+SHIPPING}
             cartEmpty={cart.length === 0}
             onCheckout={handleCheckout}
           />

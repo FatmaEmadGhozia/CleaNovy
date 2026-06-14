@@ -15,12 +15,11 @@ export interface CartItem {
 }
 
 export const ALL_SERVICES: Service[] = [
-  { id: "6a0f051543e454f5f9ac2e7f", name: "بدلة رجالي كلاسيك", subtitle: "تنظيف جاف + مكواة بخار",  price: 120, icon: "🥻" },
-  { id: "s2", name: "قميص قطني",          subtitle: "غسيل يدوي + تعطير",       price: 45,  icon: "👔" },
+  { id: "6a282ab3c3d2f28de8346d69", name: "بدلة رجالي كلاسيك", subtitle: "تنظيف جاف + مكواة بخار",  price: 120, icon: "🥻" },
+  { id: "6a28326a1d9de3be5925deef", name: "قميص قطني",          subtitle: "غسيل يدوي + تعطير",       price: 45,  icon: "👔" },
   { id: "ff0000000000000000000002", name: "بنطلون جينز",        subtitle: "غسيل عادي + كوي",         price: 60,  icon: "👖" },
-  { id: "s4", name: "عباية نسائية",       subtitle: "تنظيف جاف + عطر فاخر",   price: 80,  icon: "👘" },
-  { id: "s5", name: "تيشيرت",             subtitle: "غسيل عادي",                price: 35,  icon: "👕" },
-  { id: "s6", name: "ستائر صوف",          subtitle: "تنظيف عميق بالبخار",      price: 125, icon: "🛋️" },
+  { id: "6a28340b1d9de3be5925def6", name: "عباية نسائية",       subtitle: "تنظيف جاف + عطر فاخر",   price: 80,  icon: "👘" },
+  { id: "6a282bcec3d2f28de8346d6b", name: "غسيل سجاده",             subtitle: "غسيل عادي",                price:100,  icon: "👕" },
 ];
 
 export const SHIPPING = 20;
