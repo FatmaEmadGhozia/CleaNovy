@@ -8,6 +8,7 @@ import LandingPage from "@/components/landing/LandingPage";
 import LoginPage from "../Pages/Auth/LoginPage";
 import SignUpPage from "@/Pages/Auth/SignUpPage";
 import ProviderLayout from "@/Pages/provider/ProviderLayout";
+import ProtectedProviderRoute from "./ProtectedRoute";
 
 
 export default function AppRoutes() {
@@ -27,18 +28,25 @@ export default function AppRoutes() {
         <Route path="/signup" element={<SignUpPage />} />
 
         {/* Provider Routes */}
-        <Route path="/provider/*" element={<ProviderLayout />} />
+        {/* <Route path="/provider/*" element={<ProviderLayout />} /> */}
         <Route path="/provider" element={<Navigate to="/provider/dashboard" replace />} />
 
+
+
+        < Route path="/provider/*" element={
+             <ProtectedProviderRoute>
+               <ProviderLayout />
+             </ProtectedProviderRoute>
+                 } />
         {/* Protected Routes */}
-        <Route
+        {/* <Route
           path="/dashboard"
           element={
             <ProtectedRoute>
-              {/* <Dashboard /> */}
+           
             </ProtectedRoute>
           }
-        />
+        /> */}
 
       </Routes>
     </BrowserRouter>
