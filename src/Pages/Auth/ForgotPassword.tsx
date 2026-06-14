@@ -1,14 +1,11 @@
-
 "use client";
 
 import { useEffect, useRef, useState } from "react";
 import "./ForgotPassword.css";
 
-
 /* ── Types ── */
 type Status = "idle" | "loading" | "success" | "error";
 
-/* ── Particle config generated once per mount ── */
 interface ParticleConfig {
   size: number;
   left: number;
@@ -25,60 +22,46 @@ function generateParticles(count: number): ParticleConfig[] {
   }));
 }
 
-/* ── Particles sub-component ── */
 function Particles() {
   const particles = useRef<ParticleConfig[]>(generateParticles(18));
-
   return (
     <div className="absolute inset-0 pointer-events-none overflow-hidden">
       {particles.current.map((p, i) => (
-        <span
-          key={i}
-          className="particle"
-          style={{
-            width: p.size,
-            height: p.size,
-            left: `${p.left}%`,
-            animation: `floatUp ${p.duration}s linear ${p.delay}s infinite`,
-          }}
-        />
+        <span key={i} className="particle" style={{
+          width: p.size, height: p.size,
+          left: `${p.left}%`,
+          animation: `floatUp ${p.duration}s linear ${p.delay}s infinite`,
+        }} />
       ))}
     </div>
   );
 }
 
-/* ── Spinning ring sub-component ── */
 function SpinningRing() {
   return (
     <div className="spin-ring w-[120px] h-[120px] mx-auto mb-5">
       <svg viewBox="0 0 120 120" fill="none" className="w-full h-full">
         <circle cx="60" cy="60" r="54" stroke="rgba(95,250,224,.15)" strokeWidth="2" />
-        <circle cx="60" cy="60" r="54" stroke="#5ffae0" strokeWidth="2"
-          strokeDasharray="80 260" strokeLinecap="round" />
+        <circle cx="60" cy="60" r="54" stroke="#5ffae0" strokeWidth="2" strokeDasharray="80 260" strokeLinecap="round" />
         <circle cx="60" cy="60" r="42" stroke="rgba(95,250,224,.08)" strokeWidth="1.5" />
-        <circle cx="60" cy="60" r="42" stroke="#5ffae0" strokeWidth="1.5" opacity=".4"
-          strokeDasharray="40 224" strokeLinecap="round" />
+        <circle cx="60" cy="60" r="42" stroke="#5ffae0" strokeWidth="1.5" opacity=".4" strokeDasharray="40 224" strokeLinecap="round" />
       </svg>
     </div>
   );
 }
 
-/* ── Right decorative panel ── */
 function RightSide() {
   return (
     <section className="hidden lg:flex w-1/2 relative items-center justify-center overflow-hidden">
       <img
         src="https://lh3.googleusercontent.com/aida-public/AB6AXuAJgS0LlTXWx0SN8ZDHxAAi1GFCfwAsQ4fXMCgZ5Jd_jHXeLwVOdujpWYm521EmhT1aZh2NiRh3Lvc-Z37j-lxqAfmF7npdK6Sjr1qyn9gvrddJo8ug4ppGsZSknk7DQeP9IaTe600lnCsSCa-YI2E4Go8gSGdR1Nsc05ztFwTXISI2cQCFLhThartIcJwnMEpztr-mAyBV0Va5wyinj2GqU-XbJku6NheSsuX2KiI_jKicWWcJtVV3AKkzyzh56soAklvv1BL3WeK9"
-        className="absolute inset-0 w-full h-full object-cover slow-zoom"
-        alt=""
+        className="absolute inset-0 w-full h-full object-cover slow-zoom" alt=""
       />
       <div className="absolute inset-0 bg-gradient-to-l from-[#0d1f3c] via-[#0d1f3c]/80 to-transparent" />
       <Particles />
       <div className="right-content relative z-10 text-center text-white px-10">
         <SpinningRing />
-        <div className="glow-pulse text-[64px] font-black text-[#5ffae0] leading-none">
-          نظيف
-        </div>
+        <div className="glow-pulse text-[64px] font-black text-[#5ffae0] leading-none">نظيف</div>
         <h2 className="text-3xl font-bold mt-4">نعتني بملابسك كأنها لنا</h2>
         <p className="mt-4 text-gray-300 max-w-md mx-auto leading-relaxed">
           انضم إلى آلاف المستخدمين الذين يثقون في نظيف للحصول على أفضل خدمات الغسيل
@@ -88,7 +71,6 @@ function RightSide() {
   );
 }
 
-/* ── Button config per status ── */
 const BUTTON_CONFIG: Record<Status, { label: string; icon: string; bg: string; shadow: string }> = {
   idle: {
     label: "إرسال رابط الاستعادة",
@@ -103,7 +85,7 @@ const BUTTON_CONFIG: Record<Status, { label: string; icon: string; bg: string; s
     shadow: "0 6px 24px rgba(0,107,93,.3)",
   },
   success: {
-    label: "تم الإرسال بنجاح!",
+    label: "تم إرسال الرابط للإيميل!",
     icon: "check_circle",
     bg: "linear-gradient(135deg,#059669,#34d399)",
     shadow: "0 6px 24px rgba(5,150,105,.35)",
@@ -116,73 +98,75 @@ const BUTTON_CONFIG: Record<Status, { label: string; icon: string; bg: string; s
   },
 };
 
-/* ── Main component ── */
 export default function ForgotPassword() {
-  const [phone, setPhone] = useState("");
+  const [identifier, setIdentifier] = useState("");
   const [status, setStatus] = useState<Status>("idle");
+  const [errorMessage, setErrorMessage] = useState("");
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
- 
 
-  /* Cleanup any pending timer on unmount */
   useEffect(() => {
-    return () => {
-      if (timerRef.current) clearTimeout(timerRef.current);
-    };
+    return () => { if (timerRef.current) clearTimeout(timerRef.current); };
   }, []);
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (status === "loading" || status === "success") return;
-
     if (timerRef.current) clearTimeout(timerRef.current);
 
-    if (!phone.trim()) {
+    if (!identifier.trim()) {
+      setErrorMessage("برجاء إدخال البريد الإلكتروني أو رقم الهاتف");
       setStatus("error");
-      timerRef.current = setTimeout(() => setStatus("idle"), 1800);
+      timerRef.current = setTimeout(() => setStatus("idle"), 2500);
       return;
     }
 
     setStatus("loading");
-    timerRef.current = setTimeout(() => {
-      setStatus("success");
-     
-      timerRef.current = setTimeout(() => setStatus("idle"), 2800);
-    }, 1800);
+
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/v1/auth/forgot-password`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ identifier }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setStatus("success");
+        timerRef.current = setTimeout(() => setStatus("idle"), 3500);
+      } else {
+        setErrorMessage(data.message || "حدث خطأ ما، يرجى المحاولة مرة أخرى");
+        setStatus("error");
+        timerRef.current = setTimeout(() => setStatus("idle"), 2500);
+      }
+    } catch {
+      setErrorMessage("حدث خطأ في الاتصال بالسيرفر");
+      setStatus("error");
+      timerRef.current = setTimeout(() => setStatus("idle"), 2500);
+    }
   };
 
   const btn = BUTTON_CONFIG[status];
   const isDisabled = status === "loading" || status === "success";
 
   return (
-    <main
-      dir="rtl"
-      style={{ fontFamily: "'Tajawal', sans-serif" }}
-      className="min-h-screen flex flex-row-reverse bg-[#fbf8fc] overflow-hidden"
-    >
+    <main dir="rtl" style={{ fontFamily: "'Tajawal', sans-serif" }}
+      className="min-h-screen flex flex-row-reverse bg-[#fbf8fc] overflow-hidden">
       <RightSide />
 
-      {/* ── LEFT SIDE ── */}
       <section className="w-full lg:w-1/2 flex items-center justify-center p-8 relative overflow-hidden">
-
-        {/* Background blobs */}
-        <div
-          className="blob-drift-1 absolute w-[280px] h-[280px] rounded-full pointer-events-none opacity-55"
-          style={{ background: "#c8faf3", filter: "blur(60px)", top: "-80px", right: "-60px" }}
-        />
-        <div
-          className="blob-drift-2 absolute w-[220px] h-[220px] rounded-full pointer-events-none opacity-55"
-          style={{ background: "#d6f0ff", filter: "blur(60px)", bottom: "-60px", left: "-40px" }}
-        />
+        <div className="blob-drift-1 absolute w-[280px] h-[280px] rounded-full pointer-events-none opacity-55"
+          style={{ background: "#c8faf3", filter: "blur(60px)", top: "-80px", right: "-60px" }} />
+        <div className="blob-drift-2 absolute w-[220px] h-[220px] rounded-full pointer-events-none opacity-55"
+          style={{ background: "#d6f0ff", filter: "blur(60px)", bottom: "-60px", left: "-40px" }} />
 
         <div className="w-full max-w-md text-right relative z-10">
 
           {/* Lock badge */}
-          <div
-            className="lock-badge-anim w-16 h-16 rounded-[18px] flex items-center justify-center mb-6"
-            style={{
-              background: "linear-gradient(135deg,#006b5d,#00a896)",
-              boxShadow: "0 8px 24px rgba(0,107,93,.3)",
-            }}
-          >
+          <div className="lock-badge-anim w-16 h-16 rounded-[18px] flex items-center justify-center mb-6"
+            style={{ background: "linear-gradient(135deg,#006b5d,#00a896)", boxShadow: "0 8px 24px rgba(0,107,93,.3)" }}>
             <span className="material-symbols-outlined text-white text-4xl">lock_reset</span>
           </div>
 
@@ -198,19 +182,22 @@ export default function ForgotPassword() {
           </h1>
 
           <p className="anim-d3 text-gray-500 mb-10 text-base leading-relaxed">
-            لا تقلق، ادخل رقم هاتفك وسنرسل لك رابطاً لاستعادة حسابك.
+            لا تقلق، أدخل البريد الإلكتروني أو رقم الهاتف المرتبط بحسابك،
+            وسنرسل لك رابطاً لاستعادة بياناتك على بريدك الإلكتروني المسجل.
           </p>
 
-          {/* Phone input */}
+          {/* Identifier input */}
           <div className="anim-d3 mb-6">
-            <label className="block mb-2 font-bold text-[#1b1b1e]">رقم الهاتف</label>
+            <label className="block mb-2 font-bold text-[#1b1b1e]">
+              البريد الإلكتروني أو رقم الهاتف
+            </label>
             <div className="input-wrapper">
               <input
-                type="tel"
+                type="text"
                 dir="ltr"
-                placeholder="015xxxxxxx"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
+                placeholder="name@example.com أو 015xxxxxxxx"
+                value={identifier}
+                onChange={(e) => setIdentifier(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
                 disabled={isDisabled}
                 className={[
@@ -225,9 +212,7 @@ export default function ForgotPassword() {
               <div className="input-focus-line" />
             </div>
             {status === "error" && (
-              <p className="text-red-500 text-sm mt-1.5 text-right">
-                برجاء إدخال رقم الهاتف
-              </p>
+              <p className="text-red-500 text-sm mt-1.5 text-right">{errorMessage}</p>
             )}
           </div>
 
@@ -250,10 +235,8 @@ export default function ForgotPassword() {
 
           {/* Footer */}
           <div className="anim-d5 mt-10 text-center flex flex-col gap-4">
-            <a
-              href="/login"
-              className="group flex justify-center items-center gap-2 text-[#006b5d] font-bold transition-opacity hover:opacity-75"
-            >
+            <a href="/login"
+              className="group flex justify-center items-center gap-2 text-[#006b5d] font-bold transition-opacity hover:opacity-75">
               <span className="material-symbols-outlined text-xl transition-transform duration-300 group-hover:translate-x-1">
                 arrow_forward
               </span>
