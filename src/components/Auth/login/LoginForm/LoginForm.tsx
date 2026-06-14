@@ -128,6 +128,8 @@ const LoginForm = ({ role: _role }: LoginFormProps) => {
         const userRole = data.data.user.role;
         if (userRole === "laundry_owner") {
           navigate("/provider");
+        } else if (userRole === "admin") {
+          navigate("/dashboard");
         } else {
           navigate("/");
         }
