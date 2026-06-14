@@ -109,6 +109,7 @@ export default function Navbar() {
         {/* CTA */}
         <div className="hidden md:flex items-center gap-3">
           <button
+            aria-label="تحديد موقعي"
             className="p-2.5 rounded-xl text-[#0D1F3C]/70 hover:text-[rgb(0,201,177)] hover:bg-[rgb(0,201,177)]/10 transition-all duration-200"
             onClick={() => navigator.geolocation?.getCurrentPosition(() => {})}
           >
@@ -144,10 +145,17 @@ export default function Navbar() {
         </div>
 
         {/* Mobile toggle */}
-        <button className="md:hidden p-2 rounded-xl hover:bg-[rgb(0,201,177)]/10 transition-colors"
-          onClick={() => setMenuOpen(!menuOpen)}>
+        <button
+          aria-label={menuOpen ? "إغلاق القائمة" : "فتح القائمة"}
+          className="md:hidden p-2 rounded-xl hover:bg-[rgb(0,201,177)]/10 transition-colors"
+          onClick={() => setMenuOpen(!menuOpen)}
+        >
           <div className={cn("transition-all duration-300", menuOpen ? "rotate-90" : "rotate-0")}>
-            {menuOpen ? <X size={22} style={{ color: "#0D1F3C" }} /> : <Menu size={22} style={{ color: "#0D1F3C" }} />}
+            {menuOpen ? (
+              <X size={22} style={{ color: "#0D1F3C" }} />
+            ) : (
+              <Menu size={22} style={{ color: "#0D1F3C" }} />
+            )}
           </div>
         </button>
       </div>

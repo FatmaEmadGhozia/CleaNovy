@@ -12,6 +12,13 @@ import AboutPage from "../Pages/AboutPage/AboutPage";
 import ContactPage from "../Pages/ContactPage/ContactPage";
 import Settingspage from "../Pages/Settingspage/Settingspage";
 import { CleannovyPage } from "../Pages/CleannovyPage";
+import { Layout } from "@/modules/app/components/Layout";
+import { Dashboard } from "@/modules/app/pages/Dashboard";
+import { UsersManagement } from "@/modules/app/pages/UsersManagement";
+import { ProvidersManagement } from "@/modules/app/pages/ProvidersManagement";
+import { OrdersManagement } from "@/modules/app/pages/OrdersManagement";
+import { ServicesCategories } from "@/modules/app/pages/ServicesCategories";
+import { ReviewsReports } from "@/modules/app/pages/ReviewsReports";
 
 
 import CartPage from "../Pages/orders/CartPage"
@@ -56,6 +63,14 @@ export default function AppRoutes() {
             </ProtectedRoute>
           }
         />
+        <Route path="/" element={<Layout />}>
+          <Route path="dashboard" element={<Dashboard />} />
+          <Route path="users" element={<UsersManagement />} />
+          <Route path="providers" element={<ProvidersManagement />} />
+          <Route path="orders" element={<OrdersManagement />} />
+          <Route path="services" element={<ServicesCategories />} />
+          <Route path="reviews" element={<ReviewsReports />} />
+        </Route>
 
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
