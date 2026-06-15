@@ -3,16 +3,17 @@ import { useProvider } from "../context/ProviderContext"
 import type { Page } from "../types"
 import { ORDER_STATUS_LABELS } from "../types"
 
-const pageTitles: Record<Page, string> = {
+const pageTitles: Record<Page, string> = { 
   dashboard: "البحث عن أي شيء...",
   orders: "البحث عن رقم طلب أو اسم عميل...",
   services: "البحث عن خدمة أو سعر...",
   discounts: "بحث عن الفئات أو العروض...",
   profile: "البحث في الملف الشخصي...",
+  reviews: "البحث عن التقييمات...",
 }
 
 interface SearchResult {
-  type: "order" | "service" | "category"
+  type: "order" | "service" | "category" | "review"
   label: string
   sub: string
   page: Page
@@ -33,6 +34,7 @@ export default function TopBar({ page, setPage }: Props) {
     orders,
     services,
     categories,
+    reviews,
     showToast,
   } = useProvider()
 
@@ -92,6 +94,17 @@ export default function TopBar({ page, setPage }: Props) {
       }
     })
 
+    reviews.forEach((r) => {
+      if (r.customerName.toLowerCase().includes(q) || r.comment.toLowerCase().includes(q)) {
+        results.push({
+          type: "review",
+          label: r.customerName,
+          sub: `${r.rating} ⭐ • ${r.date}`,
+          page: "reviews",
+        })
+      }
+    })
+
     return results.slice(0, 8)
   }
 
@@ -107,6 +120,7 @@ export default function TopBar({ page, setPage }: Props) {
     order: "local_laundry_service",
     service: "dry_cleaning",
     category: "category",
+    review: "star"
   }
 
   return (

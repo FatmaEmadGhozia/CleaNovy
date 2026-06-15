@@ -11,6 +11,7 @@ const navItems: { id: Page; label: string; icon: string }[] = [
   { id: "orders", label: "الطلبات", icon: "local_laundry_service" },
   { id: "services", label: "الخدمات", icon: "list_alt" },
   { id: "discounts", label: "الخصومات", icon: "payments" },
+  { id: "reviews", label: "التقييمات", icon: "star" },
 ];
 
 export default function Sidebar({ page, setPage }: Props) {

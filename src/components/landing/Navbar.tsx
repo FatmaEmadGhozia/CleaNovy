@@ -106,6 +106,9 @@ export default function Navbar() {
                 ? "bg-[#00C9B1] text-white border-[#00C9B1]"
                 : "text-[#00C9B1] border-[#00C9B1] hover:bg-[#00C9B1] hover:text-white"
             )}
+            aria-label="تحديد موقعي"
+            className="p-2.5 rounded-xl text-[#0D1F3C]/70 hover:text-[rgb(0,201,177)] hover:bg-[rgb(0,201,177)]/10 transition-all duration-200"
+            onClick={() => navigator.geolocation?.getCurrentPosition(() => { })}
           >
             <Navigation className="h-3.5 w-3.5" />
             استكشف المغاسل
