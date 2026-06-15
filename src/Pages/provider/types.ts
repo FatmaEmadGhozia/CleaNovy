@@ -1,5 +1,6 @@
 
-export type Page = "dashboard" | "orders" | "services" | "discounts" | "profile";
+
+export type Page = "dashboard" | "orders" | "services" | "discounts" | "profile" | "reviews";
 
 export type OrderStatus = "new" | "processing" | "ready" | "delivering" | "done" | "cancelled";
 
@@ -16,7 +17,12 @@ export interface OrderCategory {
   icon: string;
   color: string;
 }
-
+interface SearchResult {
+  type: "order" | "service" | "category" | "review"
+  label: string
+  sub: string
+  page: Page
+}
 export interface Service {
   id: string;
   categoryId: string;
@@ -101,7 +107,15 @@ export interface NewServiceForm {
   fastService: boolean;
   multiplier: string;
 }
-
+export interface Review {
+  id: string;
+  customerName: string;
+  orderId: string;
+  date: string;
+  rating: 1 | 2 | 3 | 4 | 5;
+  comment: string;
+  reply?: string;
+}
 export interface ToastMessage {
   message: string;
   type: "success" | "info" | "error";

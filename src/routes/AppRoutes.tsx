@@ -1,60 +1,159 @@
 
+// import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+
+// import ProtectedRoute from "./ProtectedRoute";
+// import ForgotPassword from "../Pages/Auth/ForgotPassword";
+// import ResetPassword from "../Pages/Auth/ResetPassword";
+// import LandingPage from "../components/landing/LandingPage";
+// import LoginPage from "../Pages/Auth/LoginPage";
+// import SignUpPage from "../Pages/Auth/SignUpPage";
+// import ProviderLayout from "../Pages/provider/ProviderLayout";
+// import AboutPage from "../Pages/AboutPage/AboutPage";
+// import ContactPage from "../Pages/ContactPage/ContactPage";
+// import Settingspage from "../Pages/Settingspage/Settingspage";
+// import { CleannovyPage } from "../Pages/CleannovyPage";
+// import { Layout } from "../modules/app/components/Layout";
+// import { Dashboard } from "../modules/app/pages/Dashboard";
+// import { UsersManagement } from "../modules/app/pages/UsersManagement";
+// import { ProvidersManagement } from "../modules/app/pages/ProvidersManagement";
+// import { OrdersManagement } from "../modules/app/pages/OrdersManagement";
+// import { ServicesCategories } from "../modules/app/pages/ServicesCategories";
+// import { ReviewsReports } from "../modules/app/pages/ReviewsReports";
+
+
+// import CartPage from "../Pages/orders/CartPage"
+// import SchedulePage from "../Pages/orders/SchedulePage"
+// import CheckoutPage from "../Pages/orders/CheckoutPage"
+// export default function AppRoutes() {
+//   return (
+//     <BrowserRouter>
+//       <Routes>
+//         {/*  Public Routes */}
+
+//         {/* orders routes */}
+
+//         <Route path="/cart" element={<CartPage />} />
+//         <Route path="/schedule" element={<SchedulePage />} />
+//         <Route path="/checkout" element={<CheckoutPage />} />
+
+//         {/* Public Routes */}
+//         <Route path="/" element={<LandingPage />} />
+//         <Route path="/about" element={<AboutPage />} />
+//         <Route path="/contact" element={<ContactPage />} />
+//         <Route path="/forgot-password" element={<ForgotPassword />} />
+//         <Route path="/reset-password" element={<ResetPassword />} />
+//         <Route path="/login" element={<LoginPage />} />
+//         <Route path="/signup" element={<SignUpPage />} />
+
+//         {/* Provider Routes */}
+//         <Route path="/provider/*" element={<ProviderLayout />} />
+//         <Route
+//           path="/provider"
+//           element={<Navigate to="/provider/dashboard" replace />}
+//         />
+//         <Route path="/cleannovy" element={<CleannovyPage/>} />
+//         <Route path="/provider" element={<ProviderLayout />} />
+//         {/* <Route path="/provider/*" element={<ProviderLayout />} /> */}
+//         <Route path="/provider" element={<Navigate to="/provider/dashboard" replace />} />
+
+
+
+//         < Route path="/provider/*" element={
+//              <ProtectedProviderRoute>
+//                <ProviderLayout />
+//              </ProtectedProviderRoute>
+//                  } />
+//         {/* Protected Routes */}
+//         <Route
+//           path="/settings"
+//           element={
+//             <ProtectedRoute>
+//               <Settingspage />
+//             </ProtectedRoute>
+//           }
+//         />
+//         <Route path="/" element={<Layout />}>
+//           <Route path="dashboard" element={<Dashboard />} />
+//           <Route path="users" element={<UsersManagement />} />
+//           <Route path="providers" element={<ProvidersManagement />} />
+//           <Route path="orders" element={<OrdersManagement />} />
+//           <Route path="services" element={<ServicesCategories />} />
+//           <Route path="reviews" element={<ReviewsReports />} />
+//         </Route>
+
+//         <Route path="*" element={<Navigate to="/" replace />} />
+//       </Routes>
+//     </BrowserRouter>
+//   )
+// }
+
+
+
+
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
 import ProtectedRoute from "./ProtectedRoute";
+// import ProtectedProviderRoute from "./ProtectedProviderRoute";
+import ProtectedProviderRoute from "./ProtectedProviderRoute";
+
 import ForgotPassword from "../Pages/Auth/ForgotPassword";
 import ResetPassword from "../Pages/Auth/ResetPassword";
 import LandingPage from "../components/landing/LandingPage";
 import LoginPage from "../Pages/Auth/LoginPage";
 import SignUpPage from "../Pages/Auth/SignUpPage";
-import ProviderLayout from "../Pages/provider/ProviderLayout";
 import AboutPage from "../Pages/AboutPage/AboutPage";
 import ContactPage from "../Pages/ContactPage/ContactPage";
 import Settingspage from "../Pages/Settingspage/Settingspage";
 import { CleannovyPage } from "../Pages/CleannovyPage";
-import { Layout } from "@/modules/app/components/Layout";
-import { Dashboard } from "@/modules/app/pages/Dashboard";
-import { UsersManagement } from "@/modules/app/pages/UsersManagement";
-import { ProvidersManagement } from "@/modules/app/pages/ProvidersManagement";
-import { OrdersManagement } from "@/modules/app/pages/OrdersManagement";
-import { ServicesCategories } from "@/modules/app/pages/ServicesCategories";
-import { ReviewsReports } from "@/modules/app/pages/ReviewsReports";
 
+import ProviderLayout from "../Pages/provider/ProviderLayout";
 
-import CartPage from "../Pages/orders/CartPage"
-import SchedulePage from "../Pages/orders/SchedulePage"
-import CheckoutPage from "../Pages/orders/CheckoutPage"
+import { Layout } from "../modules/app/components/Layout";
+import { Dashboard } from "../modules/app/pages/Dashboard";
+import { UsersManagement } from "../modules/app/pages/UsersManagement";
+import { ProvidersManagement } from "../modules/app/pages/ProvidersManagement";
+import { OrdersManagement } from "../modules/app/pages/OrdersManagement";
+import { ServicesCategories } from "../modules/app/pages/ServicesCategories";
+import { ReviewsReports } from "../modules/app/pages/ReviewsReports";
+
+import CartPage from "../Pages/orders/CartPage";
+import SchedulePage from "../Pages/orders/SchedulePage";
+import CheckoutPage from "../Pages/orders/CheckoutPage";
+
 export default function AppRoutes() {
   return (
     <BrowserRouter>
       <Routes>
-        {/*  Public Routes */}
-
-        {/* orders routes */}
-
-        <Route path="/cart" element={<CartPage />} />
-        <Route path="/schedule" element={<SchedulePage />} />
-        <Route path="/checkout" element={<CheckoutPage />} />
-
         {/* Public Routes */}
         <Route path="/" element={<LandingPage />} />
         <Route path="/about" element={<AboutPage />} />
         <Route path="/contact" element={<ContactPage />} />
+        <Route path="/cleannovy" element={<CleannovyPage />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignUpPage />} />
 
-        {/* Provider Routes */}
-        <Route path="/provider/*" element={<ProviderLayout />} />
+        {/* Orders Routes */}
+        <Route path="/cart" element={<CartPage />} />
+        <Route path="/schedule" element={<SchedulePage />} />
+        <Route path="/checkout" element={<CheckoutPage />} />
+
+        {/* Provider Routes (Protected) */}
         <Route
           path="/provider"
           element={<Navigate to="/provider/dashboard" replace />}
         />
-        <Route path="/cleannovy" element={<CleannovyPage/>} />
-        <Route path="/provider" element={<ProviderLayout />} />
+        <Route
+          path="/provider/*"
+          element={
+            <ProtectedProviderRoute>
+              <ProviderLayout />
+            </ProtectedProviderRoute>
+          }
+        />
 
-        {/* Protected Routes */}
+        {/* User Protected Routes */}
         <Route
           path="/settings"
           element={
@@ -63,6 +162,8 @@ export default function AppRoutes() {
             </ProtectedRoute>
           }
         />
+
+        {/* Admin Routes */}
         <Route path="/" element={<Layout />}>
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="users" element={<UsersManagement />} />
@@ -72,8 +173,9 @@ export default function AppRoutes() {
           <Route path="reviews" element={<ReviewsReports />} />
         </Route>
 
+        {/* Fallback */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
-  )
+  );
 }

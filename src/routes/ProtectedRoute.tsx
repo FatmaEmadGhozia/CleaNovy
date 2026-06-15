@@ -1,23 +1,35 @@
-import { Navigate } from "react-router-dom";
-import type { ReactNode } from "react";
-import { useAuth } from "@/context/AuthContext";
+// src/routes/ProtectedProviderRoute.tsx
+// import { Navigate } from "react-router-dom";
+// import { authService } from "../services/authService";
 
-interface ProtectedRouteProps {
-  children: ReactNode;
+// interface Props {
+//   children: React.ReactNode;
+// }
+
+// export default function ProtectedProviderRoute({ children }: Props) {
+//   if (!authService.isLoggedIn()) {
+//     return <Navigate to="/login" replace />;
+//   }
+
+//   if (!authService.isProvider()) {
+//     return <Navigate to="/" replace />;
+//   }
+
+//   return <>{children}</>;
+// }
+
+import { Navigate } from "react-router-dom"
+
+interface Props {
+  children: React.ReactNode
 }
 
-export default function ProtectedRoute({ children }: ProtectedRouteProps) {
-  const { user, isLoading } = useAuth();
+export default function ProtectedRoute({ children }: Props) {
+  const token = localStorage.getItem("token")
 
-  // لو لسه بيتحمل، مش هنعمل redirect
-  if (isLoading) {
-    return null;
+  if (!token) {
+    return <Navigate to="/login" replace />
   }
 
-  // لو مفيش user بعد ما خلص التحميل، روح للـ login
-  if (!user) {
-    return <Navigate to="/login" replace />;
-  }
-
-  return <>{children}</>;
+  return <>{children}</>
 }
