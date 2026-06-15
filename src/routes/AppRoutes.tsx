@@ -105,6 +105,19 @@ import AboutPage from "../Pages/AboutPage/AboutPage";
 import ContactPage from "../Pages/ContactPage/ContactPage";
 import Settingspage from "../Pages/Settingspage/Settingspage";
 import { CleannovyPage } from "../Pages/CleannovyPage";
+import { Layout } from "@/modules/app/components/Layout";
+import { Dashboard } from "@/modules/app/pages/Dashboard";
+import { UsersManagement } from "@/modules/app/pages/UsersManagement";
+import { ProvidersManagement } from "@/modules/app/pages/ProvidersManagement";
+import { OrdersManagement } from "@/modules/app/pages/OrdersManagement";
+import { ServicesCategories } from "@/modules/app/pages/ServicesCategories";
+import { ReviewsReports } from "@/modules/app/pages/ReviewsReports";
+
+
+import CartPage from "../Pages/orders/CartPage"
+import SchedulePage from "../Pages/orders/SchedulePage"
+import CheckoutPage from "../Pages/orders/CheckoutPage"
+import ShopPage from "../Pages/ShopPage/ShopPage"
 
 import ProviderLayout from "../Pages/provider/ProviderLayout";
 
@@ -124,6 +137,17 @@ export default function AppRoutes() {
   return (
     <BrowserRouter>
       <Routes>
+        {/*  Public Routes */}
+
+        {/* orders routes */}
+
+        <Route path="/cart" element={<CartPage />} />
+        <Route path="/schedule" element={<SchedulePage />} />
+        <Route path="/checkout" element={<CheckoutPage />} />
+
+        {/* Shop page (user flow) */}
+        <Route path="/laundry/:id" element={<ShopPage />} />
+
         {/* Public Routes */}
         <Route path="/" element={<LandingPage />} />
         <Route path="/about" element={<AboutPage />} />
