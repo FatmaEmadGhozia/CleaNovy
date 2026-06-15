@@ -5357,11 +5357,12 @@
 
  
 import { createContext, useContext, useState, useCallback, useEffect, useRef, type ReactNode } from "react";
- 
+import { useAuth } from "../../../context/AuthContext";
+
 const BASE_URL = "http://localhost:3000/api/v1";
  
 // ── Auth helper — attaches Bearer token to every request ─────────
-const getToken = () => localStorage.getItem("accessToken") || "";
+const getToken = () => localStorage.getItem("token") || localStorage.getItem("accessToken") || "";
 const authFetch = (url: string, options: RequestInit = {}) =>
   fetch(url, {
     ...options,
@@ -5594,7 +5595,20 @@ interface ProviderContextValue {
  
 const ProviderContext = createContext<ProviderContextValue | null>(null);
  
+function profileFromUser(user: Record<string, string> | null | undefined): Partial<ProviderProfile> {
+  if (!user) return {};
+  return {
+    name: user.fullName || user.name || "",
+    email: user.email || "",
+    phone: user.phone || "",
+    businessName: user.businessName || user.fullName || user.name || "",
+    businessAddress: user.address || user.businessAddress || "",
+    role: user.role === "laundry_owner" ? "صاحب مغسلة" : user.role || "",
+  };
+}
+
 export function ProviderProvider({ children }: { children: ReactNode }) {
+  const { user } = useAuth();
   const [categories, setCategories] = useState<ServiceCategory[]>([]);
   const [orderCategories, setOrderCategories] = useState(initialOrderCategories);
   const [services, setServices] = useState<Service[]>([]);
@@ -5605,7 +5619,10 @@ export function ProviderProvider({ children }: { children: ReactNode }) {
   const [discountTiers, setDiscountTiers] = useState<DiscountTier[]>([]);
   const [specialEntities, setSpecialEntities] = useState<SpecialEntity[]>([]);
   const [notifications, setNotifications] = useState(initialNotifications);
-  const [profile, setProfile] = useState(initialProfile);
+  const [profile, setProfile] = useState<ProviderProfile>(() => ({
+    ...initialProfile,
+    ...profileFromUser(user),
+  }));
   const [pickupEnabled, setPickupEnabled] = useState(true);
   const [laundryCapacity, setLaundryCapacity] = useState(75);
   const [addServiceOpen, setAddServiceOpen] = useState(false);
@@ -5621,6 +5638,11 @@ export function ProviderProvider({ children }: { children: ReactNode }) {
     const t = setTimeout(() => setToast(null), 3000);
     return () => clearTimeout(t);
   }, [toast]);
+
+  useEffect(() => {
+    if (!user) return;
+    setProfile((prev) => ({ ...prev, ...profileFromUser(user) }));
+  }, [user]);
  
   // ── Status mapping helpers ───────────────────────────────────
   const backendToFrontendStatus = (s: string): OrderStatus => {

@@ -27,7 +27,7 @@ export const authService = {
     const data = await res.json();
     if (data.status !== "success") throw new Error(data.message);
     // save tokens
-    localStorage.setItem("accessToken", data.data.accessToken);
+    localStorage.setItem("token", data.data.accessToken);
     localStorage.setItem("refreshToken", data.data.refreshToken);
     localStorage.setItem("user", JSON.stringify(data.data.user));
     return data;
@@ -42,7 +42,7 @@ export const authService = {
     });
     const data = await res.json();
     if (data.status !== "success") throw new Error(data.message);
-    localStorage.setItem("accessToken", data.data.accessToken);
+    localStorage.setItem("token", data.data.accessToken);
     localStorage.setItem("refreshToken", data.data.refreshToken);
     localStorage.setItem("user", JSON.stringify(data.data.user));
     return data;
@@ -50,6 +50,7 @@ export const authService = {
 
   // Logout
   logout() {
+    localStorage.removeItem("token");
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
     localStorage.removeItem("user");
@@ -63,7 +64,7 @@ export const authService = {
 
   // Check if logged in
   isLoggedIn(): boolean {
-    return !!localStorage.getItem("accessToken");
+    return !!(localStorage.getItem("token") || localStorage.getItem("accessToken"));
   },
 
   // Check if provider

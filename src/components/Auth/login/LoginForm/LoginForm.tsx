@@ -64,7 +64,19 @@ const EyeClosedIcon = () => (
   </svg>
 );
 
-const LoginForm = ({ role: _role }: LoginFormProps) => {
+const ROLE_TO_BACKEND: Record<Role, string> = {
+  admin: "admin",
+  laundry: "laundry_owner",
+  client: "client",
+};
+
+const ROLE_LABELS: Record<string, string> = {
+  admin: "مدير",
+  laundry_owner: "صاحب مغسلة",
+  client: "عميل",
+};
+
+const LoginForm = ({ role }: LoginFormProps) => {
   const { login } = useAuth();
   const navigate = useNavigate();
 
@@ -120,14 +132,23 @@ const LoginForm = ({ role: _role }: LoginFormProps) => {
       const data = await response.json();
 
       if (response.ok) {
+        const userRole = data.data.user.role;
+        const expectedRole = ROLE_TO_BACKEND[role];
+
+        if (userRole !== expectedRole) {
+          setServerError(
+            `هذا الحساب مسجل كـ ${ROLE_LABELS[userRole] ?? userRole}، وليس كـ ${ROLE_LABELS[expectedRole] ?? expectedRole}`
+          );
+          return;
+        }
+
         localStorage.setItem("token", data.data.accessToken);
         localStorage.setItem("refreshToken", data.data.refreshToken);
         localStorage.setItem("user", JSON.stringify(data.data.user));
         login(data.data.user);
 
-        const userRole = data.data.user.role;
         if (userRole === "laundry_owner") {
-          navigate("/provider");
+          navigate("/provider/dashboard");
         } else if (userRole === "admin") {
           navigate("/dashboard");
         } else {
