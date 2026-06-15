@@ -5,9 +5,8 @@ import "./shopStyles.css";
 import ShopBanner      from "./components/ShopBanner";
 import ShopToolbar     from "./components/ShopToolbar";
 import ShopServiceRow  from "./components/ShopServiceRow";
-import ShopCartSidebar from "./components/ShopCartSidebar";
+import ShopCartSidebar, { DeliveryType } from "./components/ShopCartSidebar";
 import ShopReviews     from "./components/ShopReviews";
-import ShopOrderModal  from "./components/ShopOrderModal";
 
 import { ShopApi, ShopInfo, ShopService, ShopReview, CartTotals } from "./shopApi";
 
@@ -17,24 +16,24 @@ export default function ShopPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
-  const [shop, setShop]       = useState<ShopInfo | null>(null);
+  const [shop,     setShop]     = useState<ShopInfo | null>(null);
   const [services, setServices] = useState<ShopService[]>([]);
-  const [reviews, setReviews]   = useState<ShopReview[]>([]);
-  const [loading, setLoading]   = useState(true);
-  const [error, setError]       = useState<string | null>(null);
+  const [reviews,  setReviews]  = useState<ShopReview[]>([]);
+  const [loading,  setLoading]  = useState(true);
+  const [error,    setError]    = useState<string | null>(null);
 
-  const [activeTab, setActiveTab]           = useState("services");
+  const [activeTab,      setActiveTab]      = useState("services");
   const [activeCategory, setActiveCategory] = useState(CATEGORIES_ALL);
-  const [cart, setCart]                     = useState<Record<string, number>>({});
-  const [fastMap, setFastMap]               = useState<Record<string, boolean>>({});
-  const [modalOpen, setModalOpen]           = useState(false);
-  const [toast, setToast]                   = useState<string | null>(null);
-  const [cartTotals, setCartTotals]         = useState<CartTotals | null>(null);
+  const [cart,           setCart]           = useState<Record<string, number>>({});
+  const [fastMap,        setFastMap]        = useState<Record<string, boolean>>({});
+  const [toast,          setToast]          = useState<string | null>(null);
+  const [cartTotals,     setCartTotals]     = useState<CartTotals | null>(null);
+  const [deliveryType,    setDeliveryType]    = useState<DeliveryType>("pickup");
+  const [deliveryAddress, setDeliveryAddress] = useState("");
 
-  // Load shop data on mount
+  // Load shop data
   useEffect(() => {
     if (!id) { navigate("/"); return; }
-
     (async () => {
       setLoading(true);
       setError(null);
@@ -55,18 +54,17 @@ export default function ShopPage() {
     })();
   }, [id, navigate]);
 
-  // Recalculate cart totals when cart or fastMap changes
+  const DELIVERY_FEE = 30;
+
+  // Recalculate cart totals (include delivery fee when delivery type is selected)
   useEffect(() => {
     const items = Object.entries(cart)
       .filter(([, q]) => q > 0)
       .map(([serviceId, quantity]) => ({ serviceId, quantity, fast: !!fastMap[serviceId] }));
-
     if (!items.length) { setCartTotals(null); return; }
-
-    ShopApi.calculateCart(items).then((totals) => {
-      if (totals) setCartTotals(totals);
-    });
-  }, [cart, fastMap]);
+    const fee = deliveryType === "delivery" ? DELIVERY_FEE : 0;
+    ShopApi.calculateCart(items, fee).then((totals) => { if (totals) setCartTotals(totals); });
+  }, [cart, fastMap, deliveryType]);
 
   const categories = services.length
     ? [CATEGORIES_ALL, ...Array.from(new Set(services.map((s) => s.category || "عام")))]
@@ -77,16 +75,16 @@ export default function ShopPage() {
       ? services
       : services.filter((s) => (s.category || "عام") === activeCategory);
 
-  const incQty = useCallback((id: string) => {
-    setCart((prev) => ({ ...prev, [id]: (prev[id] || 0) + 1 }));
+  const incQty = useCallback((svcId: string) => {
+    setCart((prev) => ({ ...prev, [svcId]: (prev[svcId] || 0) + 1 }));
   }, []);
 
-  const decQty = useCallback((id: string) => {
+  const decQty = useCallback((svcId: string) => {
     setCart((prev) => {
       const next = { ...prev };
-      if (!next[id]) return prev;
-      next[id]--;
-      if (!next[id]) delete next[id];
+      if (!next[svcId]) return prev;
+      next[svcId]--;
+      if (!next[svcId]) delete next[svcId];
       return next;
     });
   }, []);
@@ -100,26 +98,41 @@ export default function ShopPage() {
     setTimeout(() => setToast(null), 3000);
   };
 
-  const handleOrder = async ({ name, phone, address }: { name: string; phone: string; address: string }) => {
-    const items = Object.entries(cart)
-      .filter(([, q]) => q > 0)
-      .map(([serviceId, quantity]) => ({ serviceId, quantity, fast: !!fastMap[serviceId] }));
+  // Navigate to schedule → checkout with full cart state
+  const handleGoToCheckout = () => {
+    const cartEntries = Object.entries(cart).filter(([, q]) => q > 0);
+    if (!cartEntries.length || !shop) return;
 
-    const result = await ShopApi.placeOrder({
-      shopId: shop!._id,
-      customerName: name,
-      phone,
-      address,
-      items,
+    const checkoutCart = cartEntries.map(([svcId, qty]) => {
+      const svc = services.find((s) => String(s._id) === svcId)!;
+      const isFast = !!fastMap[svcId];
+      const mult = isFast && svc.fast_service ? (svc.fast_multiplier || 1) : 1;
+      return {
+        service: {
+          id:       String(svc._id),
+          name:     svc.name,
+          subtitle: isFast ? "خدمة سريعة" : (svc.category || "خدمة عادية"),
+          price:    Math.round(svc.price * mult),
+          icon:     "🧺",
+        },
+        quantity: qty,
+      };
     });
 
-    setModalOpen(false);
-    if (result?.success !== false) {
-      setCart({}); setFastMap({}); setCartTotals(null);
-      showToast("✓ تم تأكيد طلبك بنجاح!");
-    } else {
-      showToast("⚠ " + (result.message || "حدث خطأ، حاول مرة أخرى"));
-    }
+    const apiItems = cartEntries.map(([serviceId, quantity]) => ({
+      serviceId,
+      quantity,
+      fast: !!fastMap[serviceId],
+    }));
+
+    const subtotal      = cartTotals?.subtotal    ?? checkoutCart.reduce((s, i) => s + i.service.price * i.quantity, 0);
+    const totalDisc     = cartTotals?.discount    ?? 0;
+    const shippingPrice = cartTotals?.deliveryFee ?? 0;
+    const total         = cartTotals?.total       ?? subtotal;
+
+    navigate("/schedule", {
+      state: { cart: checkoutCart, apiItems, shopId: shop._id, subtotal, totalDisc, total, shippingPrice, deliveryType, deliveryAddress },
+    });
   };
 
   const handleAddReview = async (payload: { rating: number; comment: string }) => {
@@ -137,10 +150,10 @@ export default function ShopPage() {
   if (error || !shop) {
     return (
       <div className="nv-page">
-        <div className="nv-loading" style={{ color: "var(--nv-muted)" }}>
+        <div className="nv-loading">
           {error || "المغسلة غير موجودة"}
           <br />
-          <button onClick={() => navigate("/")} style={{ marginTop: 16, padding: "8px 20px", background: "var(--nv-navy)", color: "#fff", border: "none", borderRadius: 8, cursor: "pointer", fontFamily: "inherit" }}>
+          <button type="button" className="nv-error-back-btn" onClick={() => navigate("/")}>
             العودة للرئيسية
           </button>
         </div>
@@ -156,6 +169,7 @@ export default function ShopPage() {
       <main className="nv-main">
         <div>
           <div className="nv-panel">
+
             {/* Tabs */}
             <div className="nv-main-tabs">
               {[
@@ -165,6 +179,7 @@ export default function ShopPage() {
               ].map((t) => (
                 <button
                   key={t.key}
+                  type="button"
                   className={`nv-main-tab${activeTab === t.key ? " active" : ""}`}
                   onClick={() => setActiveTab(t.key)}
                 >
@@ -180,6 +195,7 @@ export default function ShopPage() {
                   {categories.map((cat) => (
                     <button
                       key={cat}
+                      type="button"
                       className={`nv-cat-tab${activeCategory === cat ? " active" : ""}`}
                       onClick={() => setActiveCategory(cat)}
                     >
@@ -236,10 +252,10 @@ export default function ShopPage() {
                     .filter((i) => i.val)
                     .map((item) => (
                       <div key={item.label} className="nv-about-item">
-                        <span style={{ fontSize: 22, color: "var(--nv-gold)" }}>{item.icon}</span>
+                        <span className="nv-about-icon">{item.icon}</span>
                         <div>
                           <div className="nv-meta-label">{item.label}</div>
-                          <div className="nv-meta-val" style={{ justifyContent: "flex-start" }}>{item.val}</div>
+                          <div className="nv-meta-val nv-meta-val-start">{item.val}</div>
                         </div>
                       </div>
                     ))}
@@ -259,19 +275,13 @@ export default function ShopPage() {
           fastMap={fastMap}
           services={services}
           cartTotals={cartTotals}
-          onOrder={() => setModalOpen(true)}
+          deliveryType={deliveryType}
+          deliveryAddress={deliveryAddress}
+          onDeliveryTypeChange={setDeliveryType}
+          onDeliveryAddressChange={setDeliveryAddress}
+          onOrder={handleGoToCheckout}
         />
       </main>
-
-      <ShopOrderModal
-        open={modalOpen}
-        onClose={() => setModalOpen(false)}
-        cart={cart}
-        fastMap={fastMap}
-        services={services}
-        cartTotals={cartTotals}
-        onConfirm={handleOrder}
-      />
 
       {toast && <div className="nv-toast">{toast}</div>}
     </div>

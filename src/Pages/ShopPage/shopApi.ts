@@ -97,8 +97,8 @@ export const ShopApi = {
 
   async placeOrder(payload: {
     shopId: string;
-    customerName: string;
-    phone: string;
+    customerName?: string;
+    phone?: string;
     address?: string;
     notes?: string;
     paymentMethod?: string;

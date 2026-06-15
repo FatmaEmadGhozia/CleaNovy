@@ -1,15 +1,26 @@
 import { ShopService, CartTotals } from "../shopApi";
 import { H } from "../shopHelpers";
 
+export type DeliveryType = "pickup" | "delivery";
+
 interface Props {
   cart: Record<string, number>;
   fastMap: Record<string, boolean>;
   services: ShopService[];
   cartTotals: CartTotals | null;
+  deliveryType: DeliveryType;
+  deliveryAddress: string;
+  onDeliveryTypeChange: (t: DeliveryType) => void;
+  onDeliveryAddressChange: (v: string) => void;
   onOrder: () => void;
 }
 
-export default function ShopCartSidebar({ cart, fastMap, services, cartTotals, onOrder }: Props) {
+export default function ShopCartSidebar({
+  cart, fastMap, services, cartTotals,
+  deliveryType, deliveryAddress,
+  onDeliveryTypeChange, onDeliveryAddressChange,
+  onOrder,
+}: Props) {
   const cartItems = Object.entries(cart)
     .filter(([, q]) => q > 0)
     .map(([id, qty]) => {
@@ -21,18 +32,18 @@ export default function ShopCartSidebar({ cart, fastMap, services, cartTotals, o
     })
     .filter(Boolean) as { svc: ShopService; qty: number; isF: boolean; lineTotal: number }[];
 
-  const totalQty   = cartTotals?.totalQty  ?? cartItems.reduce((a, i) => a + i.qty, 0);
-  const subtotal   = cartTotals?.subtotal  ?? cartItems.reduce((a, i) => a + i.lineTotal, 0);
-  const discount   = cartTotals?.discount  ?? 0;
-  const vat        = cartTotals?.vat       ?? 0;
-  const total      = cartTotals?.total     ?? subtotal;
+  const totalQty    = cartTotals?.totalQty  ?? cartItems.reduce((a, i) => a + i.qty, 0);
+  const subtotal    = cartTotals?.subtotal  ?? cartItems.reduce((a, i) => a + i.lineTotal, 0);
+  const discount    = cartTotals?.discount  ?? 0;
+  const vat         = cartTotals?.vat       ?? 0;
+  const total       = cartTotals?.total     ?? subtotal;
   const deliveryFee = cartTotals?.deliveryFee ?? 0;
 
   const progressPct = Math.min(100, (totalQty / 10) * 100);
   let discountLabel = "أضف ٥ قطع للحصول على خصم ١٠٪";
-  if (totalQty >= 10) discountLabel = "حصلت على خصم ٢٠٪!";
+  if (totalQty >= 10)     discountLabel = "حصلت على خصم ٢٠٪!";
   else if (totalQty >= 5) discountLabel = `باقي ${H.toAr(10 - totalQty)} قطع لخصم ٢٠٪`;
-  else if (totalQty > 0) discountLabel = `باقي ${H.toAr(5 - totalQty)} قطع لخصم ١٠٪`;
+  else if (totalQty > 0)  discountLabel = `باقي ${H.toAr(5 - totalQty)} قطع لخصم ١٠٪`;
 
   const isEmpty = cartItems.length === 0;
 
@@ -41,11 +52,44 @@ export default function ShopCartSidebar({ cart, fastMap, services, cartTotals, o
       <div className="nv-side-title">
         ملخص الطلب{" "}
         {totalQty > 0 && (
-          <span style={{ fontWeight: 400, fontSize: 13, color: "var(--nv-muted)" }}>
-            ({H.toAr(totalQty)} قطع)
-          </span>
+          <span className="nv-side-title-qty">({H.toAr(totalQty)} قطع)</span>
         )}
       </div>
+
+      {/* Delivery / Pickup toggle */}
+      <div className="nv-delivery-toggle">
+        <button
+          type="button"
+          className={`nv-delivery-btn${deliveryType === "pickup" ? " active" : ""}`}
+          onClick={() => onDeliveryTypeChange("pickup")}
+        >
+          🏪 استلام من المغسلة
+        </button>
+        <button
+          type="button"
+          className={`nv-delivery-btn${deliveryType === "delivery" ? " active" : ""}`}
+          onClick={() => onDeliveryTypeChange("delivery")}
+        >
+          🚚 توصيل للمنزل
+        </button>
+      </div>
+
+      {/* Address field — only shown when delivery is selected */}
+      {deliveryType === "delivery" && (
+        <div className="nv-address-wrap">
+          <label className="nv-address-label" htmlFor="nv-address-input">
+            📍 عنوان التوصيل <span className="nv-required">*</span>
+          </label>
+          <textarea
+            id="nv-address-input"
+            className="nv-address-input"
+            placeholder="اكتب العنوان بالتفصيل: الشارع، الحي، رقم المبنى..."
+            value={deliveryAddress}
+            onChange={(e) => onDeliveryAddressChange(e.target.value)}
+            rows={3}
+          />
+        </div>
+      )}
 
       <div className="nv-cart-items">
         {isEmpty ? (
@@ -86,7 +130,7 @@ export default function ShopCartSidebar({ cart, fastMap, services, cartTotals, o
       <div className="nv-totals-box">
         <div className="nv-tot-row"><span>المجموع الفرعي</span><span>{H.fmtPrice(subtotal)}</span></div>
         {discount > 0 && (
-          <div className="nv-tot-row" style={{ color: "var(--nv-green)" }}>
+          <div className="nv-tot-row nv-discount-row">
             <span>الخصم ({cartTotals?.discountRate ? Math.round(cartTotals.discountRate * 100) + "٪" : ""})</span>
             <span>- {H.fmtPrice(discount)}</span>
           </div>
@@ -94,18 +138,29 @@ export default function ShopCartSidebar({ cart, fastMap, services, cartTotals, o
         {vat > 0 && (
           <div className="nv-tot-row"><span>الضريبة</span><span>{H.fmtPrice(vat)}</span></div>
         )}
-        <div className="nv-tot-row">
-          <span>التوصيل</span>
-          <span className={deliveryFee === 0 ? "nv-free" : ""}>{deliveryFee === 0 ? "مجاني" : H.fmtPrice(deliveryFee)}</span>
-        </div>
+        {deliveryType === "delivery" && (
+          <div className="nv-tot-row">
+            <span>التوصيل</span>
+            <span className={deliveryFee === 0 ? "nv-free" : ""}>{deliveryFee === 0 ? "مجاني" : H.fmtPrice(deliveryFee)}</span>
+          </div>
+        )}
         <div className="nv-tot-row nv-grand-row">
           <span>الإجمالي</span><span>{H.fmtPrice(total)}</span>
         </div>
       </div>
 
-      <button className="nv-btn-order" disabled={isEmpty} onClick={onOrder}>
+      <button
+        type="button"
+        className="nv-btn-order"
+        disabled={isEmpty || (deliveryType === "delivery" && !deliveryAddress.trim())}
+        onClick={onOrder}
+      >
         🛒 المتابعة لإتمام الطلب
       </button>
+
+      {deliveryType === "delivery" && !deliveryAddress.trim() && !isEmpty && (
+        <p className="nv-address-hint">يرجى إدخال عنوان التوصيل للمتابعة</p>
+      )}
     </aside>
   );
 }

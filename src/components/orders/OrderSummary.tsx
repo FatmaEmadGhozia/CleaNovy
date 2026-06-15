@@ -1,17 +1,18 @@
 // components/OrderSummary.tsx
 
 interface Props {
-  totalQty:    number;
-  subtotal:    number;
+  totalQty:     number;
+  subtotal:     number;
   shippingPrice: number;
-  totalDisc:   number;
-  total:       number;
-  loading:     boolean;
-  onConfirm:   () => void;
+  totalDisc:    number;
+  total:        number;
+  loading:      boolean;
+  deliveryType?: "pickup" | "delivery";
+  onConfirm:    () => void;
 }
 
 export default function OrderSummary({
-  totalQty, subtotal, shippingPrice, totalDisc, total, loading, onConfirm,
+  totalQty, subtotal, shippingPrice, totalDisc, total, loading, deliveryType = "pickup", onConfirm,
 }: Props) {
   const discPct = totalDisc > 0 ? Math.round((totalDisc / subtotal) * 100) : 0;
 
@@ -28,10 +29,12 @@ export default function OrderSummary({
             <span>إجمالي المنتجات ({totalQty})</span>
             <span>{subtotal} ج.م</span>
           </div>
-          <div className="flex justify-between text-gray-500">
-            <span>رسوم التوصيل</span>
-            <span>{shippingPrice} ج.م</span>
-          </div>
+          {deliveryType === "delivery" && (
+            <div className="flex justify-between text-gray-500">
+              <span>رسوم التوصيل</span>
+              <span className={shippingPrice === 0 ? "text-[#0F6E56] font-semibold" : ""}>{shippingPrice === 0 ? "مجاني" : `${shippingPrice} ج.م`}</span>
+            </div>
+          )}
           {totalDisc > 0 && (
             <div className="flex justify-between text-[#0F6E56] font-semibold">
               <span>خصم الحجم ({discPct}%)</span>

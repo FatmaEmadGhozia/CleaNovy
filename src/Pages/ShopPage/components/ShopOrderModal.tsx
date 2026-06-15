@@ -38,9 +38,12 @@ export default function ShopOrderModal({ open, onClose, cart, fastMap, services,
   const handleConfirm = async () => {
     if (!name.trim() || !phone.trim()) return;
     setSubmitting(true);
-    await onConfirm({ name, phone, address });
-    setSubmitting(false);
-    setName(""); setPhone(""); setAddress("");
+    try {
+      await onConfirm({ name, phone, address });
+      setName(""); setPhone(""); setAddress("");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (

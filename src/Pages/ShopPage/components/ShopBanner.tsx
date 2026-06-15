@@ -1,6 +1,8 @@
+import { useNavigate } from "react-router-dom";
 import { ShopInfo } from "../shopApi";
 
 export default function ShopBanner({ shop }: { shop: ShopInfo }) {
+  const navigate = useNavigate();
   const bannerStyle = shop.images?.[0]
     ? {
         backgroundImage: `linear-gradient(135deg,rgba(13,31,60,.6),rgba(26,47,82,.6)),url('${shop.images[0]}')`,
@@ -12,6 +14,9 @@ export default function ShopBanner({ shop }: { shop: ShopInfo }) {
   return (
     <section className="nv-banner" style={bannerStyle}>
       <div className="nv-banner-bg" />
+      <button type="button" className="nv-back-btn" onClick={() => navigate(-1)}>
+        &#8594; رجوع
+      </button>
       <div className="nv-banner-content">
         <div className="nv-banner-text">
           <h1>{shop.name}</h1>
