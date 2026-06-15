@@ -1,4 +1,4 @@
-import { ShopInfo } from "../shopApi";
+import type { ShopInfo } from "../shopApi"
 
 export default function ShopToolbar({ shop }: { shop: ShopInfo }) {
   return (
@@ -6,7 +6,11 @@ export default function ShopToolbar({ shop }: { shop: ShopInfo }) {
       <div className="nv-toolbar-inner">
         <div className="nv-toolbar-left">
           {shop.phone && (
-            <a href={`tel:${shop.phone}`} className="nv-call-btn" style={{ textDecoration: "none" }}>
+            <a
+              href={`tel:${shop.phone}`}
+              className="nv-call-btn"
+              style={{ textDecoration: "none" }}
+            >
               📞 اتصل بنا
             </a>
           )}
@@ -38,5 +42,5 @@ export default function ShopToolbar({ shop }: { shop: ShopInfo }) {
         </div>
       </div>
     </div>
-  );
+  )
 }

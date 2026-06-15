@@ -1,4 +1,4 @@
-import { ShopService } from "../shopApi";
+import type { ShopService } from "../shopApi";
 import { H } from "../shopHelpers";
 
 interface Props {
