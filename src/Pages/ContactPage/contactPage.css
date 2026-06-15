@@ -1,0 +1,5 @@
+.cp-page     { font-family: 'Tajawal', sans-serif; }
+.cp-submit   { background-color: #00C9B1; }
+.cp-submit:hover { background-color: #00b39d; }
+.cp-icon-bg  { background-color: rgba(0, 201, 177, 0.12); }
+.cp-feat-bg  { background-color: rgba(0, 201, 177, 0.10); }

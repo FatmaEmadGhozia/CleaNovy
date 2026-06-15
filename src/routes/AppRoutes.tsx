@@ -24,6 +24,8 @@ import { ReviewsReports } from "@/modules/app/pages/ReviewsReports";
 import CartPage from "../Pages/orders/CartPage"
 import SchedulePage from "../Pages/orders/SchedulePage"
 import CheckoutPage from "../Pages/orders/CheckoutPage"
+import ShopPage from "../Pages/ShopPage/ShopPage"
+
 export default function AppRoutes() {
   return (
     <BrowserRouter>
@@ -35,6 +37,9 @@ export default function AppRoutes() {
         <Route path="/cart" element={<CartPage />} />
         <Route path="/schedule" element={<SchedulePage />} />
         <Route path="/checkout" element={<CheckoutPage />} />
+
+        {/* Shop page (user flow) */}
+        <Route path="/laundry/:id" element={<ShopPage />} />
 
         {/* Public Routes */}
         <Route path="/" element={<LandingPage />} />

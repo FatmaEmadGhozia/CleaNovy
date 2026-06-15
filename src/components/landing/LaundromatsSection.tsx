@@ -1,5 +1,6 @@
 import { Star, MapPin, Truck, Clock, ArrowLeft, Heart } from "lucide-react";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const featuredLaundries = [
   {
@@ -39,6 +40,7 @@ const featuredLaundries = [
 
 export default function Gallery() {
   const [liked, setLiked] = useState<string[]>([]);
+  const navigate = useNavigate();
 
   const toggleLike = (id: string) => {
     setLiked((prev) => prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]);
@@ -56,6 +58,8 @@ export default function Gallery() {
             </h2>
           </div>
           <button
+            type="button"
+            onClick={() => navigate("/cleannovy")}
             className="flex items-center gap-2 text-sm font-semibold px-5 py-2.5 rounded-2xl border transition-all duration-200 hover:bg-[#00C9B1] hover:text-white hover:border-[#00C9B1]"
             style={{ color: "#00C9B1", borderColor: "#00C9B1" }}
           >
@@ -147,6 +151,8 @@ export default function Gallery() {
                     <span className="text-xs">توصيل متاح</span>
                   </div>
                   <button
+                    type="button"
+                    onClick={() => navigate("/cleannovy")}
                     className="text-xs font-semibold px-4 py-2 rounded-xl transition-all duration-200 hover:bg-[#00C9B1] hover:text-white"
                     style={{ color: "#00C9B1", backgroundColor: "#00C9B110" }}
                   >

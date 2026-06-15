@@ -1,0 +1,131 @@
+/* ── Shared admin-palette tokens ─────────────────────────────────────────── */
+.lc-card {
+  --lc-navy:   #0D1F3C;
+  --lc-teal:   #00C9B1;
+  --lc-teal-h: #00b39d;
+  --lc-bg:     #F4F6F9;
+  --lc-border: #e8eaed;
+  --lc-muted:  #777779;
+  --lc-gold:   #F4C542;
+  --lc-white:  #fff;
+  --lc-sh:     0 2px 12px rgba(0,0,0,.07);
+  font-family: 'Tajawal', sans-serif;
+  direction: rtl;
+}
+
+/* ── LaundryCard (list view) ─────────────────────────────────────────────── */
+.lc-card {
+  display: flex;
+  background: var(--lc-white);
+  border-radius: 12px;
+  border: 1px solid var(--lc-border);
+  overflow: hidden;
+  transition: box-shadow 0.3s, transform 0.2s;
+  box-shadow: var(--lc-sh);
+}
+.lc-card:hover {
+  box-shadow: 0 6px 20px rgba(13,31,60,.12);
+  transform: translateY(-1px);
+}
+
+.lc-card-img { width: 120px; flex-shrink: 0; position: relative; overflow: hidden; }
+.lc-card-img img { width: 100%; height: 100%; object-fit: cover; }
+
+.lc-tag {
+  position: absolute; top: 7px; right: 7px;
+  background: var(--lc-gold); color: var(--lc-navy);
+  font-size: 9px; font-weight: 700;
+  padding: 2px 6px; border-radius: 20px;
+}
+
+.lc-card-body {
+  flex: 1; padding: 10px 12px;
+  display: flex; flex-direction: column; justify-content: space-between;
+}
+
+.lc-card-header { display: flex; justify-content: space-between; align-items: flex-start; }
+.lc-rating-badge {
+  display: flex; align-items: center; gap: 3px;
+  background: var(--lc-bg); border-radius: 7px; padding: 2px 6px;
+}
+.lc-rating-val { font-size: 11px; font-weight: 700; color: var(--lc-navy); }
+.lc-shop-name  { font-weight: 700; font-size: 13.5px; color: var(--lc-navy); }
+
+.lc-meta { display: flex; align-items: center; gap: 10px; margin-top: 4px; font-size: 11px; color: var(--lc-muted); }
+.lc-meta-item { display: flex; align-items: center; gap: 3px; }
+
+.lc-services { display: flex; gap: 4px; margin-top: 7px; flex-wrap: wrap; }
+.lc-svc-icon {
+  width: 28px; height: 28px;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(0,201,177,.15);
+  border: 1px solid rgba(0,201,177,.35);
+  border-radius: 7px; color: var(--lc-teal);
+  font-size: 14px;
+}
+.lc-svc-icon-sm {
+  width: 26px; height: 26px;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(0,201,177,.15);
+  border: 1px solid rgba(0,201,177,.35);
+  border-radius: 6px; color: var(--lc-teal);
+  font-size: 13px;
+}
+
+.lc-card-footer {
+  display: flex; justify-content: space-between; align-items: center; margin-top: 7px;
+}
+.lc-delivery-badge {
+  display: flex; align-items: center; gap: 4px;
+  font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 20px;
+  border: 1px solid rgba(0,201,177,.35);
+  color: var(--lc-teal);
+  background: rgba(0,201,177,.10);
+}
+.lc-delivery-badge-sm { font-size: 9.5px; padding: 3px 7px; }
+
+.lc-btn-order {
+  background: var(--lc-teal); color: var(--lc-white);
+  border: none; border-radius: 8px;
+  padding: 5px 14px;
+  font-family: 'Tajawal', sans-serif; font-weight: 700; font-size: 11px;
+  cursor: pointer; white-space: nowrap; transition: background 0.2s;
+}
+.lc-btn-order:hover { background: var(--lc-teal-h); }
+.lc-btn-order-sm { padding: 5px 12px; font-size: 10.5px; }
+
+/* ── GridCard ────────────────────────────────────────────────────────────── */
+.lc-grid-card {
+  background: var(--lc-white);
+  border-radius: 12px;
+  border: 1px solid var(--lc-border);
+  overflow: hidden;
+  display: flex; flex-direction: column;
+  transition: box-shadow 0.3s, transform 0.2s;
+  box-shadow: var(--lc-sh);
+  font-family: 'Tajawal', sans-serif;
+  direction: rtl;
+}
+.lc-grid-card:hover {
+  box-shadow: 0 8px 24px rgba(13,31,60,.12);
+  transform: translateY(-2px);
+}
+
+.lc-grid-img { width: 100%; height: 140px; position: relative; overflow: hidden; }
+.lc-grid-img img { width: 100%; height: 100%; object-fit: cover; }
+.lc-tag-grid {
+  position: absolute; top: 8px; right: 8px;
+  background: var(--lc-gold); color: var(--lc-navy);
+  font-size: 9px; font-weight: 700; padding: 2px 7px; border-radius: 20px;
+}
+
+.lc-grid-body { padding: 12px; display: flex; flex-direction: column; gap: 7px; flex: 1; }
+.lc-grid-header { display: flex; justify-content: space-between; align-items: flex-start; }
+.lc-grid-name { font-weight: 700; font-size: 13px; color: var(--lc-navy); line-height: 1.3; text-align: right; }
+.lc-grid-meta { display: flex; align-items: center; gap: 8px; font-size: 10.5px; color: var(--lc-muted); }
+
+.lc-grid-footer {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-top: auto; padding-top: 8px;
+  border-top: 1px solid var(--lc-bg);
+}

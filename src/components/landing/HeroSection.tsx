@@ -1,12 +1,14 @@
 
 import { useState, useEffect } from "react";
 import { Navigation, Truck, Star } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 
 export default function Hero() {
   const [query, setQuery] = useState("");
   const [focused, setFocused] = useState(false);
   const [visible, setVisible] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const t = setTimeout(() => setVisible(true), 100);
@@ -14,9 +16,7 @@ export default function Hero() {
   }, []);
 
   const handleSearch = () => {
-    if (query.trim()) {
-      document.getElementById("gallery")?.scrollIntoView({ behavior: "smooth" });
-    }
+    navigate("/cleannovy");
   };
 
   return (
