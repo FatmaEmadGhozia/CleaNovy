@@ -9,13 +9,8 @@ import ShopCartSidebar from "./components/ShopCartSidebar"
 import type { DeliveryType } from "./components/ShopCartSidebar"
 import ShopReviews from "./components/ShopReviews"
 
-import type {
-  ShopApi,
-  ShopInfo,
-  ShopService,
-  ShopReview,
-  CartTotals,
-} from "./shopApi"
+import { ShopApi } from "./shopApi"
+import type { ShopInfo, ShopService, ShopReview, CartTotals } from "./shopApi"
 
 const CATEGORIES_ALL = "الكل"
 

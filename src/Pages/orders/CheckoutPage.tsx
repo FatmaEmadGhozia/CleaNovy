@@ -61,6 +61,7 @@ export default function CheckoutPage() {
     }
     if (!shopId)         { setError("بيانات الطلب ناقصة، ارجع واختار المغسلة"); return; }
     if (!apiItems.length){ setError("السلة فاضية"); return; }
+    if (!pickupTime)     { setError("موعد الاستلام مطلوب، ارجع لاختيار الميعاد"); return; }
 
     setShowModal(true);
   };
@@ -71,16 +72,20 @@ export default function CheckoutPage() {
     setLoading(true);
     try {
       const result = await ShopApi.placeOrder({
-        shopId,
-        items:         apiItems,
-        paymentMethod: payMethod === "vodafone_cash" ? "wallet" : payMethod,
-        deliveryFee:   deliveryType === "delivery" ? shippingPrice : 0,
+        provider:      shopId,
+        items:         apiItems.map((i: any) => ({ provider_service_id: i.serviceId, quantity: i.quantity })),
+        pickup_time:   pickupTime,
+        delivery_time: deliveryTime || undefined,
+        payment_method: payMethod,
+        delivery_type: deliveryType as "pickup" | "delivery",
         address:       deliveryType === "delivery" ? deliveryAddress : undefined,
+        shipping_price: deliveryType === "delivery" ? shippingPrice : 0,
         notes:         deliveryType === "delivery" ? "توصيل للمنزل" : "استلام من المغسلة",
       });
 
-      if (result?.success === false) {
-        throw new Error(result.message || "حدث خطأ في تأكيد الطلب");
+      if (!result?.success) {
+        const msg = result?.message || (result as any)?.message || "حدث خطأ في تأكيد الطلب";
+        throw new Error(msg);
       }
 
       setSuccess(true);

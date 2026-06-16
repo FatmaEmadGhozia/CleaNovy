@@ -1,35 +1,16 @@
-// src/routes/ProtectedProviderRoute.tsx
-// import { Navigate } from "react-router-dom";
-// import { authService } from "../services/authService";
-
-// interface Props {
-//   children: React.ReactNode;
-// }
-
-// export default function ProtectedProviderRoute({ children }: Props) {
-//   if (!authService.isLoggedIn()) {
-//     return <Navigate to="/login" replace />;
-//   }
-
-//   if (!authService.isProvider()) {
-//     return <Navigate to="/" replace />;
-//   }
-
-//   return <>{children}</>;
-// }
-
-import { Navigate } from "react-router-dom"
+import { Navigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 interface Props {
-  children: React.ReactNode
+  children: React.ReactNode;
 }
 
 export default function ProtectedRoute({ children }: Props) {
-  const token = localStorage.getItem("token")
+  const { user } = useAuth();
 
-  if (!token) {
-    return <Navigate to="/login" replace />
+  if (!user) {
+    return <Navigate to="/login" replace />;
   }
 
-  return <>{children}</>
+  return <>{children}</>;
 }

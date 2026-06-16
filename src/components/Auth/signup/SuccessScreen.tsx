@@ -58,6 +58,22 @@ export default function SuccessScreen({ name, onReset }: SuccessScreenProps): Re
         </p>
       </div>
 
+      <a
+        href="/login"
+        style={{
+          display: "inline-block", marginTop: 4, padding: "11px 32px",
+          background: "linear-gradient(135deg, #2563eb, #14b8a6)",
+          color: "#fff", border: "none", borderRadius: 12,
+          fontWeight: 700, fontSize: 14, cursor: "pointer",
+          fontFamily: "'Cairo', sans-serif", textDecoration: "none",
+          transition: "opacity .18s",
+        }}
+        onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.opacity = "0.88"; }}
+        onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.opacity = "1"; }}
+      >
+        تسجيل الدخول
+      </a>
+
       <button
         onClick={onReset}
         style={{

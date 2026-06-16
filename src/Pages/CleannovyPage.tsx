@@ -9,6 +9,7 @@ import { useShops } from '@/hooks/useShops';
 
 
 import { useState, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Sidebar from '../components/LOCATION/Sidebar';
 import LaundryCard from '../components/LOCATION/LaundryCard';
 import GridCard from '../components/LOCATION/GridCard';
@@ -29,6 +30,7 @@ interface Location {
 }
 
 export function CleannovyPage() {
+  const navigate = useNavigate();
   const [view, setView] = useState<string>('map');
   const [sort, setSort] = useState<string>('rating');
   const [location, setLocation] = useState<Location>({ lat: 30.0626, lng: 31.2497, name: 'القاهرة' });
@@ -64,6 +66,35 @@ export function CleannovyPage() {
       overflow: 'hidden',
     }}>
       {/* <Navbar /> */}
+
+      {/* Back navigation header */}
+      <div style={{
+        background: '#fff',
+        borderBottom: '1px solid #e8eaed',
+        padding: '8px 18px',
+        display: 'flex',
+        alignItems: 'center',
+        flexShrink: 0,
+      }}>
+        <button
+          type="button"
+          onClick={() => navigate(-1)}
+          style={{
+            display: 'flex', alignItems: 'center', gap: 6,
+            background: 'none', border: 'none', cursor: 'pointer',
+            color: '#0D1F3C', fontSize: 14,
+            fontFamily: "'Tajawal', sans-serif", fontWeight: 600,
+            padding: '4px 10px', borderRadius: 8, transition: 'color 0.2s',
+          }}
+          onMouseEnter={(e) => { e.currentTarget.style.color = '#00C9B1'; }}
+          onMouseLeave={(e) => { e.currentTarget.style.color = '#0D1F3C'; }}
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+            <path d="M19 12H5M5 12l7 7M5 12l7-7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+          رجوع
+        </button>
+      </div>
 
       {usingMock && (
         <div style={{

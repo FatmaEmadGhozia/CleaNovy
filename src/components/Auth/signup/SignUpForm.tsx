@@ -191,7 +191,7 @@ export default function SignUpForm(): React.ReactElement {
     setServerError("");
 
     try {
-      const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+      const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
       const roleMap: Record<AccountType, string> = {
         customer: "client",
         owner: "laundry_owner",

@@ -401,26 +401,10 @@ export function ProviderProvider({ children }: { children: ReactNode }) {
   }, []);
  
   useEffect(() => {
-    // initial fetch
     fetchDashboard();
- 
-    // SSE for real-time updates
-    const es = new EventSource(`${BASE_URL}/provider/dashboard/live`);
-    es.onmessage = (e) => {
-      try {
-        const data = JSON.parse(e.data);
-        setDashboardStats(data);
-      } catch (err) {
-        console.error("SSE parse error", err);
-      }
-    };
-    es.onerror = () => {
-      console.warn("SSE connection error — falling back to polling");
-      es.close();
-    };
- 
-    return () => es.close(); // cleanup on unmount
-  }, []);
+    const interval = setInterval(fetchDashboard, 30000);
+    return () => clearInterval(interval);
+  }, [fetchDashboard]);
  
   // ── Fetch discount tiers ─────────────────────────────────────
   const fetchDiscountTiers = useCallback(async () => {

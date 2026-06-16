@@ -1,7 +1,7 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, Outlet } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 import ProtectedRoute from "./ProtectedRoute";
-// import ProtectedProviderRoute from "./ProtectedProviderRoute";
 import ProtectedProviderRoute from "./ProtectedProviderRoute";
 
 import ForgotPassword from "../pages/Auth/ForgotPassword";
@@ -21,49 +21,78 @@ import { OrdersManagement } from "@/modules/app/pages/OrdersManagement";
 import { ServicesCategories } from "@/modules/app/pages/ServicesCategories";
 import { ReviewsReports } from "@/modules/app/pages/ReviewsReports";
 
-
-import CartPage from "../pages/orders/CartPage"
-import SchedulePage from "../pages/orders/SchedulePage"
-import CheckoutPage from "../pages/orders/CheckoutPage"
-import ShopPage from "../pages/ShopPage/ShopPage"
+import CartPage from "../pages/orders/CartPage";
+import SchedulePage from "../pages/orders/SchedulePage";
+import CheckoutPage from "../pages/orders/CheckoutPage";
+import ShopPage from "../pages/ShopPage/ShopPage";
 
 import ProviderLayout from "../pages/provider/ProviderLayout";
+
+// Redirects based on auth state — default entry point
+function SmartHome() {
+  const { user } = useAuth();
+  if (!user) return <Navigate to="/login" replace />;
+  if (user.role === "laundry_owner" || user.role === "provider")
+    return <Navigate to="/provider/dashboard" replace />;
+  if (user.role === "admin")
+    return <Navigate to="/dashboard" replace />;
+  return <LandingPage />;
+}
+
+// Guards admin routes — non-admin users are bounced out
+function AdminOnly() {
+  const { user } = useAuth();
+  if (!user) return <Navigate to="/login" replace />;
+  if (user.role !== "admin") return <Navigate to="/home" replace />;
+  return <Outlet />;
+}
+
+// Prevents already-logged-in users from seeing the login page
+function GuestOnly({ children }: { children: React.ReactNode }) {
+  const { user } = useAuth();
+  if (!user) return <>{children}</>;
+  if (user.role === "laundry_owner" || user.role === "provider")
+    return <Navigate to="/provider/dashboard" replace />;
+  if (user.role === "admin")
+    return <Navigate to="/dashboard" replace />;
+  return <Navigate to="/home" replace />;
+}
 
 export default function AppRoutes() {
   return (
     <BrowserRouter>
       <Routes>
-        {/*  Public Routes */}
+        {/* Smart root — redirects based on auth */}
+        <Route path="/" element={<SmartHome />} />
 
-        {/* orders routes */}
+        {/* Landing page (for logged-in clients) */}
+        <Route path="/home" element={<LandingPage />} />
 
-        <Route path="/cart" element={<CartPage />} />
-        <Route path="/schedule" element={<SchedulePage />} />
-        <Route path="/checkout" element={<CheckoutPage />} />
+        {/* Auth pages — guests only */}
+        <Route path="/login"  element={<GuestOnly><LoginPage /></GuestOnly>} />
+        <Route path="/signup" element={<GuestOnly><SignUpPage /></GuestOnly>} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password"  element={<ResetPassword />} />
 
-        {/* Shop page (user flow) */}
+        {/* Public pages */}
+        <Route path="/about"     element={<AboutPage />} />
+        <Route path="/contact"   element={<ContactPage />} />
+        <Route path="/cleannovy" element={<CleannovyPage />} />
         <Route path="/laundry/:id" element={<ShopPage />} />
 
-        {/* Public Routes */}
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/about" element={<AboutPage />} />
-        <Route path="/contact" element={<ContactPage />} />
-        <Route path="/cleannovy" element={<CleannovyPage />} />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/reset-password" element={<ResetPassword />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/signup" element={<SignUpPage />} />
+        {/* Order flow — requires login */}
+        <Route path="/cart"     element={<ProtectedRoute><CartPage /></ProtectedRoute>} />
+        <Route path="/schedule" element={<ProtectedRoute><SchedulePage /></ProtectedRoute>} />
+        <Route path="/checkout" element={<ProtectedRoute><CheckoutPage /></ProtectedRoute>} />
 
-        {/* Orders Routes */}
-        <Route path="/cart" element={<CartPage />} />
-        <Route path="/schedule" element={<SchedulePage />} />
-        <Route path="/checkout" element={<CheckoutPage />} />
-
-        {/* Provider Routes (Protected) */}
+        {/* User protected */}
         <Route
-          path="/provider"
-          element={<Navigate to="/provider/dashboard" replace />}
+          path="/settings"
+          element={<ProtectedRoute><Settingspage /></ProtectedRoute>}
         />
+
+        {/* Provider routes (protected) */}
+        <Route path="/provider" element={<Navigate to="/provider/dashboard" replace />} />
         <Route
           path="/provider/*"
           element={
@@ -73,24 +102,16 @@ export default function AppRoutes() {
           }
         />
 
-        {/* User Protected Routes */}
-        <Route
-          path="/settings"
-          element={
-            <ProtectedRoute>
-              <Settingspage />
-            </ProtectedRoute>
-          }
-        />
-
-        {/* Admin Routes */}
-        <Route path="/" element={<Layout />}>
-          <Route path="dashboard" element={<Dashboard />} />
-          <Route path="users" element={<UsersManagement />} />
-          <Route path="providers" element={<ProvidersManagement />} />
-          <Route path="orders" element={<OrdersManagement />} />
-          <Route path="services" element={<ServicesCategories />} />
-          <Route path="reviews" element={<ReviewsReports />} />
+        {/* Admin routes — protected: admin only */}
+        <Route element={<AdminOnly />}>
+          <Route path="/" element={<Layout />}>
+            <Route path="dashboard"  element={<Dashboard />} />
+            <Route path="users"      element={<UsersManagement />} />
+            <Route path="providers"  element={<ProvidersManagement />} />
+            <Route path="orders"     element={<OrdersManagement />} />
+            <Route path="services"   element={<ServicesCategories />} />
+            <Route path="reviews"    element={<ReviewsReports />} />
+          </Route>
         </Route>
 
         {/* Fallback */}

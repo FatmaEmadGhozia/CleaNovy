@@ -81,7 +81,7 @@ export function ReviewsReports() {
         setReviews(
           json.data.reviews.map((r: any): Review => ({
             id:       String(r.id),
-            customer: r.client   || "مجهول",
+            customer: r.client || "مجهول",
             avatar:   r.avatar   || null,
             provider: r.provider || "—",
             rating:   r.rating,

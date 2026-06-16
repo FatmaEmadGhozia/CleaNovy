@@ -1,12 +1,14 @@
-import { Outlet, NavLink } from "react-router";
+import { Outlet, NavLink, useNavigate } from "react-router";
 import {
   LayoutDashboard,
   Users,
   Store,
   ClipboardList,
   Star,
-  Droplet
+  Droplet,
+  LogOut,
 } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
 
 const navItems = [
   { path: "/dashboard", label: "لوحة التحكم", icon: LayoutDashboard, exact: true },
@@ -17,6 +19,14 @@ const navItems = [
 ];
 
 export function Layout() {
+  const { logout } = useAuth();
+  const navigate = useNavigate();
+
+  function handleLogout() {
+    logout();
+    navigate("/login", { replace: true });
+  }
+
   return (
     <div className="flex h-screen bg-[#F4F6F9]" dir="rtl">
       {/* Main Content */}
@@ -25,6 +35,15 @@ export function Layout() {
         <header className="bg-white shadow-sm h-16 flex items-center justify-between px-8 sticky top-0 z-10">
           <h2 className="text-xl text-[#0D1F3C]">لوحة الإدارة</h2>
           <div className="flex items-center gap-4">
+            <button
+              type="button"
+              onClick={handleLogout}
+              title="تسجيل الخروج"
+              className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-[#0D1F3C] hover:bg-red-50 hover:text-red-600 transition-colors"
+            >
+              <LogOut className="w-4 h-4" />
+              تسجيل الخروج
+            </button>
             <div className="w-10 h-10 rounded-full bg-[#00C9B1] flex items-center justify-center text-white">
               م
             </div>

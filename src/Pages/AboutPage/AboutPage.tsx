@@ -1,8 +1,10 @@
- import { Eye, Rocket, Leaf, Shield, Clock, Smartphone } from "lucide-react";
+import { Eye, Rocket, Leaf, Shield, Clock, Smartphone } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/landing/Navbar";
 import Footer from "@/components/landing/Footer";
 
 export default function AboutPage() {
+  const navigate = useNavigate();
   return (
     <div
       className="min-h-screen bg-white"
@@ -10,6 +12,27 @@ export default function AboutPage() {
       style={{ fontFamily: "Tajawal, sans-serif" }}
     >
       <Navbar />
+      {/* Back button */}
+      <div style={{ padding: "10px 24px", borderBottom: "1px solid #f1f5f9" }}>
+        <button
+          type="button"
+          onClick={() => navigate(-1)}
+          style={{
+            display: "inline-flex", alignItems: "center", gap: 6,
+            background: "none", border: "none", cursor: "pointer",
+            color: "#0D1F3C", fontSize: 14,
+            fontFamily: "Tajawal, sans-serif", fontWeight: 600,
+            padding: "4px 10px", borderRadius: 8, transition: "color 0.2s",
+          }}
+          onMouseEnter={(e) => { e.currentTarget.style.color = "#14b8a6"; }}
+          onMouseLeave={(e) => { e.currentTarget.style.color = "#0D1F3C"; }}
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+            <path d="M19 12H5M5 12l7 7M5 12l7-7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+          رجوع
+        </button>
+      </div>
       {/* Hero Section */}
       <section className="relative h-[340px] md:h-[420px] flex items-center justify-end overflow-hidden">
         {/* Background image */}

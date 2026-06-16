@@ -152,7 +152,7 @@ const LoginForm = ({ role }: LoginFormProps) => {
         } else if (userRole === "admin") {
           navigate("/dashboard");
         } else {
-          navigate("/");
+          navigate("/home");
         }
       } else {
         setServerError(data.message || "البريد الإلكتروني أو كلمة المرور غير صحيحة");
